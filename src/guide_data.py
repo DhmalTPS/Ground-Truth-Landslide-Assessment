@@ -98,7 +98,7 @@ HI = {
     
     "Classification after Hungr, Leroueil & Picarelli (2014).": "वर्गीकरण: हंगर, लेरुइल और पिकारेली (2014)।",
     "Landslide type": "भूस्खलन का प्रकार", "Landslide family": "भूस्खलन समूह",
-    "Confidence": "विश्वास", "How the sizes were measured": "आकार कैसे मापे गए", "Model": "मॉडल", "Model confidence": "मॉडल का विश्वास", "Most likely type": "सबसे संभावित प्रकार", "High": "उच्च", "Moderate": "मध्यम", "Low": "कम", "(family)": "(वर्ग)", "Confidence (family)": "विश्वास (समूह)", "All types": "सभी प्रकार", "Check on site": "स्थल पर जाँचें", "Safety": "सुरक्षा",
+    "Confidence": "विश्वास", "How the sizes were measured": "आकार कैसे मापे गए", "Decimal": "दशमलव", "Size class": "आकार वर्ग", "From the camera": "कैमरे से", "needs a compass bearing and a distance": "कम्पास दिशा और दूरी चाहिए", "Tap Add my location (needs https) or use a photo with GPS.": "मेरा स्थान जोड़ें दबाएँ (https चाहिए) या GPS वाली फ़ोटो लें।", "Model": "मॉडल", "Model confidence": "मॉडल का विश्वास", "Most likely type": "सबसे संभावित प्रकार", "High": "उच्च", "Moderate": "मध्यम", "Low": "कम", "(family)": "(वर्ग)", "Confidence (family)": "विश्वास (समूह)", "All types": "सभी प्रकार", "Check on site": "स्थल पर जाँचें", "Safety": "सुरक्षा",
     "Photo check": "फ़ोटो जाँच", "Retake the photo": "फ़ोटो दोबारा लें", "Retake photo": "फ़ोटो दोबारा लें",
     "Estimated dimensions": "अनुमानित आयाम", "Analysing photo": "फ़ोटो का विश्लेषण", "Something went wrong": "कुछ गलत हुआ",
     "Check the connection to the laptop running the app, then try again.": "ऐप चला रहे लैपटॉप से कनेक्शन जाँचें, फिर दोबारा कोशिश करें।",

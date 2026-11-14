@@ -877,19 +877,23 @@ The 1-σ radius combines the GPS error, the bearing error and the distance error
 
 Example: GPS ±8 m, bearing ±10°, typed 100 m gives ±19.8 m, which the headless test reproduces.
 
-**Image report (one JPEG, 1,080 px wide).**
+**Image report (one JPEG, 1,600 px wide, landscape).**
 
-1. Header with the date and time, the shot and the set.
-2. The photo, with the measured outline when there is one, carrying a GPS-camera style stamp: a pin, the position in DMS ± error, decimal degrees, altitude, bearing with its cardinal direction, the time, and the estimated landslide position.
-3. Location panel: a map with OSM tiles at zoom 18 → 3, chosen so that d + σ fits in 40 % of the panel.
-   - Markers: blue camera dot with its GPS-error circle, a view cone of ±σ_θ, a dashed line along the bearing, and a red pin at the landslide with its σ circle.
-   - Map furniture: scale bar, north arrow and attribution.
-   - Beside the map: the coordinate table.
-4. Type with its top-3 probability bars and the field-answer posterior.
-5. Photo quality with its reasons.
-6. Sizes: every measure with its 90 % range, size class, slope, distance, grains, scale source and depth trust.
-7. Field answers, signs seen, weather and notes.
-8. Disclaimer, model name, WGS-84 and the map credit.
+The first version was a single 1,080 px column, about 1 : 2.5. That is awkward on a phone gallery, in a chat preview
+and in a printed annex, and its long phrases wrapped onto second lines. It is now a two-column sheet of about 8 : 7
+(1,600 × about 1,350 px for a full result).
+- **Header across the top:** the title on the left; the date and time, shot and set on the right.
+- **Left column (900 px):**
+  - the photo, with the measured outline when there is one, carrying a GPS-camera style stamp: a pin, the position in DMS ± error, decimal degrees, altitude, bearing with its cardinal direction, the time, and the estimated landslide position;
+  - below it, the size table: measure, value, 90 % range, plus size class, slope, distance and grains, then the scale source and the depth trust.
+- **Right column (588 px):**
+  - type, confidence and the top-3 probability bars;
+  - the field-answer result;
+  - the location map. It uses OSM tiles at zoom 18 → 3, chosen so that d + σ fits in 40 % of the panel. Markers: a blue camera dot with its GPS-error circle, a view cone of ±σ_θ, a dashed line along the bearing, and a red pin at the landslide with its σ circle. Map furniture: scale bar, north arrow and attribution;
+  - under the map, the coordinates as aligned key : value lines.
+- **Balancing:** photo quality and the field check (answers, signs seen, weather, notes) are placed in whichever column is shorter at that point, so the two columns end at nearly the same height.
+- **Footer across the bottom:** the disclaimer on one line; model, WGS-84 and the map credit on the next.
+- **One line per phrase:** nothing is wrapped. A phrase that does not fit shrinks, down to 72 % of its size. Only if it still does not fit does it end in "…". The web page report keeps the full text, for example long notes.
 
 The JPEG also carries EXIF written by the phone, so gallery apps and GIS place the file on a map:
 
@@ -922,7 +926,7 @@ report" and is covered by the OSM tile policy, with low-volume, user-initiated u
 - DMS formatting.
 - Destination point: 100 m at 45° comes back as 100.00 m at 45.00°.
 - σ formula; no location gives no marker; no bearing gives no landslide position.
-- A 1,080 × 2,532 JPEG with all sections. Its EXIF GPS reads back to 1e-6° with the app's own reader, altitude, bearing and error included, and PIL decodes the file and the GPS IFD independently.
+- A 1,600 × 1,356 JPEG with all sections (was 1,080 × 2,532 as one column). Its EXIF GPS reads back to 1e-6° with the app's own reader, altitude, bearing and error included, and PIL decodes the file and the GPS IFD independently.
 - Odd results, no photo and no location still produce both reports.
 - A late GPS fix is attached to the shown photo.
 - The image report is shown on the page and saved, and so is the page report.
@@ -1315,7 +1319,7 @@ kept within 85–95 %).
 | Compass | fresh ≤ 5 s at shutter; default σ 15°; horizontal component ≥ 0.2 | guide.py |
 | Landslide position error | σ_d typed 5 %, model depth 30 %; GPS default 10 m; Earth R 6,371,008.8 m | guide.py |
 | Late GPS fix attached | ≤ 3 min after the photo; silent refresh maximumAge 20 s | guide.py |
-| Image report | 1,080 px wide, photo ≤ 920 px high, JPEG q 0.9, map 470 × 350, zoom ≤ 18, tiles 5 s | guide.py |
+| Image report | 1,600 px wide, two columns 900 + 588 px, photo ≤ 640 px high, one line per phrase (shrink to 72 %, then …), JPEG q 0.9, map 588 × 329, zoom ≤ 18, tiles 5 s | guide.py |
 | UI tokens | spacing 4/8/12/16/24/32 px; tap ≥ 44–48 px; text ≥ 4.5 : 1 (AA); paper #e9ede6 / #0f1a1b, ink #15242a, hazard tape #ff6a1a, summit gauge 6 rings, DIN headings; accent #17695a light / #5fd1a8 dark | ui.py |
 
 ## Appendix B: file map
