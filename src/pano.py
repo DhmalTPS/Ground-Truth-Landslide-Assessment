@@ -369,6 +369,21 @@ async function f35Of(f){try{const b=new DataView(await f.slice(0,262144).arrayBu
    const ifd=(p,tag)=>{const n=u16(p);for(let i=0;i<n;i++){const e=p+2+i*12;if(u16(e)===tag)return e}return -1};
    const e0=ifd(t+u32(t+4),0x8769);if(e0<0)return null;const e1=ifd(t+u32(e0+8),0xA405);if(e1<0)return null;const v=u16(e1+8);return v>0?v:null}
   if((mk&0xFF00)!==0xFF00)break;o+=2+len}}catch(_){}return null}
+/* ---------- EXIF GPS of the original file (where the photo was taken): lat/lon, altitude, camera bearing, error ---------- */
+async function gpsOf(f){try{const b=new DataView(await f.slice(0,262144).arrayBuffer());if(b.getUint16(0)!==0xFFD8)return null;let o=2;
+ while(o+4<b.byteLength){const mk=b.getUint16(o),len=b.getUint16(o+2);
+  if(mk===0xFFE1&&b.getUint32(o+4)===0x45786966){const t=o+10,le=b.getUint16(t)===0x4949,u16=p=>b.getUint16(p,le),u32=p=>b.getUint32(p,le);
+   const ent=p=>{const n=u16(p),m={};for(let i=0;i<n;i++){const e=p+2+i*12;m[u16(e)]=e}return m};
+   const i0=ent(t+u32(t+4));if(!i0[0x8825])return null;const g=ent(t+u32(i0[0x8825]+8));
+   const rat=(e,k)=>{const p=t+u32(e+8)+8*k,d=u32(p+4);return d?u32(p)/d:NaN},dms=e=>rat(e,0)+rat(e,1)/60+rat(e,2)/3600,ch=e=>String.fromCharCode(b.getUint8(e+8));
+   if(!g[2]||!g[4])return null;let lat=dms(g[2]),lon=dms(g[4]);if(g[1]&&ch(g[1])==='S')lat=-lat;if(g[3]&&ch(g[3])==='W')lon=-lon;
+   if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180||(lat===0&&lon===0))return null;
+   const r={lat,lon,src:'photo'};
+   if(g[6]){const a=rat(g[6],0);if(isFinite(a))r.alt=g[5]&&b.getUint8(g[5]+8)===1?-a:a}
+   if(g[0x11]){const h=rat(g[0x11],0);if(isFinite(h))r.head=((h%360)+360)%360}
+   if(g[0x1F]){const a=rat(g[0x1F],0);if(isFinite(a)&&a>0)r.acc=a}
+   return r}
+  if((mk&0xFF00)!==0xFF00)break;o+=2+len}}catch(_){}return null}
 async function bitmapOf(f){try{return await createImageBitmap(f,{imageOrientation:'from-image'})}catch(_){return await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(f)})}}
 function thumbOf(src,max){const w0=src.videoWidth||src.width,h0=src.videoHeight||src.height,s=Math.min(1,max/Math.max(w0,h0)),c=document.createElement('canvas');
  c.width=Math.round(w0*s);c.height=Math.round(h0*s);c.getContext('2d').drawImage(src,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.7)}
@@ -602,7 +617,7 @@ function perPhoto(r,items,r0){const N=A.D.names,top=r.label,rows=[];
   ${r.set.stereo_points?`<p class="hungr" style="margin:4px 0 0">${esc(L('stereo_ok',{n:r.set.stereo_points,p:r.set.stereo_pairs||1}))}</p>`:(r.set.steps_given?`<p class="hungr" style="margin:4px 0 0">${esc(L('stereo_no'))}</p>`:'')}<div class="perset">${rows.map(x=>`<div><img src="${x.img||''}" alt=""><p><b>${esc(x.t)}</b><br><span class="${x.lab===top?'agree':'dis'}">${esc(N[x.lab]||x.lab)} ${pct(x.c)}%</span></p></div>`).join('')}</div></section>`;
  const anchor=g.out.querySelector('.card.result')||g.out.firstElementChild;if(anchor)anchor.insertAdjacentHTML('afterend',html)}
 
-A.f35Of=f35Of;   // also used by single photos (src/guide.py): the shrunk upload has no EXIF
+A.f35Of=f35Of;A.gpsOf=gpsOf;   // also used by single photos (src/guide.py): the shrunk upload has no EXIF
 A.pano={show(on){want=on;if(ready)apply()},init(){g=A._g;D=A.D;P=D.pano;esc=A.esc;lang=g.store.get('lang','en');S.kind=g.store.get('pkind','turn');S.auto=!!g.store.get('pauto',false);
   build();ready=true;apply();
   // ui.js treats any truthy return as handled: return false synchronously outside set mode (a Promise is truthy)

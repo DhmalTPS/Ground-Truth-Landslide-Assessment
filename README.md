@@ -138,7 +138,9 @@ It also adds:
 - a cut-off-edge warning and a mostly-sky check;
 - yes/no decision questions when the model is unsure;
 - a combined site result for surveys;
-- notes, GPS and saved or shared reports;
+- notes and saved or shared reports;
+- a GPS marker. The camera position comes from the photo's own GPS or the phone, and the compass bearing plus the distance give an estimated position of the landslide itself.
+- an image report: one JPEG with a location stamp on the photo, a map with markers and every metric, and GPS written into its EXIF so maps and GIS can place it (TECHNICAL_REPORT.md §10.3);
 - an offline queue, a practice quiz and Hindi.
 
 Details and tests are in `report.md` §5.1–5.2.

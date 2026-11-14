@@ -137,6 +137,7 @@ CSS = """
 .pace{margin-top:8px;font-size:.85rem;color:var(--ink-2)}.pace summary{cursor:pointer;color:var(--teal-600);font-weight:600}
 .pace .pr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .pace input{width:76px;padding:8px;border-radius:9px;border:1px solid var(--line);font:inherit;background:transparent;color:inherit}
+.locl{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);font-size:.9rem;line-height:1.45}.locl a{color:var(--teal-600);word-break:break-all}.locl small{opacity:.7}.lpin{flex:none;width:16px;height:16px;margin-top:2px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#d93a2b;box-shadow:inset 0 0 0 4px #fff,0 0 0 1px #d93a2b}
 .minibtn{border:1.5px solid rgba(31,122,104,.45);background:var(--surface);color:var(--teal-600);border-radius:10px;padding:8px 12px;font:650 .86rem inherit;cursor:pointer}
 .minibtn.pri{background:var(--g-ground);color:#fff;border-color:transparent}
 .fieldmsg{font-size:.8rem;color:var(--orange);margin-top:4px;min-height:1em}
@@ -384,7 +385,16 @@ function onOri(e){if(e.beta==null)return;const b=e.beta*Math.PI/180,g=(e.gamma||
  th=((screen.orientation&&screen.orientation.angle)??window.orientation??0)*Math.PI/180,ix=x*Math.cos(th)-y*Math.sin(th),iy=x*Math.sin(th)+y*Math.cos(th);
  ori={g:[ix,iy,z].map(v=>v.toFixed(3)).join(','),roll:Math.atan2(ix,iy)*180/Math.PI,elev:Math.atan2(-z,Math.hypot(ix,iy))*180/Math.PI}}
 let oriOn=false;async function listenOri(){if(oriOn)return;oriOn=true;try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)await DeviceOrientationEvent.requestPermission()}catch(_){}
- window.addEventListener('deviceorientation',onOri)}
+ window.addEventListener('deviceorientation',onOri);window.addEventListener('deviceorientation',onHead);window.addEventListener('deviceorientationabsolute',onHead)}
+/* compass bearing of the back camera (degrees from true/magnetic north, clockwise): iOS gives it directly; elsewhere it is
+   the -z device axis of R = Rz(alpha) Rx(beta) Ry(gamma) in the east-north-up frame, valid only for absolute alpha */
+let head=null;
+function onHead(e){let h=null,acc=null;
+ if(e.webkitCompassHeading!=null){h=e.webkitCompassHeading;acc=e.webkitCompassAccuracy}
+ else if((e.absolute||e.type==='deviceorientationabsolute')&&e.alpha!=null&&e.beta!=null){const r=Math.PI/180,ca=Math.cos(e.alpha*r),sa=Math.sin(e.alpha*r),sb=Math.sin(e.beta*r),cg=Math.cos((e.gamma||0)*r),sg=Math.sin((e.gamma||0)*r);
+  const vE=-ca*sg-sa*sb*cg,vN=-sa*sg+ca*sb*cg;if(Math.hypot(vE,vN)<.2)return;h=Math.atan2(vE,vN)/r}
+ if(h==null||!isFinite(h))return;head={deg:((h%360)+360)%360,acc:acc!=null&&acc>=0?acc:null,t:Date.now()}}
+A._head=onHead;A._headNow=()=>head;
 document.querySelectorAll('.btn').forEach(b=>b.addEventListener('click',listenOri,{once:true}));
 
 /* ---------- live viewfinder ---------- */
@@ -470,11 +480,23 @@ $('.pace').insertAdjacentHTML('afterend',`<details class="pace" id="obsbox"><sum
 const notes=$('#notes'),weather=$('#weather');notes.value=sess.get('notes')||'';weather.value=sess.get('weather')||'';
 notes.oninput=()=>sess.set('notes',notes.value);weather.onchange=()=>sess.set('weather',weather.value);
 let gps=null;try{gps=JSON.parse(sess.get('gps')||'null')}catch(_){}
-const showGps=()=>{$('#gpsout').textContent=gps?`Location: ${gps.lat.toFixed(5)}, ${gps.lon.toFixed(5)} (±${Math.round(gps.acc)} m)`:''};showGps();
-$('#gpsbtn').onclick=()=>{if(!navigator.geolocation||!window.isSecureContext){$('#gpsout').textContent='Location needs a secure address (start the app with --https). You can type it in the notes.';return}
- $('#gpsout').textContent='Finding your location…';navigator.geolocation.getCurrentPosition(p=>{gps={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,t:Date.now()};sess.set('gps',JSON.stringify(gps));showGps();buzz(20)},
-  e=>{$('#gpsout').textContent='Location not available ('+e.message+'). You can type it in the notes.'},{enableHighAccuracy:true,timeout:20000,maximumAge:60000})};
-const meta=()=>({t:Date.now(),notes:notes.value.trim(),weather:weather.value,gps,shot:curShot()?.t||'',shotId:curShot()?.id||'',mode,dist:lastDist});
+if(gps&&!(isFinite(gps.lat)&&isFinite(gps.lon)))gps=null;
+const showGps=()=>{$('#gpsout').textContent=gps?`Location: ${gps.lat.toFixed(5)}, ${gps.lon.toFixed(5)} (±${Math.round(gps.acc||0)} m)`:''};showGps();
+// a fix arriving shortly after a photo belongs to that photo: it is attached to its record and the report is refreshed
+function setGps(p){const c=p.coords;if(!isFinite(c.latitude)||!isFinite(c.longitude))return;
+ gps={lat:c.latitude,lon:c.longitude,acc:c.accuracy,alt:c.altitude??null,altAcc:c.altitudeAccuracy??null,t:Date.now()};sess.set('gps',JSON.stringify(gps));showGps();
+ if(curMeta&&Math.abs(gps.t-curMeta.t)<180000&&(!curMeta.gps||Math.abs(curMeta.gps.t-curMeta.t)>180000||curMeta.gps.acc>gps.acc)){curMeta.gps=gps;if(cur&&cur.__id)finish(cur)}
+ locLine()}
+function askGps(){if(!navigator.geolocation||!window.isSecureContext){$('#gpsout').textContent='Location needs a secure address (start the app with --https). You can type it in the notes.';toast(tr('Location needs a secure address (start the app with --https). You can type it in the notes.'));return}
+ $('#gpsout').textContent='Finding your location…';navigator.geolocation.getCurrentPosition(p=>{setGps(p);buzz(20)},
+  e=>{$('#gpsout').textContent='Location not available ('+e.message+'). You can type it in the notes.'},{enableHighAccuracy:true,timeout:20000,maximumAge:60000})}
+$('#gpsbtn').onclick=askGps;
+// once the user has allowed location, every camera photo gets a fresh fix without asking again
+async function freshGps(){if(!navigator.geolocation||!window.isSecureContext)return;
+ try{const s=navigator.permissions&&await navigator.permissions.query({name:'geolocation'});if(!s||s.state!=='granted')return}catch(_){return}
+ navigator.geolocation.getCurrentPosition(setGps,()=>{},{enableHighAccuracy:true,timeout:15000,maximumAge:20000})}
+let lastPGps=null,lastHead=null;
+const meta=()=>({t:Date.now(),notes:notes.value.trim(),weather:weather.value,gps,pgps:lastPGps,head:lastHead,shot:curShot()?.t||'',shotId:curShot()?.id||'',mode,dist:lastDist});
 
 /* ---------- what the guidance did (sent with the photo, logged for tools/guidance_report.py) ---------- */
 let gstate={flags:[],override:false,retakes:0,live:false};
@@ -489,7 +511,8 @@ let photoQ={level:0,issues:[]};
 let lastF35=null,lastBlob=null,lastTilt=null,lastSrc='cam',lastDist=null,xhr=null,job=null,cur=null,curMeta=null,curPhoto='';
 A.onPick=(f,fromCam)=>start(f,fromCam,fromCam?ori:null,false);
 async function start(file,fromCam,t,live){lastSrc=fromCam?'cam':'gal';gstate.live=!!live;gstate.override=false;step(2);
- lastF35=A.f35Of?await A.f35Of(file):null;
+ lastHead=fromCam&&head&&Date.now()-head.t<5000?{...head,src:'compass'}:null;if(fromCam)freshGps();
+ lastF35=A.f35Of?await A.f35Of(file):null;lastPGps=A.gpsOf?await A.gpsOf(file):null;
  const fig=$('#fig'),prev=$('#prev');prev.src=URL.createObjectURL(file);fig.style.display='block';A.setChip('','Checking photo…',true);
  fig.scrollIntoView({behavior:'smooth',block:'start'});
  let m=null;try{const bmp=await createImageBitmap(file,{imageOrientation:'from-image'});m=metrics(bmp);bmp.close&&bmp.close()}catch(_){}
@@ -588,7 +611,7 @@ function afterType(r,replay){step(3);const N=D.names,top=r.ranked[0][0],sec=r.ra
  if(r.status==='bad_photo'||r.status==='uncertain'||close)ask(r,replay);
  ticks(r);reportBar();
  if(!replay){buzz(r.status==='ok'?40:[40,80,40]);say(r.status==='bad_photo'?tr('Very poor photo. Best guess')+' '+tr(N[r.label])+'. '+tr('Please retake the photo.'):(r.status==='uncertain'?tr('Uncertain. Most likely')+' ':'')+tr(N[r.label])+', '+Math.round(r.confidence*100)+' %.')}}
-function afterDims(r,replay){const d=r.dimensions;if(!d)return;const c=findDims();if(c)c.id='dimcard';
+function afterDims(r,replay){const d=r.dimensions;if(!d)return;locLine();const c=findDims();if(c)c.id='dimcard';
  if(!d.available){if(r.status!=='bad_photo')addAct(esc(d.reason||'No size estimate for this photo.'),'','');return}
  const ce=d.cut_edges||[];if(ce.length)addAct(cutMsg(ce),'Retake','retake');
  if(!replay&&!lastDist&&!/object|person|car|calibrat/i.test(d.scale_source||''))addAct('Add the distance to the slope and re-measure: sizes get much tighter ranges.','Add distance','dist');
@@ -669,42 +692,238 @@ function siteCard(s){const N=D.names,t=s.type.ranked,d=s.dimensions,old=$('#site
  h+=`<div style="margin-top:12px"><button type="button" class="minibtn pri" data-a="sitereport">Save site report</button></div></section>`;
  const w=document.createElement('div');w.innerHTML=h;const c=w.firstElementChild,first=out.querySelector('.card.result');if(old)old.replaceWith(c);else if(first)first.after(c);else return;c.querySelector('[data-a]').onclick=siteReport}
 
-/* ---------- reports: a standalone HTML page (opens anywhere, prints to PDF) and a short shareable text ---------- */
-function reportBar(){const b=document.createElement('div');b.className='btns';b.id='repbar';b.style.marginTop='14px';
- b.innerHTML=`<button type="button" class="btn ghost" data-a="report">Save report</button><button type="button" class="btn ghost" data-a="share">Share</button>`;
- const m=out.querySelector('.meta');m?out.insertBefore(b,m):out.appendChild(b);
- b.onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='report')saveReport();if(a==='share')share()}}
+/* ---------- location: where the photo was taken and, with a compass bearing and a distance, where the landslide is ----------
+   camera = EXIF GPS of the original photo (exact place and time of the shot) or else the phone fix nearest the photo.
+   landslide = destination point on the sphere: camera + distance (typed, else the model's median depth of the outlined
+   area) along the camera bearing. 1-sigma radius = hypot(GPS error, distance x bearing error (compass +-15 deg unless the
+   phone reports it), distance error (typed 5 %, model depth 30 %)). */
+const R2D=180/Math.PI;
+function locOf(mt,r){mt=mt||{};const t0=mt.t||Date.now(),pg=mt.pgps,pp=mt.gps;let cam=null;
+ if(pg&&isFinite(pg.lat)&&isFinite(pg.lon))cam={lat:pg.lat,lon:pg.lon,acc:pg.acc||null,alt:isFinite(pg.alt)?pg.alt:null,src:'photo'};
+ else if(pp&&isFinite(pp.lat)&&isFinite(pp.lon))cam={lat:pp.lat,lon:pp.lon,acc:pp.acc||null,alt:isFinite(pp.alt)&&pp.alt!==null?pp.alt:null,src:'phone',age:Math.round(Math.abs(t0-(pp.t||t0))/60000)};
+ if(!cam)return null;
+ const hd=mt.head&&isFinite(mt.head.deg)?mt.head:pg&&isFinite(pg.head)?{deg:pg.head,acc:null,src:'photo'}:null;
+ const d=r&&r.dimensions,dist=mt.dist||(d&&d.available&&isFinite(d.distance_m)&&d.distance_m>0?d.distance_m:null);let tgt=null;
+ if(hd&&dist>0){const R=6371008.8,dl=dist/R,th=hd.deg/R2D,p1=cam.lat/R2D,l1=cam.lon/R2D;
+  const p2=Math.asin(Math.sin(p1)*Math.cos(dl)+Math.cos(p1)*Math.sin(dl)*Math.cos(th)),l2=l1+Math.atan2(Math.sin(th)*Math.sin(dl)*Math.cos(p1),Math.cos(dl)-Math.sin(p1)*Math.sin(p2));
+  const sh=(hd.acc>0?hd.acc:15)/R2D,sd=(mt.dist?.05:.3)*dist;
+  tgt={lat:p2*R2D,lon:((l2*R2D+540)%360)-180,acc:Math.hypot(cam.acc||10,dist*sh,sd),dist,typed:!!mt.dist}}
+ return {cam,head:hd,tgt}}
+const dmsOf=(v,p,n)=>{const T=Math.round(Math.abs(v)*36000),d=Math.floor(T/36000),m=Math.floor(T%36000/600),s=(T%600)/10;return `${d}°${String(m).padStart(2,'0')}'${s.toFixed(1).padStart(4,'0')}"${v<0?n:p}`};
+const cardOf=h=>['N','NE','E','SE','S','SW','W','NW'][Math.round(h/45)%8];
+const osm=p=>`https://www.openstreetmap.org/?mlat=${p.lat.toFixed(6)}&mlon=${p.lon.toFixed(6)}#map=17/${p.lat.toFixed(6)}/${p.lon.toFixed(6)}`;
+const ll=p=>`${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`,pm=a=>a?` ±${Math.round(a)} m`:'';
+function locHTML(L){if(!L)return '<p>No location recorded.</p>';const c=L.cam;
+ let h=`<table><tr><td>Camera position</td><td><a href="${osm(c)}">${ll(c)}</a>${pm(c.acc)}<br>${dmsOf(c.lat,'N','S')} ${dmsOf(c.lon,'E','W')}${c.alt!=null?` · ${Math.round(c.alt)} m altitude`:''}</td></tr>
+ <tr><td>Location source</td><td>${c.src==='photo'?'GPS stored in the photo':'Phone GPS'+(c.age>2?` (${c.age} min from the photo time)`:'')}</td></tr>`;
+ if(L.head)h+=`<tr><td>Camera facing</td><td>${Math.round(L.head.deg)}° ${cardOf(L.head.deg)}${L.head.acc?` (±${Math.round(L.head.acc)}°)`:''}</td></tr>`;
+ if(L.tgt)h+=`<tr><td>Landslide (estimated)</td><td><a href="${osm(L.tgt)}">${ll(L.tgt)}</a>${pm(L.tgt.acc)}<br>${Math.round(L.tgt.dist)} m along the camera bearing (${L.tgt.typed?'your distance':'model depth'})</td></tr>`;
+ return h+'</table>'}
+// in the result view: where this photo was taken, with a one-tap fix when there is none
+function locLine(){const el=$('#locline');if(!el)return;const L=cur?locOf(curMeta,cur):null;
+ if(!L){el.innerHTML=`<span class="lpin"></span><div><span>No location for this photo.</span> <button type="button" class="minibtn" data-a="gps">Add my location</button></div>`;el.querySelector('[data-a=gps]').onclick=askGps;return}
+ const c=L.cam;el.innerHTML=`<span class="lpin"></span><div><b>Location</b> <a href="${osm(c)}" target="_blank" rel="noopener">${ll(c)}</a>${pm(c.acc)} <small>(${c.src==='photo'?'photo GPS':'phone GPS'})</small>`+
+  (L.tgt?`<br><span>Landslide about</span> <a href="${osm(L.tgt)}" target="_blank" rel="noopener">${ll(L.tgt)}</a>${pm(L.tgt.acc)}`:'')+'</div>'}
+
+/* ---------- image report: the photo with a GPS stamp, a map panel with markers and every result, as one JPEG ---------- */
+const loadImg=(src,cors,ms=6000)=>new Promise(res=>{if(!src){res(null);return}const i=new Image();if(cors)i.crossOrigin='anonymous';const t=setTimeout(()=>res(null),ms);
+ i.onload=()=>{clearTimeout(t);res(i.naturalWidth?i:null)};i.onerror=()=>{clearTimeout(t);res(null)};i.src=src});
+async function blobImg(b){if(!b)return null;let u='';try{u=URL.createObjectURL(b)}catch(_){return null}const i=await loadImg(u);setTimeout(()=>URL.revokeObjectURL(u),2000);return i}
+function pin(x,px,py,s,col){x.save();x.translate(px,py);x.beginPath();x.moveTo(0,0);x.bezierCurveTo(-s*.15,-s*.35,-s*.55,-s*.55,-s*.55,-s);x.arc(0,-s,s*.55,Math.PI,0);
+ x.bezierCurveTo(s*.55,-s*.55,s*.15,-s*.35,0,0);x.closePath();x.fillStyle=col;x.fill();x.lineWidth=Math.max(2,s*.08);x.strokeStyle='#fff';x.stroke();x.beginPath();x.arc(0,-s,s*.2,0,7);x.fillStyle='#fff';x.fill();x.restore()}
+const wpx=(lat,lon,z)=>{const n=256*2**z,s=Math.min(.9999,Math.max(-.9999,Math.sin(lat/R2D)));return [(lon+180)/360*n,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]};
+// map panel: OSM tiles when online (all or none, 5 s each), else a plain grid; blue = camera (+ GPS error, view cone), red pin = landslide
+async function drawMap(x,X0,Y0,w,h,L,tiles){const c=L.cam,t=L.tgt,mpp=z=>156543.034*Math.cos(c.lat/R2D)/2**z,span=Math.max(t?t.dist+t.acc:0,c.acc||0,40);
+ let z=18;while(z>3&&span/mpp(z)>Math.min(w,h)*.4)z--;const m=mpp(z),pc=wpx(c.lat,c.lon,z),pt=t?wpx(t.lat,t.lon,z):pc,ox=(pc[0]+pt[0])/2-w/2,oy=(pc[1]+pt[1])/2-h/2,P=p=>[X0+p[0]-ox,Y0+p[1]-oy];
+ x.save();x.beginPath();x.rect(X0,Y0,w,h);x.clip();x.fillStyle='#e9efe9';x.fillRect(X0,Y0,w,h);let used=false;
+ if(tiles&&navigator.onLine!==false){const n=2**z,jobs=[];
+  for(let tx=Math.floor(ox/256);tx<=Math.floor((ox+w)/256);tx++)for(let ty=Math.floor(oy/256);ty<=Math.floor((oy+h)/256);ty++)if(ty>=0&&ty<n)
+   jobs.push(loadImg(`https://tile.openstreetmap.org/${z}/${((tx%n)+n)%n}/${ty}.png`,true,5000).then(i=>[i,tx,ty]));
+  const got=await Promise.all(jobs);if(got.length&&got.every(g=>g[0])){got.forEach(([i,tx,ty])=>x.drawImage(i,X0+tx*256-ox,Y0+ty*256-oy,256,256));used=true}}
+ if(!used){x.strokeStyle='rgba(31,122,104,.2)';x.lineWidth=1;const g=48;
+  for(let gx=X0+((-ox)%g+g)%g;gx<X0+w;gx+=g){x.beginPath();x.moveTo(gx,Y0);x.lineTo(gx,Y0+h);x.stroke()}
+  for(let gy=Y0+((-oy)%g+g)%g;gy<Y0+h;gy+=g){x.beginPath();x.moveTo(X0,gy);x.lineTo(X0+w,gy);x.stroke()}}
+ const [cx,cy]=P(pc);
+ if(c.acc){x.beginPath();x.arc(cx,cy,Math.max(4,c.acc/m),0,7);x.fillStyle='rgba(30,110,220,.15)';x.fill();x.strokeStyle='rgba(30,110,220,.6)';x.lineWidth=2;x.stroke()}
+ if(L.head){const a=(L.head.deg-90)/R2D,sp=((L.head.acc>0?L.head.acc:15))/R2D,len=t?Math.hypot(...P(pt).map((v,k)=>v-[cx,cy][k])):70;
+  x.beginPath();x.moveTo(cx,cy);x.arc(cx,cy,Math.max(40,len),a-sp,a+sp);x.closePath();x.fillStyle='rgba(30,110,220,.18)';x.fill()}
+ if(t){const [tx,ty]=P(pt);x.setLineDash([8,6]);x.beginPath();x.moveTo(cx,cy);x.lineTo(tx,ty);x.strokeStyle='#1e6edc';x.lineWidth=3;x.stroke();x.setLineDash([]);
+  x.beginPath();x.arc(tx,ty,Math.max(6,t.acc/m),0,7);x.fillStyle='rgba(217,58,43,.14)';x.fill();x.strokeStyle='rgba(217,58,43,.7)';x.lineWidth=2;x.stroke()}
+ x.beginPath();x.arc(cx,cy,10,0,7);x.fillStyle='#1e6edc';x.fill();x.lineWidth=4;x.strokeStyle='#fff';x.stroke();
+ const [px,py]=t?P(pt):[cx,cy];pin(x,px,py-(t?0:10),44,'#d93a2b');
+ // scale bar and north arrow
+ const nice=[5,10,20,50,100,200,500,1000,2000,5000,10000,20000,50000,1e5].filter(v=>v/m<w*.32).pop()||5,bl=nice/m;
+ x.fillStyle='rgba(255,255,255,.85)';x.fillRect(X0+10,Y0+h-40,bl+20,30);x.fillStyle='#13201c';x.fillRect(X0+20,Y0+h-18,bl,5);x.font='600 15px system-ui,sans-serif';
+ x.fillText(nice>=1000?nice/1000+' km':nice+' m',X0+20,Y0+h-24);
+ x.fillStyle='rgba(255,255,255,.85)';x.beginPath();x.arc(X0+w-28,Y0+30,20,0,7);x.fill();x.fillStyle='#13201c';x.beginPath();x.moveTo(X0+w-28,Y0+14);x.lineTo(X0+w-36,Y0+36);x.lineTo(X0+w-20,Y0+36);x.closePath();x.fill();
+ x.font='700 13px system-ui,sans-serif';x.fillText('N',X0+w-32,Y0+48);
+ if(used){x.font='12px system-ui,sans-serif';const s='© OpenStreetMap contributors',sw=x.measureText(s).width;x.fillStyle='rgba(255,255,255,.85)';x.fillRect(X0+w-sw-12,Y0+h-20,sw+12,20);x.fillStyle='#13201c';x.fillText(s,X0+w-sw-6,Y0+h-6)}
+ x.restore();x.strokeStyle='#c9d4cf';x.lineWidth=2;x.strokeRect(X0,Y0,w,h);return used}
+function wrapT(x,s,X,Y,maxW,lh){const words=String(s??'').split(/\s+/);let line='',y=Y;
+ for(const w of words){const t=line?line+' '+w:w;if(x.measureText(t).width>maxW&&line){x.fillText(line,X,y);y+=lh;line=w}else line=t}
+ if(line){x.fillText(line,X,y);y+=lh}return y}
+const STW={ok:'Confident',uncertain:'Uncertain',bad_photo:'Not reliable'};
+async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D.names,d=r.dimensions,L=locOf(mt,r),T=s=>tr(s),miss=[];
+ const cv=document.createElement('canvas');cv.width=W;cv.height=8000;const x=cv.getContext('2d');if(!x)throw new Error('no canvas');
+ const F=(sz,wt=400)=>`${wt} ${sz}px system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Nirmala UI",sans-serif`,ink='#13201c',ink2='#4d5c56',line='#d7e0dc';
+ x.fillStyle='#fff';x.fillRect(0,0,W,cv.height);
+ x.fillStyle='#13463b';x.fillRect(0,0,W,124);x.fillStyle='#fff';x.font=F(40,700);x.fillText(T('Landslide observation'),M,62);
+ x.font=F(24);x.fillStyle='#cfe5dd';x.fillText(new Date(mt.t||Date.now()).toLocaleString()+(mt.shot?' · '+T(mt.shot):'')+(mt.set?' · '+mt.set:''),M,102);
+ let y=152;
+ const sec=t=>{y+=14;x.fillStyle='#1f7a68';x.font=F(30,700);x.fillText(T(t),M,y+28);y+=42;x.fillStyle=line;x.fillRect(M,y,IW,2);y+=26};
+ const part=(name,f)=>{const y0=y;try{f()}catch(e){x.fillStyle='#fff';x.fillRect(0,y0,W,Math.max(0,y-y0)+80);y=y0;miss.push(name)}};
+ // 1 photo (with the measured outline when there is one) and the GPS stamp on it
+ const im=(d&&d.available&&d.overlay?await loadImg(d.overlay):null)||await blobImg(blob)||await loadImg(photo);
+ if(im){const s=Math.min(IW/im.naturalWidth,920/im.naturalHeight),w=Math.round(im.naturalWidth*s),h=Math.round(im.naturalHeight*s),X=M+Math.round((IW-w)/2);
+  x.drawImage(im,X,y,w,h);const sh=L?(L.tgt?118:86):54;x.fillStyle='rgba(0,0,0,.64)';x.fillRect(X,y+h-sh,w,sh);x.fillStyle='#fff';
+  if(L){const c=L.cam;pin(x,X+36,y+h-sh/2+20,34,'#d93a2b');x.font=F(25,700);
+   x.fillText(`${dmsOf(c.lat,'N','S')}  ${dmsOf(c.lon,'E','W')}${pm(c.acc)}`,X+70,y+h-sh+34);x.font=F(20);x.fillStyle='#e6efeb';
+   x.fillText(`${ll(c)}${c.alt!=null?' · '+Math.round(c.alt)+' m':''}${L.head?' · '+T('facing')+' '+Math.round(L.head.deg)+'° '+cardOf(L.head.deg):''} · ${new Date(mt.t||Date.now()).toLocaleString()}`,X+70,y+h-sh+64,w-90);
+   if(L.tgt){x.fillStyle='#ffd7d2';x.fillText(`${T('Landslide about')} ${ll(L.tgt)}${pm(L.tgt.acc)}`,X+70,y+h-sh+96,w-90)}}
+  else{x.font=F(21);x.fillText(T('No location recorded')+' · '+new Date(mt.t||Date.now()).toLocaleString(),X+18,y+h-20)}
+  y+=h+12;if(d&&d.available&&d.overlay){x.font=F(19);x.fillStyle=ink2;x.fillText(T('Outlined area = the measured landslide'),M,y+18);y+=30}}
+ else miss.push('photo');
+ // 2 location: map panel + coordinates
+ sec('Location');
+ if(L){const mw=470,mh=350;let used=false;try{used=await drawMap(x,M,y,mw,mh,L,tiles)}catch(e){miss.push('map')}
+  const X=M+mw+26,TW=IW-mw-26;let ty=y+26;const kv=(k,v,col)=>{x.font=F(19,600);x.fillStyle=ink2;x.fillText(T(k),X,ty);ty+=28;x.font=F(22);x.fillStyle=col||ink;for(const s of v)ty=wrapT(x,s,X,ty,TW,30);ty+=10};
+  const c=L.cam;kv('Camera position',[`${dmsOf(c.lat,'N','S')} ${dmsOf(c.lon,'E','W')}`,ll(c)+pm(c.acc)+(c.alt!=null?' · '+Math.round(c.alt)+' m':'')],'#1e6edc');
+  kv('Location source',[c.src==='photo'?T('GPS stored in the photo'):T('Phone GPS')+(c.age>2?` (${c.age} min)`:'')]);
+  if(L.head)kv('Camera facing',[`${Math.round(L.head.deg)}° ${cardOf(L.head.deg)}${L.head.acc?' ±'+Math.round(L.head.acc)+'°':''}`]);
+  if(L.tgt)kv('Landslide (estimated)',[ll(L.tgt)+pm(L.tgt.acc),`${Math.round(L.tgt.dist)} m ${T('along the camera bearing')} (${T(L.tgt.typed?'your distance':'model depth')})`],'#d93a2b');
+  else kv('Landslide (estimated)',[T('Needs the compass bearing (camera photo) and a distance.')]);
+  y=Math.max(y+mh,ty)+16;if(used)mt.__tiles=true}
+ else{x.font=F(22);x.fillStyle=ink2;y=wrapT(x,T('No location recorded. Tap Add my location (needs https) or use a photo with GPS.'),M,y+6,IW,32)+6}
+ // 3 type
+ part('type',()=>{sec('Landslide type');x.font=F(38,700);x.fillStyle=ink;y=wrapT(x,T(N[r.label]||r.label),M,y+30,IW,46);
+  x.font=F(23);x.fillStyle=r.status==='ok'?'#1f7a68':r.status==='uncertain'?'#b06b00':'#c0392b';
+  x.fillText(`${Math.round((r.confidence||0)*100)}% · ${T(STW[r.status]||r.status)}${r.family?' · '+T(r.family)+' '+T('family'):''}`,M,y+6);y+=40;
+  for(const [c,p] of (r.ranked||[]).slice(0,3)){x.font=F(21);x.fillStyle=ink;x.fillText(T(N[c]||c),M,y+20);x.fillStyle='#e3ebe7';x.fillRect(M+430,y+4,IW-530,22);
+   x.fillStyle='#1f7a68';x.fillRect(M+430,y+4,(IW-530)*Math.max(0,Math.min(1,p)),22);x.fillStyle=ink;x.fillText(Math.round(p*100)+'%',M+IW-80,y+22);y+=36}
+  if(r.fieldRanked&&r.answers&&r.answers.some(a=>a.a!=='not sure')){x.font=F(21,600);x.fillStyle=ink;x.fillText(`${T('With your field answers')}: ${T(N[r.fieldRanked[0][0]])} ${Math.round(r.fieldRanked[0][1]*100)}%`,M,y+22);y+=36}});
+ // 4 photo quality
+ part('quality',()=>{const ql=qLevel(r);sec('Photo quality');x.font=F(23,700);x.fillStyle=['#1f7a68','#8a7a00','#b06b00','#c0392b'][ql];x.fillText(T(QL[ql]),M,y+22);y+=34;
+  x.font=F(20);x.fillStyle=ink2;const iss=(r.quality&&r.quality.issues||[]).map(i=>T(i[0])+(i[2]===2?' ('+T('serious')+')':''));
+  if(r.status==='bad_photo')iss.unshift(T('photo check failed: the result is not reliable'));if(iss.length)y=wrapT(x,iss.join(' · '),M,y+26,IW,28)});
+ // 5 sizes
+ part('sizes',()=>{if(!d)return;sec('Estimated dimensions');
+  if(!d.available){x.font=F(21);x.fillStyle=ink2;y=wrapT(x,d.reason||T('No size estimate for this photo.'),M,y+6,IW,30);return}
+  const C=[M,M+470,M+700],row=(a,b,c,bold)=>{x.font=F(21,bold?700:400);x.fillStyle=bold?ink2:ink;const y0=y;let y1=wrapT(x,a,C[0],y+22,450,28);x.fillText(b,C[1],y+22);if(c)x.fillText(c,C[2],y+22);y=Math.max(y1,y0+34)+4;x.fillStyle=line;x.fillRect(M,y-4,IW,1)};
+  row(T('Measure'),T('Value'),T('90% range'),true);
+  for(const m of d.measures||[])row(T(m.name),`${num(m.value)} ${m.unit}`,m.range?`${num(m.range[0])} – ${num(m.range[1])}`:'');
+  if(d.size_class)row(T('Size class'),T(d.size_class),'');if(d.slope_angle_deg!=null)row(T('Slope angle'),d.slope_angle_deg+'°','');
+  if(d.distance_m)row(T('Distance to the slope'),(mt.dist||d.distance_m)+' m',mt.dist?T('your distance'):T('model depth'));
+  if(d.grains&&d.grains.reliable)row(T('Grain size D16 / D50 / D84'),`${d.grains.D16_m} / ${d.grains.D50_m} / ${d.grains.D84_m} m`,'');
+  x.font=F(19);x.fillStyle=ink2;y=wrapT(x,`${T('Scale')}: ${d.scale_source||''} · ${T('Depth trust')}: ${T(d.depth_trust||'')}${(d.cut_edges||[]).length?' · '+T('sizes are minimums')+' ('+d.cut_edges.map(T).join(', ')+')':''}`,M,y+18,IW,26)});
+ // 6 field check, notes
+ part('field',()=>{const ans=r.answers||[],sg=r.signs||{},seen=Object.values(sg).map(v=>v.filter(Boolean).length+' / '+v.length);
+  if(!ans.length&&!seen.length&&!mt.notes&&!mt.weather)return;sec('Field check');x.font=F(20);x.fillStyle=ink;
+  for(const a of ans)y=wrapT(x,`${T(a.q)} — ${T(a.a)}`,M,y+4,IW,28);
+  for(const [c,v] of Object.entries(sg))y=wrapT(x,`${T('Signs seen:')} ${v.filter(Boolean).length} / ${v.length} (${T(N[c]||c)})`,M,y+4,IW,28);
+  if(mt.weather)y=wrapT(x,`${T('Weather')}: ${T(mt.weather)}`,M,y+4,IW,28);if(mt.notes)y=wrapT(x,`${T('Notes')}: ${mt.notes}`,M,y+4,IW,28)});
+ // footer
+ y+=20;x.fillStyle=line;x.fillRect(M,y,IW,2);y+=10;x.font=F(18);x.fillStyle=ink2;
+ y=wrapT(x,T('Decision support only: confirm with a geologist or geotechnical engineer before acting.')+(r.model?' · '+r.model:'')+' · WGS-84'+(mt.__tiles?' · Map © OpenStreetMap contributors':'')+(miss.length?' · not drawn: '+miss.join(', '):''),M,y+22,IW,26);
+ const tiled=!!mt.__tiles;delete mt.__tiles;
+ const o=document.createElement('canvas');o.width=W;o.height=Math.ceil(y+24);const ox=o.getContext('2d');ox.drawImage(cv,0,0);
+ const jb=await new Promise((res,rej)=>{try{o.toBlob(b=>b?res(b):rej(new Error('toBlob')),'image/jpeg',.9)}catch(e){rej(e)}});   // a tainted canvas throws here
+ const desc=`Landslide observation: ${N[r.label]||r.label} ${Math.round((r.confidence||0)*100)}% (${r.status})`+(L?` at ${ll(L.cam)}`:'')+(L&&L.tgt?`; landslide about ${ll(L.tgt)}`:'');
+ return {blob:await withExif(jb,exifOf(L,mt.t||Date.now(),desc)),tiles:tiled,miss}}
+
+/* EXIF for the saved JPEG (little-endian TIFF): description, software, time and, with a location, a GPS IFD with the
+   camera position, altitude, bearing (magnetic, 'M') and horizontal error, so photo apps and GIS place it on a map */
+function exifOf(L,t,desc){const enc=s=>{s=String(s).slice(0,240);const a=new Uint8Array(s.length+1);for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);a[i]=c>=32&&c<127?c:63}return a};
+ const rat=v=>{const b=new Uint8Array(8*v.length),dv=new DataView(b.buffer);v.forEach(([n,dn],i)=>{dv.setUint32(8*i,Math.max(0,Math.min(4294967295,Math.round(n))),true);dv.setUint32(8*i+4,dn,true)});return b};
+ const dmsR=v=>{const a=Math.abs(v),dd=Math.floor(a),mm=Math.floor((a-dd)*60),ss=((a-dd)*60-mm)*60;return rat([[dd,1],[mm,1],[ss*1e4,1e4]])};
+ const dt=new Date(t),p2=n=>String(n).padStart(2,'0'),ptr=new Uint8Array(4);
+ const E=[[0x010E,2,enc(desc)],[0x0131,2,enc('Landslide Type Check field app')],[0x0132,2,enc(`${dt.getFullYear()}:${p2(dt.getMonth()+1)}:${p2(dt.getDate())} ${p2(dt.getHours())}:${p2(dt.getMinutes())}:${p2(dt.getSeconds())}`)]],G=[];
+ if(L){const c=L.cam;E.push([0x8825,4,ptr]);
+  G.push([0,1,new Uint8Array([2,3,0,0])],[1,2,enc(c.lat<0?'S':'N')],[2,5,dmsR(c.lat)],[3,2,enc(c.lon<0?'W':'E')],[4,5,dmsR(c.lon)],[0x12,2,enc('WGS-84')]);
+  if(c.alt!=null&&isFinite(c.alt))G.push([5,1,new Uint8Array([c.alt<0?1:0])],[6,5,rat([[Math.abs(c.alt)*100,100]])]);
+  if(L.head)G.push([0x10,2,enc('M')],[0x11,5,rat([[L.head.deg*100,100]])]);
+  if(c.acc)G.push([0x1F,5,rat([[c.acc*100,100]])])}
+ const ifds=G.length?[E,G]:[E],cnt=e=>e[1]===5?e[2].length/8:e[1]===4?e[2].length/4:e[2].length,ext=e=>e[2].length>4?e[2].length+(e[2].length&1):0;
+ ifds.forEach(f=>f.sort((a,b)=>a[0]-b[0]));const offs=[];let o=8;for(const f of ifds){offs.push(o);o+=2+12*f.length+4+f.reduce((s,e)=>s+ext(e),0)}
+ if(G.length)new DataView(ptr.buffer).setUint32(0,offs[1],true);
+ const buf=new Uint8Array(o),dv=new DataView(buf.buffer);buf.set([0x49,0x49,42,0]);dv.setUint32(4,8,true);
+ ifds.forEach((f,k)=>{const p=offs[k];let q2=p+2+12*f.length+4;dv.setUint16(p,f.length,true);
+  f.forEach((e,i)=>{const q=p+2+12*i;dv.setUint16(q,e[0],true);dv.setUint16(q+2,e[1],true);dv.setUint32(q+4,cnt(e),true);
+   if(e[2].length<=4)buf.set(e[2],q+8);else{dv.setUint32(q+8,q2,true);buf.set(e[2],q2);q2+=ext(e)}});dv.setUint32(p+2+12*f.length,0,true)});
+ return buf}
+async function withExif(blob,tiff){try{const a=new Uint8Array(await blob.arrayBuffer());if(a[0]!==0xFF||a[1]!==0xD8||tiff.length>65000)return blob;
+ let p=2;if(a[2]===0xFF&&a[3]===0xE0)p=4+((a[4]<<8)|a[5]);const L=8+tiff.length,hd=new Uint8Array([0xFF,0xE1,L>>8,L&255,0x45,0x78,0x69,0x66,0,0]);
+ return new Blob([a.slice(0,p),hd,tiff,a.slice(p)],{type:'image/jpeg'})}catch(_){return blob}}
+
+/* ---------- saving that works on every phone browser: download link -> share sheet -> open in a tab, and the image is
+   also shown on the page (long-press to save) so a blocked download never loses the report ---------- */
+function saveBlob(blob,name){try{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=name;a.rel='noopener';a.style.display='none';
+ document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},120000);return true}catch(_){return false}}
+async function shareBlob(blob,name,text){try{const f=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:text||''});return true}}
+ catch(e){if(e&&e.name==='AbortError')return true}return false}
+function openBlob(blob){try{return !!window.open(URL.createObjectURL(blob),'_blank')}catch(_){return false}}
+function reportBar(){$('#repbar')?.remove();$('#locline')?.remove();$('#repcard')?.remove();
+ const b=document.createElement('div');b.className='btns';b.id='repbar';b.style.marginTop='14px';
+ b.innerHTML=`<button type="button" class="btn primary" data-a="img" style="grid-column:1/-1">Save image report</button><button type="button" class="btn ghost" data-a="report">Save page report</button><button type="button" class="btn ghost" data-a="share">Share</button>`;
+ const ln=document.createElement('div');ln.className='locl';ln.id='locline';
+ const m=out.querySelector('.meta');if(m){out.insertBefore(ln,m);out.insertBefore(b,m)}else{out.appendChild(ln);out.appendChild(b)}
+ b.onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='img')saveImageReport();if(a==='report')saveReport();if(a==='share')share()};locLine()}
+let repBusy=false;
+async function saveImageReport(){if(!cur||repBusy)return;repBusy=true;const btn=$('#repbar [data-a=img]');if(btn)btn.disabled=true;toast(tr('Making the image report…'));
+ const r=cur,mt=curMeta||meta();let res=null;
+ for(const tiles of [true,false]){try{res=await reportImage(r,mt,curPhoto,lastBlob,tiles);break}catch(_){res=null}}   // retry without map tiles (offline, blocked, tainted)
+ repBusy=false;if(btn)btn.disabled=false;
+ if(!res){toast(tr('The image report could not be drawn on this phone: the page report is saved instead.'));saveReport();return null}
+ const name=fname('observation',mt.t,'jpg');repShow(res.blob,name,res.tiles);
+ if(saveBlob(res.blob,name))toast(tr('Report saved')+': '+name);return res}
+function repShow(blob,name,tiles){$('#repcard')?.remove();let u='';try{u=URL.createObjectURL(blob)}catch(_){}
+ const c=document.createElement('section');c.className='card';c.id='repcard';
+ c.innerHTML=`<div class="kicker">Image report</div>${u?`<img class="dimg" src="${u}" alt="Image report with location and results">`:''}<p class="hungr" style="margin:0 0 10px"><span>If no file was downloaded, long-press the image to save it, or use Share.</span>${tiles?' <span>Map © OpenStreetMap contributors.</span>':''}</p>
+ <div class="btns"><button type="button" class="btn ghost" data-a="dl">Save again</button><button type="button" class="btn ghost" data-a="sh">Share image</button></div>`;
+ const bar=$('#repbar');bar?bar.after(c):out.appendChild(c);
+ c.onclick=async e=>{const a=e.target.closest('[data-a]')?.dataset.a;
+  if(a==='dl'&&!saveBlob(blob,name)&&!openBlob(blob))toast(tr('Could not save the report on this browser.'));
+  if(a==='sh'&&!(await shareBlob(blob,name,shareText()))&&!openBlob(blob))toast(tr('Sharing is not available here: use Save report.'))}}
+
+/* ---------- page report: a standalone HTML page (opens anywhere, prints to PDF) and a short shareable text ---------- */
 const RCSS='body{font:15px/1.5 system-ui,sans-serif;max-width:780px;margin:24px auto;padding:0 16px;color:#13201c}h1{font-size:1.35rem}h2{font-size:1.05rem;margin-top:22px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #ddd;padding:6px;text-align:left;vertical-align:top}img{max-width:100%;border-radius:8px;margin:8px 0}.m{color:#5c6b65;font-size:.9rem}';
-function metaHTML(mt){return `<p class="m">${new Date(mt.t).toLocaleString()}${mt.gps?` · <a href="https://www.openstreetmap.org/?mlat=${mt.gps.lat}&mlon=${mt.gps.lon}#map=17/${mt.gps.lat}/${mt.gps.lon}">${mt.gps.lat.toFixed(5)}, ${mt.gps.lon.toFixed(5)}</a> (±${Math.round(mt.gps.acc)} m)`:''}${mt.weather?' · '+esc(mt.weather):''}${mt.shot?' · '+esc(mt.shot):''}${mt.set?' · '+esc(mt.set):''}${mt.dist?' · distance '+mt.dist+' m':''}</p>${mt.notes?`<p><b>Notes:</b> ${esc(mt.notes)}</p>`:''}`}
-function resultHTML(r,photo){const N=D.names,d=r.dimensions;let h=photo?`<img src="${photo}" alt="photo">`:'';
- const ql=qLevel(r);h+=`<h2>Photo quality</h2><p><b>${QL[ql]}</b>${r.quality&&r.quality.issues.length?': '+r.quality.issues.map(x=>esc(x[0])+(x[2]===2?' (serious)':'')).join(', '):''}${r.status==='bad_photo'?' · photo check failed: the result is not reliable':''}</p>`;
- h+=`<h2>Type</h2><p><b>${esc(N[r.label])}</b> · ${Math.round(r.confidence*100)}% (${esc(r.status)}${r.family?', '+esc(r.family)+' family':''})</p><table>${r.ranked.map(([c,p])=>`<tr><td>${esc(N[c])}</td><td>${Math.round(p*100)}%</td></tr>`).join('')}</table>`;
- if(r.answers&&r.answers.length)h+=`<h2>Field questions</h2><table>${r.answers.map(a=>`<tr><td>${esc(a.q)}</td><td>${a.a}</td></tr>`).join('')}</table>${r.fieldRanked?`<p>With these answers: <b>${esc(N[r.fieldRanked[0][0]])}</b> ${Math.round(r.fieldRanked[0][1]*100)}%</p>`:''}`;
- if(r.signs)h+=`<h2>Signs checked on site</h2><table>${Object.entries(r.signs).map(([c,v])=>v.map((on,i)=>`<tr><td>${esc(D.info[c].check[i])}</td><td>${on?'seen':'not seen'}</td></tr>`).join('')).join('')}</table>`;
- if(d&&d.available)h+=`<h2>Estimated dimensions</h2>${d.overlay?`<img src="${d.overlay}" alt="measured outline">`:''}<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${d.measures.map(m=>`<tr><td>${esc(m.name)}</td><td>${num(m.value)} ${m.unit}</td><td>${num(m.range[0])} – ${num(m.range[1])}</td></tr>`).join('')}
-  ${d.size_class?`<tr><td>Size class (Fell 1994)</td><td colspan="2">${esc(d.size_class)}</td></tr>`:''}<tr><td>Slope angle</td><td colspan="2">${d.slope_angle_deg}°</td></tr></table>
-  <p class="m">Scale: ${esc(d.scale_source)}. Depth trust: ${esc(d.depth_trust)}. ${esc([...(d.notes||[]),...(d.cut_edges||[]).length?['Runs off the '+d.cut_edges.join(', ')+' edge of the photo.']:[]].join(' '))}</p>`;
+function metaHTML(mt){mt=mt||{};const g=mt.gps&&isFinite(mt.gps.lat)?mt.gps:null;return `<p class="m">${new Date(mt.t||Date.now()).toLocaleString()}${g?` · <a href="${osm(g)}">${g.lat.toFixed(5)}, ${g.lon.toFixed(5)}</a>${pm(g.acc)}`:''}${mt.weather?' · '+esc(mt.weather):''}${mt.shot?' · '+esc(mt.shot):''}${mt.set?' · '+esc(mt.set):''}${mt.dist?' · distance '+esc(mt.dist)+' m':''}</p>${mt.notes?`<p><b>Notes:</b> ${esc(mt.notes)}</p>`:''}`}
+// every section is written on its own: a missing or odd field costs that section, never the whole report
+const partH=(name,f)=>{try{return f()}catch(e){return `<p class="m">(${esc(name)}: this part could not be written)</p>`}};
+function resultHTML(r,photo,mt){const N=D.names,d=r.dimensions;let h=photo?`<img src="${photo}" alt="photo">`:'';
+ h+=partH('location',()=>`<h2>Location</h2>${locHTML(locOf(mt,r))}`);
+ h+=partH('photo quality',()=>{const ql=qLevel(r);return `<h2>Photo quality</h2><p><b>${QL[ql]}</b>${r.quality&&r.quality.issues&&r.quality.issues.length?': '+r.quality.issues.map(x=>esc(x[0])+(x[2]===2?' (serious)':'')).join(', '):''}${r.status==='bad_photo'?' · photo check failed: the result is not reliable':''}</p>`});
+ h+=partH('type',()=>`<h2>Type</h2><p><b>${esc(N[r.label]||r.label)}</b> · ${Math.round((r.confidence||0)*100)}% (${esc(r.status)}${r.family?', '+esc(r.family)+' family':''})</p><table>${(r.ranked||[]).map(([c,p])=>`<tr><td>${esc(N[c]||c)}</td><td>${Math.round(p*100)}%</td></tr>`).join('')}</table>`);
+ if(r.answers&&r.answers.length)h+=partH('field questions',()=>`<h2>Field questions</h2><table>${r.answers.map(a=>`<tr><td>${esc(a.q)}</td><td>${esc(a.a)}</td></tr>`).join('')}</table>${r.fieldRanked?`<p>With these answers: <b>${esc(N[r.fieldRanked[0][0]])}</b> ${Math.round(r.fieldRanked[0][1]*100)}%</p>`:''}`);
+ if(r.signs)h+=partH('signs',()=>`<h2>Signs checked on site</h2><table>${Object.entries(r.signs).map(([c,v])=>v.map((on,i)=>`<tr><td>${esc(((D.info[c]||{}).check||[])[i]||'sign '+(i+1))}</td><td>${on?'seen':'not seen'}</td></tr>`).join('')).join('')}</table>`);
+ if(d&&d.available)h+=partH('dimensions',()=>`<h2>Estimated dimensions</h2>${d.overlay?`<img src="${d.overlay}" alt="measured outline">`:''}<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${(d.measures||[]).map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td><td>${m.range?esc(num(m.range[0]))+' – '+esc(num(m.range[1])):''}</td></tr>`).join('')}
+  ${d.size_class?`<tr><td>Size class (Fell 1994)</td><td colspan="2">${esc(d.size_class)}</td></tr>`:''}${d.slope_angle_deg!=null?`<tr><td>Slope angle</td><td colspan="2">${esc(d.slope_angle_deg)}°</td></tr>`:''}${d.distance_m?`<tr><td>Distance to the slope</td><td colspan="2">${esc(d.distance_m)} m</td></tr>`:''}${d.grains&&d.grains.reliable?`<tr><td>Grain size D16 / D50 / D84</td><td colspan="2">${esc(d.grains.D16_m)} / ${esc(d.grains.D50_m)} / ${esc(d.grains.D84_m)} m</td></tr>`:''}</table>
+  <p class="m">Scale: ${esc(d.scale_source)}. Depth trust: ${esc(d.depth_trust)}. ${esc([...(d.notes||[]),...((d.cut_edges||[]).length?['Runs off the '+d.cut_edges.join(', ')+' edge of the photo.']:[])].join(' '))}</p>`);
+ else if(d&&d.reason)h+=`<h2>Estimated dimensions</h2><p>${esc(d.reason)}</p>`;
  return h}
-const foot=m=>`<p class="m">Landslide Type Check field app${m?' ('+esc(m)+')':''}. Decision support only: confirm with a geologist or geotechnical engineer before acting.</p>`;
-function download(name,html){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},3000);toast('Report saved: '+name)}
-const fname=(k,t)=>`landslide_${k}_${new Date(t).toISOString().slice(0,16).replace(/[:T]/g,'-')}.html`;
+const foot=m=>`<p class="m">Landslide Type Check field app${m?' ('+esc(m)+')':''}. Decision support only: confirm with a geologist or geotechnical engineer before acting. Coordinates WGS-84.</p>`;
+function download(name,html){const b=new Blob([html],{type:'text/html'});if(saveBlob(b,name))toast(tr('Report saved')+': '+name);else if(!openBlob(b))toast(tr('Could not save the report on this browser.'))}
+const fname=(k,t,ext='html')=>`landslide_${k}_${new Date(t||Date.now()).toISOString().slice(0,16).replace(/[:T]/g,'-')}.${ext}`;
+const page=(title,body)=>`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>${RCSS}</style></head><body>${body}</body></html>`;
 function saveReport(){if(!cur)return;const mt=curMeta||meta();
- download(fname('observation',mt.t),`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Landslide observation</title><style>${RCSS}</style></head><body><h1>Landslide observation</h1>${metaHTML(mt)}${resultHTML(cur,curPhoto)}${foot(cur.model)}</body></html>`)}
+ download(fname('observation',mt.t),page('Landslide observation',`<h1>Landslide observation</h1>${metaHTML(mt)}${resultHTML(cur,curPhoto,mt)}${foot(cur.model)}`))}
 async function siteReport(){let s=null;try{s=JSON.parse(sess.get('site')||'null')}catch(_){}const hs=store.get('hist',[]),N=D.names,mt=meta();
  const ids=hs.filter(o=>o.site===siteId()).map(o=>o.id),rs=(await Promise.all(ids.map(id=>safe(()=>DB.get('results',id),null)))).filter(Boolean).reverse();
  let h=`<h1>Landslide site survey</h1>${metaHTML(mt)}`;
- if(s){const t=s.type.ranked,d=s.dimensions;h+=`<h2>Site result (${s.n} shots combined)</h2><p><b>${esc(N[t[0][0]])}</b> · ${Math.round(t[0][1]*100)}%</p>`;
-  if(d&&d.available)h+=`<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${d.measures.map(m=>`<tr><td>${esc(m.name)}</td><td>${num(m.value)} ${m.unit}</td><td>${num(m.range[0])} – ${num(m.range[1])}</td></tr>`).join('')}</table><p class="m">Median of the whole-slope shots; the spread between photos is added to the range.</p>`;
-  if(s.grains)h+=`<p>Grain size D16 / D50 / D84: ${s.grains.D16_m} / ${s.grains.D50_m} / ${s.grains.D84_m} m</p>`}
- for(const x of rs)h+=`<hr><h2>${esc(x.meta.shot||'Photo')}</h2>${metaHTML(x.meta)}${resultHTML(x.r,x.photo)}`;
- download(fname('site',mt.t),`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Landslide site survey</title><style>${RCSS}</style></head><body>${h}${foot('')}</body></html>`)}
-async function share(){if(!cur)return;const r=cur,mt=curMeta||meta(),N=D.names,d=r.dimensions;
- const txt=[`Landslide observation, ${new Date(mt.t).toLocaleString()}`,`${N[r.label]} (${Math.round(r.confidence*100)}%, ${r.status})`,`Photo quality: ${QL[qLevel(r)]}${r.status==='bad_photo'?' (not reliable)':''}`,
-  ...(d&&d.available?d.measures.slice(0,4).map(m=>`${m.name}: ${num(m.value)} ${m.unit} (90%: ${num(m.range[0])}-${num(m.range[1])})`):[]),
-  mt.gps?`Location: https://www.openstreetmap.org/?mlat=${mt.gps.lat}&mlon=${mt.gps.lon}`:'',mt.weather?'Weather: '+mt.weather:'',mt.notes?'Notes: '+mt.notes:'','Decision support only; confirm with a geologist.'].filter(Boolean).join('\n');
+ if(s)h+=partH('site result',()=>{const t=s.type.ranked,d=s.dimensions;let q=`<h2>Site result (${s.n} shots combined)</h2><p><b>${esc(N[t[0][0]])}</b> · ${Math.round(t[0][1]*100)}%</p>`;
+  if(d&&d.available)q+=`<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${d.measures.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td><td>${esc(num(m.range[0]))} – ${esc(num(m.range[1]))}</td></tr>`).join('')}</table><p class="m">Median of the whole-slope shots; the spread between photos is added to the range.</p>`;
+  if(s.grains)q+=`<p>Grain size D16 / D50 / D84: ${esc(s.grains.D16_m)} / ${esc(s.grains.D50_m)} / ${esc(s.grains.D84_m)} m</p>`;return q});
+ for(const x of rs)h+=partH('photo',()=>`<hr><h2>${esc(x.meta&&x.meta.shot||'Photo')}</h2>${metaHTML(x.meta)}${resultHTML(x.r,x.photo,x.meta)}`);
+ download(fname('site',mt.t),page('Landslide site survey',h+foot('')))}
+function shareText(){const r=cur,mt=curMeta||meta(),N=D.names,d=r.dimensions,L=locOf(mt,r);
+ return [`Landslide observation, ${new Date(mt.t||Date.now()).toLocaleString()}`,`${N[r.label]||r.label} (${Math.round((r.confidence||0)*100)}%, ${r.status})`,`Photo quality: ${QL[qLevel(r)]}${r.status==='bad_photo'?' (not reliable)':''}`,
+  ...(d&&d.available?(d.measures||[]).slice(0,4).map(m=>`${m.name}: ${num(m.value)} ${m.unit} (90%: ${num(m.range[0])}-${num(m.range[1])})`):[]),
+  L?`Camera position: ${ll(L.cam)}${pm(L.cam.acc)} ${osm(L.cam)}`:'',L&&L.tgt?`Landslide about: ${ll(L.tgt)}${pm(L.tgt.acc)} ${osm(L.tgt)}`:'',
+  mt.weather?'Weather: '+mt.weather:'',mt.notes?'Notes: '+mt.notes:'','Decision support only; confirm with a geologist.'].filter(Boolean).join('\n')}
+async function share(){if(!cur)return;const txt=shareText();
  try{const f=lastBlob?new File([lastBlob],'landslide.jpg',{type:'image/jpeg'}):null;
   if(f&&navigator.canShare&&navigator.canShare({files:[f]}))await navigator.share({text:txt,files:[f]});else if(navigator.share)await navigator.share({text:txt});
   else{await navigator.clipboard.writeText(txt);toast('Summary copied: paste it into a message or e-mail.')}}catch(e){if(e&&e.name!=='AbortError')toast('Sharing is not available here: use Save report.')}}
+A._rep={locOf,reportImage,exifOf,withExif,dmsOf,resultHTML,saveImageReport,setGps:p=>setGps(p)};   // exposed for tests
 
 /* ---------- offline queue: photos wait on the phone and are sent when the connection is back ---------- */
 async function queueIt(){const it={id:Date.now(),blob:lastBlob,q:params({stage:'full',d:lastDist,g:gArg(),f35:lastF35,gx:gx()}).toString(),meta:curMeta||meta(),photo:await photoURL(lastBlob,720),site:siteId()};
@@ -745,7 +964,7 @@ async function openHist(id){const x=await safe(()=>DB.get('results',id),null);if
  $('#fig').scrollIntoView({behavior:'smooth',block:'start'})}
 drawHist();A._metrics=metrics;A._judge=judge;A._grade=grade;A._hold=hold;A._live=liveShow;A._fuse=fuse;A._flush=flush;A._q=()=>safe(()=>DB.all('queue'),[]);A._st=()=>({flushing,done:[...done],shot,mode,curId:cur&&cur.__id,metaShot:curMeta&&curMeta.shotId,site:!!sess.get('site')});   // exposed for tests
 /* ---------- shared with the overlapping-set module (src/pano.py) ---------- */
-function runSet(r,blob,g,label){lastBlob=blob;lastSrc=g?'cam':'gal';lastTilt=g?{g}:null;const dv=parseFloat(dist.value);lastDist=dv>=1&&dv<=3000?dv:null;
+function runSet(r,blob,g,label){lastBlob=blob;lastPGps=null;lastHead=null;lastSrc=g?'cam':'gal';lastTilt=g?{g}:null;const dv=parseFloat(dist.value);lastDist=dv>=1&&dv<=3000?dv:null;
  curMeta=meta();curMeta.set=label||'';cur=r;job=r.job||null;const fig=$('#fig');$('#prev').src=URL.createObjectURL(blob);fig.style.display='block';
  if(r.ms)store.set('etaT',ema('etaT',r.ms,4000));photoQ={level:0,issues:[]};withQ(r);A.render(r);afterType(r);sizes(r)}
 A._g={say,buzz,toast,tr,store,sess,step,safety,openFinder,closeFinder,openCamera,ICO,LIVE,prog,post,busy,cancelled,params,gx,runSet,fail,RX,out,vf,vid,

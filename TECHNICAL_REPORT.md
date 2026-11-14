@@ -49,7 +49,8 @@ video; optionally typed distance, steps walked, phone tilt sensors, GPS, notes.
 | Photo usability | Good / Fair / Poor / Very poor + reasons | calibrated thresholds; server usable-probability |
 | Sizes | length, widths, drop, area, volume, perimeter, slope, travel angle, size class, grains/blocks | median + 90 % range (Monte Carlo), size-class probabilities |
 | Field guidance | checklist, safety notes, yes/no questions, next steps | Bayes-updated field probabilities |
-| Records | history, HTML report, share text, offline queue, guidance log | — |
+| Location | camera position (photo EXIF GPS or phone fix), camera bearing, estimated landslide position, map panel with markers | GPS error (m); landslide 1-σ radius from GPS, bearing and distance errors (§10.3) |
+| Records | image report (JPEG with GPS stamp, map marker, every metric, GPS in EXIF), HTML report, share text, history, offline queue, guidance log | — |
 
 **Scope boundary.** One photo sees only what is in frame; cracks or seepage outside it are invisible. Sizes
 come from monocular depth and are unverified against field tape measurements. Labels are AI-made (§3.3).
@@ -799,7 +800,7 @@ deposit shot.
 
 | Endpoint | Purpose | Limits |
 |---|---|---|
-| `GET /` | single self-contained HTML page (no external requests) | — |
+| `GET /` | single self-contained HTML page (no external requests except optional OSM map tiles for the image report, §10.3) | — |
 | `POST /predict?stage=type\|full` | classify (type in ~2–5 s, returns a job id) or classify + measure | 25 MB body, 40 MP |
 | `POST /measure?job=` | sizes for a kept photo; 410 if evicted (phone re-sends) | GPU lock |
 | `POST /overlap` | check a set of 2–8 photos | 40 MB, CPU lock |
@@ -822,11 +823,109 @@ time with an arrow, voice and haptics, shutter always works; instant photo check
 (EXIF orientation applied; f35 read from EXIF tag 0xA405 *before* shrinking and sent separately); staged
 progress paced by learned server times (EMA 0.6/0.4); result cards with all probabilities, quality band,
 sizes with 90 % ranges, glossary; history (20 results, IndexedDB); offline queue (retries on reconnect and
-every 60 s); HTML report / share; GPS and notes. **Hindi**: dictionary (~300 strings + ~18 patterns) applied
+every 60 s); image report, HTML report and share (§10.3); GPS, compass bearing and notes. **Hindi**: dictionary (~300 strings + ~18 patterns) applied
 by a MutationObserver to every text node and aria attribute (machine-drafted, needs native review).
 **Accessibility**: aria-live regions, dialogs with focus return, keyboard (Enter/Space/Esc), reduced motion,
-dark mode, high-contrast sun mode, spoken summary. Tested headlessly in Edge (English and Hindi): 28 guidance
-checks per language and the photo-set suite, 0 failures.
+dark mode, high-contrast sun mode, spoken summary. Tested headlessly in Edge (English and Hindi): 40 guidance
+checks per language (incl. 12 location/report checks) and the photo-set suite, 0 failures.
+
+
+### 10.3 Location, GPS marker and reports (`guide.py`, `pano.py`)
+
+**What it serves.** A field record must say *where*: the camera position, which way the camera looked, and
+where the landslide itself is. The landslide is usually 20–300 m from the engineer, so the phone's own GPS fix
+alone puts the marker in the wrong place by the whole viewing distance.
+
+**Sources, in priority order.**
+
+| Quantity | Source 1 | Source 2 | Notes |
+|---|---|---|---|
+| Camera position | EXIF GPS IFD (tag 0x8825) of the *original* file, read before the 1,280 px shrink strips it (lat/lon DMS rationals + refs, altitude 0x05/0x06, bearing 0x11, horizontal error 0x1F) | phone fix (`navigator.geolocation`, high accuracy) | the photo's own GPS is the exact place and time of the shot; a phone fix records its age vs the photo time |
+| Camera bearing | compass at the shutter (≤ 5 s old) | EXIF GPSImgDirection | camera photos only; gallery photos rarely carry it |
+| Distance | typed distance | median model depth of the outlined area (`distance_m`) | |
+
+Location permission is asked only on the user's tap ("Add my location"). Once it is granted, every camera photo
+silently gets a fresh fix (`maximumAge` 20 s); a fix that arrives up to 3 min after the photo is attached to
+that photo's record and the stored result is updated. Location needs https (browser rule).
+
+**Compass bearing.** iOS: `webkitCompassHeading` (+ `webkitCompassAccuracy`). Elsewhere, from an *absolute*
+`deviceorientation(absolute)` event, the back camera looks along the device −z axis. With the W3C rotation
+R = R_z(α)·R_x(β)·R_y(γ) in the east-north-up frame:
+
+    v_E = −cos α sin γ − sin α sin β cos γ,   v_N = −sin α sin γ + cos α sin β cos γ,   bearing = atan2(v_E, v_N)
+
+This is valid when the phone is held upright, as it is for slope photos (the formula gives 0° = north for
+α = 0, β = 90°). The bearing is discarded when the horizontal component is below 0.2 (camera pointing straight up
+or down). It is magnetic north; the declination in the Indian Himalaya is under 1°, which is far below the
+compass error.
+
+**Landslide position.** The destination point on a sphere (R = 6,371,008.8 m) from the camera (φ1, λ1),
+bearing θ and distance d, with δ = d / R:
+
+    φ2 = asin(sin φ1 cos δ + cos φ1 sin δ cos θ)
+    λ2 = λ1 + atan2(sin θ sin δ cos φ1, cos δ − sin φ1 sin φ2)
+
+The 1-σ radius combines the GPS error, the bearing error and the distance error:
+
+    σ = sqrt(σ_GPS² + (d·σ_θ)² + σ_d²)
+
+| Term | Value used |
+|---|---|
+| σ_θ | the phone's own compass accuracy when it reports one, else 15° |
+| σ_d | 5 % of d for a typed distance; 30 % of d for model depth (the depth log-sd is about 0.25–0.3, §7.2) |
+| σ_GPS | the phone's or the EXIF's stated error, else 10 m |
+
+Example: GPS ±8 m, bearing ±10°, typed 100 m gives ±19.8 m, which the headless test reproduces.
+
+**Image report (one JPEG, 1,080 px wide).**
+
+1. Header with the date and time, the shot and the set.
+2. The photo, with the measured outline when there is one, carrying a GPS-camera style stamp: a pin, the position in DMS ± error, decimal degrees, altitude, bearing with its cardinal direction, the time, and the estimated landslide position.
+3. Location panel: a map with OSM tiles at zoom 18 → 3, chosen so that d + σ fits in 40 % of the panel.
+   - Markers: blue camera dot with its GPS-error circle, a view cone of ±σ_θ, a dashed line along the bearing, and a red pin at the landslide with its σ circle.
+   - Map furniture: scale bar, north arrow and attribution.
+   - Beside the map: the coordinate table.
+4. Type with its top-3 probability bars and the field-answer posterior.
+5. Photo quality with its reasons.
+6. Sizes: every measure with its 90 % range, size class, slope, distance, grains, scale source and depth trust.
+7. Field answers, signs seen, weather and notes.
+8. Disclaimer, model name, WGS-84 and the map credit.
+
+The JPEG also carries EXIF written by the phone, so gallery apps and GIS place the file on a map:
+
+| Tag | Content |
+|---|---|
+| ImageDescription | a summary of type, confidence, status, position and landslide position |
+| Software, DateTime | the app name and the photo time |
+| GPS IFD | version 2.3, lat/lon as DMS rationals, altitude, bearing (ref M), WGS-84 datum, horizontal error |
+
+The EXIF block is a little-endian TIFF, inserted as APP1 after the JFIF APP0.
+
+**Robustness (design choices).**
+
+| Failure | Handling |
+|---|---|
+| Map tiles slow, blocked, offline or tainting the canvas | tiles are all-or-nothing (5 s each); any failure, including a SecurityError at `toBlob`, redraws the whole report with a plain grid map; offline phones never request tiles |
+| One section fails (missing or odd field) | that section is blanked and listed as "not drawn"; the rest of the report is kept (same per-section guard in the HTML report) |
+| Canvas cannot be drawn at all | falls back to the HTML report automatically |
+| Download blocked (in-app browsers, iOS) | download link → share sheet → open in a new tab; the report image is also shown on the page (long-press to save) with "Save again" and "Share image" buttons that run on a fresh tap, because share needs a user gesture |
+| Photo missing (old history entry) | the stamp and all metrics are still drawn; the photo is listed as not drawn |
+| Unescaped text in the HTML report | every value is now escaped; unknown classes in the ticked signs no longer crash it |
+| Stale phone fix | its age vs the photo time is printed in the report |
+
+**Privacy.** Coordinates stay on the phone. The upload is the shrunk JPEG without EXIF, so the server never
+receives or logs a location. When online, the image report asks tile.openstreetmap.org for the 4–6 tiles
+around the site; this is the only network request that reveals the area. It happens only on "Save image
+report" and is covered by the OSM tile policy, with low-volume, user-initiated use and attribution.
+
+**Verified (headless Edge, English and Hindi, 40/40 each).**
+- DMS formatting.
+- Destination point: 100 m at 45° comes back as 100.00 m at 45.00°.
+- σ formula; no location gives no marker; no bearing gives no landslide position.
+- A 1,080 × 2,532 JPEG with all sections. Its EXIF GPS reads back to 1e-6° with the app's own reader, altitude, bearing and error included, and PIL decodes the file and the GPS IFD independently.
+- Odd results, no photo and no location still produce both reports.
+- A late GPS fix is attached to the shown photo.
+- The image report is shown on the page and saved, and so is the page report.
 
 ---
 
@@ -891,6 +990,10 @@ checks per language and the photo-set suite, 0 failures.
 | 25 | Bayesian questions with bounded expert likelihoods | free-text checklist | principled update; cannot overrule model |
 | 26 | Single self-contained page, offline queue | external libs, online only | field connectivity |
 | 27 | AI annotation with blind test and audit trail | human labels | time; flagged as the main open item |
+| 28 | Landslide position = camera + distance along compass bearing | phone fix only; manual map tap | the fix alone is off by the viewing distance (20–300 m); stated σ instead of false precision |
+| 29 | Image report drawn on the phone (canvas) with EXIF GPS | server-rendered PDF; HTML only | works offline, no location sent to the server, opens in any gallery / WhatsApp, GIS-readable |
+| 30 | OSM tiles optional, all-or-nothing, grid fallback | bundled offline map; always online map | single-page app stays small; field phones are often offline |
+| 31 | Location asked only on tap, then refreshed silently | prompt on load | permission prompts on load are refused more often; https required anyway |
 
 ---
 
@@ -912,6 +1015,7 @@ checks per language and the photo-set suite, 0 failures.
 | 11-03 | 9 accuracy levers | none significant: data-limited |
 | 11-04 | Graded photo quality, results always shown | 56 headless checks pass |
 | 11-04/05 | Deployment: HF Space files, Cloudflare tunnel | public link: 40 s full result |
+| 11-14 | GPS marker: photo EXIF GPS, compass bearing, landslide position, image report with map + EXIF, robust saving | 12 new headless checks; EXIF round-trip exact to 1e-6° |
 
 ---
 
@@ -948,6 +1052,12 @@ Found or confirmed while writing this report (none hidden; ordered by impact):
 13. **fuse_site** cannot narrow with more photos and is noisy at n = 2.
 14. **Server**: small caches (6 jobs / 3 sets) and a single GPU lock limit concurrent users; token in the URL.
 15. **Hindi** machine-drafted.
+16. **Landslide position is unvalidated in the field**: phone compasses are often off by 10–30° near vehicles,
+    rebar or power lines, and the 15° default and the 30 % model-depth distance error are assumptions, not
+    measurements. A field check against surveyed points is needed. The bearing uses magnetic north.
+17. **Map tiles need a connection** (offline reports have a grid map with scale and north arrow, not streets),
+    and the request reveals the area to the tile server.
+18. **Photo sets / video** do not carry photo EXIF GPS or bearing yet (only the phone fix).
 
 ---
 
@@ -1007,6 +1117,10 @@ kept within 85–95 %).
 | Auto sweep | sharp ≥ 0.6× median, pan ≤ 0.35 W/s, ≥ 1.2 s apart | pano.py |
 | Question likelihood bounds | 0.05–0.92; ≤ 5 questions; stop at 0.85 | guide_data.py, guide.py |
 | Server caches | 6 jobs, 3 sets; bodies 25 / 40 / 2 MB; 40 MP | app.py |
+| Compass | fresh ≤ 5 s at shutter; default σ 15°; horizontal component ≥ 0.2 | guide.py |
+| Landslide position error | σ_d typed 5 %, model depth 30 %; GPS default 10 m; Earth R 6,371,008.8 m | guide.py |
+| Late GPS fix attached | ≤ 3 min after the photo; silent refresh maximumAge 20 s | guide.py |
+| Image report | 1,080 px wide, photo ≤ 920 px high, JPEG q 0.9, map 470 × 350, zoom ≤ 18, tiles 5 s | guide.py |
 
 ## Appendix B: file map
 
