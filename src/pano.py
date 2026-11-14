@@ -191,7 +191,7 @@ TEXT = {
     "next_walk": ["Walk 3-5 steps along the slope, face it, and take the next.",
                   "ढलान के साथ 3-5 कदम चलें, उसकी ओर देखें, और अगली लें।"],
     "right": ["right", "दाएँ"], "left": ["left", "बाएँ"],
-    "label_turn": ["Overlapping set · photo {k}", "ओवरलैप सेट · फ़ोटो {k}"],
+    "label_turn": ["Overlapping set, photo {k}", "ओवरलैप सेट, फ़ोटो {k}"],
     "hint_first_turn": ["Start just beyond one end of the landslide. Take the first photo.",
                         "भूस्खलन के एक छोर से थोड़ा आगे से शुरू करें। पहली फ़ोटो लें।"],
     "hint_first_walk": ["Start at one end, facing the slope. Take the first photo.",
@@ -213,7 +213,7 @@ TEXT = {
     "st_join": ["Joining them into one picture", "उन्हें एक तस्वीर में जोड़ रहे हैं"],
     "need_net": ["The overlap check needs the connection to the laptop. Your photos stay here; try again when connected.",
                  "ओवरलैप जाँच के लिए लैपटॉप से कनेक्शन चाहिए। आपकी फ़ोटो यहीं रहेंगी; जुड़ने पर फिर कोशिश करें।"],
-    "kick": ["Overlap check · {n} photos · {k}", "ओवरलैप जाँच · {n} फ़ोटो · {k}"],
+    "kick": ["Overlap check, {n} photos, {k}", "ओवरलैप जाँच, {n} फ़ोटो, {k}"],
     "v_ready": ["Ready to join", "जोड़ने के लिए तैयार"], "v_warn": ["Can be used, but check these", "उपयोग हो सकता है, पर इन्हें देखें"],
     "v_fix": ["Fix these first", "पहले इन्हें ठीक करें"],
     "sum_join": ["{a} of {n} photos join into one picture", "{n} में से {a} फ़ोटो एक तस्वीर में जुड़ती हैं"],
@@ -484,7 +484,7 @@ function render(){const tr=$('#pano .tray');if(!tr)return;
  tr.innerHTML=S.items.map((it,k)=>{let link='';if(k<S.items.length-1){const e=S.est[k];
    link=!e?'<div class="plink"><i></i></div>':e.orient?`<div class="plink gap" title="${esc(L('est_orient'))}">&ne;<i></i></div>`:e.score<.3?`<div class="plink" title="${esc(L('est_q'))}">?<i></i></div>`:`<div class="plink ${band(e.ov)}">~${pct(e.ov)}%<i></i></div>`}
   return `<div class="pit ${it.src==='cam'?'cam':''}"><img src="${it.thumb}" alt=""><span class="pn">${k+1}</span><button type="button" class="px" data-id="${it.id}" aria-label="${esc(L('remove',{k:k+1}))}">&times;</button></div>${link}`}).join('');
- const n=S.items.length;$('#pano .pstat').textContent=n?L('n_photos',{n})+' · '+L('est_note'):L('add_hint');
+ const n=S.items.length;$('#pano .pstat').textContent=n?L('n_photos',{n})+', '+L('est_note'):L('add_hint');
  $('#pano [data-a=check]').disabled=n<2}
 function apply(){const on=want;$('.pgide').hidden=!on;$('#pano').hidden=!on;g.galIn.multiple=on;g.galIn.accept=on?'image/*,video/*':'image/*';
  const tips=$('#capH').closest('.card').querySelector('.tips');if(tips)tips.hidden=on;if(on){drawGuide();render()}}

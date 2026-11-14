@@ -87,7 +87,7 @@ QUIZ = [
 # ---------------------------------------------------------------- Hindi (machine-drafted; needs a native-speaker review)
 HI = {
     # page and result cards
-    "Landslide Type Check": "भूस्खलन प्रकार जाँच", "Field classifier · Hungr 2014": "फ़ील्ड वर्गीकरण · हंगर 2014",
+    "Landslide Type Check": "भूस्खलन प्रकार जाँच", "Field classifier after Hungr 2014": "हंगर 2014 के अनुसार फ़ील्ड वर्गीकरण",
     "New observation": "नया अवलोकन", "Photograph the slope from below": "ढलान की फ़ोटो नीचे से लें",
     "Stand at the foot of the slope or across the road, facing up at it.": "ढलान के नीचे या सड़क के उस पार खड़े होकर ऊपर की ओर देखें।",
     "Fit the whole slope: the top (scarp or source) and the bottom (deposit).": "पूरी ढलान फ़्रेम में लें: ऊपर (दरार/स्रोत) और नीचे (मलबा)।",
@@ -98,7 +98,7 @@ HI = {
     
     "Classification after Hungr, Leroueil & Picarelli (2014).": "वर्गीकरण: हंगर, लेरुइल और पिकारेली (2014)।",
     "Landslide type": "भूस्खलन का प्रकार", "Landslide family": "भूस्खलन समूह",
-    "Confidence": "विश्वास", "Confidence (family)": "विश्वास (समूह)", "All types": "सभी प्रकार", "Check on site": "स्थल पर जाँचें", "Safety": "सुरक्षा",
+    "Confidence": "विश्वास", "Model confidence": "मॉडल का विश्वास", "Most likely type": "सबसे संभावित प्रकार", "High": "उच्च", "Moderate": "मध्यम", "Low": "कम", "(family)": "(वर्ग)", "Confidence (family)": "विश्वास (समूह)", "All types": "सभी प्रकार", "Check on site": "स्थल पर जाँचें", "Safety": "सुरक्षा",
     "Photo check": "फ़ोटो जाँच", "Retake the photo": "फ़ोटो दोबारा लें", "Retake photo": "फ़ोटो दोबारा लें",
     "Estimated dimensions": "अनुमानित आयाम", "Analysing photo": "फ़ोटो का विश्लेषण", "Something went wrong": "कुछ गलत हुआ",
     "Check the connection to the laptop running the app, then try again.": "ऐप चला रहे लैपटॉप से कनेक्शन जाँचें, फिर दोबारा कोशिश करें।",
@@ -218,7 +218,7 @@ HI = {
     "tilt down or step back so the toe and deposit are inside": "नीचे झुकाएँ या पीछे हटें ताकि तलहटी और मलबा फ़्रेम में आएँ",
     "turn left or step back": "बाएँ मुड़ें या पीछे हटें", "turn right or step back": "दाएँ मुड़ें या पीछे हटें",
     "Survey: next shot": "सर्वे: अगला शॉट", "Survey complete: all 4 shots taken. The combined site result is above.": "सर्वे पूरा: सभी 4 शॉट लिए गए। संयुक्त स्थल परिणाम ऊपर है।",
-    "Help decide · answer what you can see": "निर्णय में मदद · जो दिखे उसका उत्तर दें", "Yes": "हाँ", "No": "नहीं", "Not sure": "पता नहीं",
+    "Help decide: answer what you can see": "निर्णय में मदद: जो दिखे उसका उत्तर दें", "Yes": "हाँ", "No": "नहीं", "Not sure": "पता नहीं",
     "Undo last answer": "पिछला उत्तर वापस लें", "Your answers point to": "आपके उत्तर इस ओर इशारा करते हैं:",
     "No further question would change the answer much": "कोई और प्रश्न उत्तर को ज़्यादा नहीं बदलेगा",
     "Model result combined with your answers.": "मॉडल परिणाम आपके उत्तरों के साथ मिलाया गया।", "Starts from the model result.": "मॉडल परिणाम से शुरू।",
@@ -360,7 +360,7 @@ HI = {
     'Cover the slope with overlapping photos': 'ओवरलैप करती फ़ोटो से पूरी ढलान लें',
     # graded photo quality (Good / Fair / Poor / Very poor) and results for photos that fail the check
     'Not reliable': 'भरोसेमंद नहीं', 'Not reliable.': 'भरोसेमंद नहीं।',
-    'Best guess · photo check failed': 'सबसे संभावित अनुमान · फ़ोटो जाँच विफल',
+    'Best guess: photo check failed': 'सबसे संभावित अनुमान: फ़ोटो जाँच विफल',
     'This does not look like a ground photo of a slope': 'यह ज़मीन से ली गई ढलान की फ़ोटो नहीं लगती',
     'usable': 'उपयोगी',
     "This is the model's own answer, not adjusted. Retake the photo before relying on it:": 'यह मॉडल का अपना उत्तर है, बिना बदलाव के। इस पर भरोसा करने से पहले फ़ोटो दोबारा लें:',

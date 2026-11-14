@@ -119,12 +119,15 @@ TOUR = [
 ]
 
 CSS = """
-.iconbtn{margin-left:0;flex:none;min-width:44px;height:44px;border-radius:22px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:1.02rem;line-height:1;font-family:inherit;cursor:pointer}
-.journey{display:flex;gap:6px;margin:2px 0 14px;padding:0;list-style:none;counter-reset:j}
-.journey li{flex:1;font-size:.7rem;color:var(--mute);text-align:center;counter-increment:j}
-.journey li::before{content:counter(j);display:grid;place-items:center;width:24px;height:24px;margin:0 auto 4px;border-radius:50%;border:1.5px solid var(--line);font-weight:700;background:var(--surface)}
-.journey li.done::before{content:"\\2713";background:var(--tint-ground);border-color:var(--teal-400);color:var(--link)}
-.journey li.on{color:var(--ink);font-weight:650}.journey li.on::before{background:var(--brand);color:var(--on-brand);border-color:transparent}
+.iconbtn{margin-left:0;flex:none;min-width:44px;height:44px;border-radius:22px;border:1.5px solid var(--contour);background:var(--surface);color:var(--ink);font-weight:700;font-size:1.02rem;line-height:1;font-family:inherit;cursor:pointer}
+/* the journey is a climb: stations rise along a trail towards the report, the goal at the top */
+.journey{position:relative;display:flex;gap:4px;margin:2px 0 16px;padding:0;list-style:none;counter-reset:j}
+.journey::before{content:"";position:absolute;left:0;right:0;top:0;height:40px;background:var(--contour);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'%3E%3Cpolyline points='10,24 30,21 50,18 70,15 90,12' fill='none' stroke='%23000' stroke-width='1.6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'%3E%3Cpolyline points='10,24 30,21 50,18 70,15 90,12' fill='none' stroke='%23000' stroke-width='1.6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
+.journey li{position:relative;flex:1;padding-top:12px;font-size:.74rem;line-height:1.25;color:var(--mute);text-align:center;counter-increment:j}
+.journey li:nth-child(1){--up:0px}.journey li:nth-child(2){--up:-3px}.journey li:nth-child(3){--up:-6px}.journey li:nth-child(4){--up:-9px}.journey li:nth-child(5){--up:-12px}
+.journey li::before{content:counter(j);display:grid;place-items:center;width:24px;height:24px;margin:0 auto 6px;border-radius:50%;border:1.5px solid var(--contour);font-weight:600;font-size:.8rem;font-family:var(--f-sign);background:var(--surface);color:var(--ink-2);transform:translateY(var(--up));transition:background-color .3s ease}
+.journey li.done::before{content:"\\2713";background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.journey li.on{color:var(--ink);font-weight:650}.journey li.on::before{border:2.5px solid var(--brand);color:var(--link);box-shadow:0 0 0 4px var(--tint-ground)}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);margin:0 0 14px}
 .seg button{border:0;border-radius:9px;padding:8px;min-height:44px;font-weight:600;font-size:.88rem;font-family:inherit;background:transparent;color:var(--ink-2);cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
@@ -200,7 +203,7 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .shutter{width:78px;height:78px;border-radius:50%;border:4px solid #ffc862;background:transparent;padding:5px;cursor:pointer;transition:border-color .2s}
 .shutter span{display:block;width:100%;height:100%;border-radius:50%;background:#fff}.shutter.ready{border-color:#5fd1a8;box-shadow:0 0 0 6px rgba(95,209,168,.25)}
 .vfr{justify-self:end;font-size:.78rem;font-weight:650}
-.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,140%);z-index:70;max-width:min(92vw,520px);padding:11px 16px;border-radius:14px;background:#13201c;color:#fff;font-size:.88rem;box-shadow:var(--shadow);transition:transform .25s ease}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,140%);z-index:70;max-width:min(92vw,520px);padding:11px 16px;border-radius:14px;background:#15242a;color:#fff;font-size:.88rem;box-shadow:var(--shadow);transition:transform .25s ease}
 .toast.on{transform:translate(-50%,0)}
 .qband{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:12px 14px;margin:14px 0;border-radius:14px;border:1.5px solid var(--line);background:var(--surface)}
 .qband .qd{width:14px;height:14px;border-radius:50%;margin-top:4px}.qband b{color:var(--ink)}.qband p{margin:4px 0 0;font-size:.88rem;color:var(--ink-2)}
@@ -441,7 +444,7 @@ function liveShow(m,t,px){const c=judge(m,t).filter(x=>x[0]!=='Resolution'&&!(mo
  const msg=ready||!hit?(px&&px.good)||'Good. Take the photo.':hit[1];vf.querySelector('.vfmsg').textContent=msg;
  const k=ready?'':top;vf.querySelector('.vfarrow').textContent=k==='Framing'||(k==='Aim'&&t&&t.elev>60)?'\u2193':k==='Aim'?'\u2191':'';
  const sh=vf.querySelector('.shutter');sh.classList.toggle('ready',ready&&q===0);sh.classList.toggle('poor',q>=2);
- sh.setAttribute('aria-label',tr('Take photo')+' · '+tr('Photo quality')+': '+tr(QL[q]));
+ sh.setAttribute('aria-label',tr('Take photo')+', '+tr('Photo quality')+': '+tr(QL[q]));
  vf.querySelector('.vfr').textContent=ready&&q===0?'Ready':q===1?'OK to shoot':q>=2?'Can still shoot':'';
  const now=Date.now();if(ready&&!wasReady){buzz(30);say(msg);lastSay=now}else if(!ready&&(msg!==lv.said||now-lastSay>5000)){say(msg);lastSay=now}lv.said=msg;wasReady=ready;
  return {q,ready,msg}}
@@ -456,12 +459,12 @@ vf.addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;
 /* ---------- language: English / Hindi (text nodes are translated as they appear) ---------- */
 const HI=G.hi||{};
 const RX=[[/^Shot (\d) of (\d): (.+)$/,(m,a,b,c)=>`शॉट ${a}/${b}: ${HI[c]||c}`],[/^Shot (\d): (.+)$/,(m,a,b)=>`शॉट ${a}: ${HI[b]||b}`],
- [/^Uploading… (\d+)%$/,(m,a)=>`अपलोड हो रहा है… ${a}%`],[/^(\d+) s · about (\d+) s left$/,(m,a,b)=>`${a} सेकंड · लगभग ${b} सेकंड बाकी`],
- [/^(\d+) s · taking longer than usual, still working$/,(m,a)=>`${a} सेकंड · सामान्य से अधिक समय, काम जारी है`],[/^Guide (\d) of (\d)$/,(m,a,b)=>`गाइड ${a}/${b}`],
+ [/^Uploading… (\d+)%$/,(m,a)=>`अपलोड हो रहा है… ${a}%`],[/^(\d+) s, about (\d+) s left$/,(m,a,b)=>`${a} सेकंड, लगभग ${b} सेकंड बाकी`],
+ [/^(\d+) s, taking longer than usual, still working$/,(m,a)=>`${a} सेकंड, सामान्य से अधिक समय, काम जारी है`],[/^Guide (\d) of (\d)$/,(m,a,b)=>`गाइड ${a}/${b}`],
  [/^Practice (\d) of (\d)$/,(m,a,b)=>`अभ्यास ${a}/${b}`],[/^(\d) of (\d) correct$/,(m,a,b)=>`${b} में से ${a} सही`],[/^Tip: (.+)$/,(m,a)=>'सुझाव: '+(HI[a]||a)],
  [/^Aim (-?\d+)°$/,(m,a)=>`दिशा ${a}°`],[/^(\d) things could be better$/,(m,a)=>`${a} चीज़ें बेहतर हो सकती हैं`],[/^(.+):$/,(m,a)=>HI[a]?HI[a]+':':m],
- [/^Estimated dimensions · depth trust: (\w+)$/,(m,a)=>`अनुमानित आयाम · गहराई भरोसा: ${HI[a]||a}`],[/^Site result · (\d) shots combined$/,(m,a)=>`स्थल परिणाम · ${a} शॉट मिलाकर`],
- [/^Recent observations \(this phone\)$/,()=>'हाल के अवलोकन (यह फ़ोन)'],[/^Volume \((.+)\)$/,(m,a)=>`आयतन (${a})`],
+ [/^Estimated dimensions, depth trust: (\w+)$/,(m,a)=>`अनुमानित आयाम, गहराई भरोसा: ${HI[a]||a}`],[/^Site result, (\d) shots combined$/,(m,a)=>`स्थल परिणाम, ${a} शॉट मिलाकर`],
+ [/^Recent observations \(this phone\)$/,()=>'हाल के अवलोकन (यह फ़ोन)'],[/^Answers below (\d+)% are marked uncertain\.$/,(m,a)=>`${a}% से कम वाले उत्तर अनिश्चित माने जाते हैं।`],[/^Volume \((.+)\)$/,(m,a)=>`आयतन (${a})`],
  [/^(.+) \(second choice\)$/,(m,a)=>`${HI[a]||a} (दूसरा विकल्प)`],[/^Measured with your distance of ([\d.]+) m\.$/,(m,a)=>`आपकी ${a} मीटर दूरी से मापा गया।`]];
 function tr(s){if(lang!=='hi'||!s)return s;const k=s.trim();if(!k)return s;let v=HI[k];if(v==null)for(const [re,f] of RX){if(re.test(k)){v=k.replace(re,f);break}}return v==null?s:s.replace(k,v)}
 function trTree(n){if(n.nodeType===3){const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;return}
@@ -549,7 +552,7 @@ function prog(el,stages,eta,withUpload){
  const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);return}
   if(!ts){bar.style.width=(up*U).toFixed(1)+'%';tm.textContent='Uploading… '+Math.round(up*100)+'%';return}
   const f=(Date.now()-ts)/eta,p=f<1?f*.9:.9+.09*(1-Math.exp(-(f-1)*2)),left=Math.max(0,Math.round((eta-(Date.now()-ts))/1000));
-  bar.style.width=(U+p*(100-U)).toFixed(1)+'%';tm.textContent=Math.round((Date.now()-t0)/1000)+' s'+(f<1?' · about '+left+' s left':' · taking longer than usual, still working');
+  bar.style.width=(U+p*(100-U)).toFixed(1)+'%';tm.textContent=Math.round((Date.now()-t0)/1000)+' s'+(f<1?', about '+left+' s left':', taking longer than usual, still working');
   li.forEach((x,k)=>{const a=stages[k][0],b=k+1<stages.length?stages[k+1][0]:9;x.className=f>=b?'done':f>=a?'on':''})},400);
  return {up:v=>{up=v},srv:()=>{ts=ts||Date.now()},stop:()=>clearInterval(iv)}}
 function tipRot(el){let i=Math.floor(Math.random()*G.tips.length);const put=()=>{el.textContent='Tip: '+G.tips[i]};put();
@@ -560,7 +563,7 @@ function post(url,body,P,h){const x=new XMLHttpRequest();xhr=x;x.open('POST',url
  x.onerror=()=>{P&&P.stop();h.err('Could not reach the server. Check the Wi-Fi or hotspot connection to the laptop running the app.',0)};
  x.ontimeout=()=>{P&&P.stop();h.err('The server took more than 4 minutes. It may be busy or out of memory; try again.',-1)};
  x.onabort=()=>{P&&P.stop();h.err(null,-2)};x.send(body||null);return x}
-function busy(title){out.innerHTML=`<section class="card result" aria-busy="true"><div class="kicker">${esc(title)}${curShot()?' · '+esc(curShot().t):''}</div><div id="pg"></div><div class="tipline" id="ptip"></div>
+function busy(title){out.innerHTML=`<section class="card result" aria-busy="true"><div class="kicker">${esc(title)}${curShot()?', '+esc(curShot().t):''}</div><div id="pg"></div><div class="tipline" id="ptip"></div>
  <div class="u-t3"><button type="button" class="minibtn" id="pcancel">Cancel</button></div></section>`;tipRot($('#ptip'));$('#pcancel').onclick=()=>xhr&&xhr.abort()}
 function cancelled(){A.setChip('','Cancelled');out.innerHTML='';step(1)}
 function send(){lastDist=distM();curMeta=meta();job=null;
@@ -656,7 +659,7 @@ function ask(r,replay){let p={};r.ranked.forEach(([c,v])=>p[c]=Math.max(v,1e-4))
  const pick=()=>{let best=null,bg=0;for(const q of Q){if(asked.includes(q.id))continue;const g=gain(q);if(g>bg){bg=g;best=q}}return bg>=.05?best:null};
  for(const a of ans){const q=Q.find(x=>x.t===a.q);if(q){asked.push(q.id);if(a.a!=='not sure')p=upd(p,q,a.a==='yes')}}
  const draw=()=>{const rk=Object.entries(p).sort((a,b)=>b[1]-a[1]),q=!replay&&asked.length<5&&rk[0][1]<.85?pick():null;
-  card.innerHTML=`<div class="kicker">Help decide · answer what you can see</div>${q?`<h2>${esc(q.t)}</h2>${q.hint?`<p class="hungr u-sub">${esc(q.hint)}</p>`:''}
+  card.innerHTML=`<div class="kicker">Help decide: answer what you can see</div>${q?`<h2>${esc(q.t)}</h2>${q.hint?`<p class="hungr u-sub">${esc(q.hint)}</p>`:''}
   <div class="qa"><button type="button" class="minibtn pri" data-y="1">Yes</button><button type="button" class="minibtn pri" data-y="0">No</button><button type="button" class="minibtn" data-y="-">Not sure</button></div>`
   :`<h2>${ans.some(a=>a.a!=='not sure')?esc(tr('Your answers point to'))+' '+esc(tr(D.names[rk[0][0]]))+' ('+Math.round(rk[0][1]*100)+'%)':esc(tr('No further question would change the answer much'))}</h2>`}
   <div class="probs u-t3">${rk.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>
@@ -676,7 +679,7 @@ function ticks(r){const card=$('#checkcard');if(!card)return;const N=D.names,top
  const ul1=card.querySelector('ul.list'),ul2=$('#ck2'),sv=r.signs||{};let l1=[],l2=[];
  const upd=()=>{const on=l=>l.map(li=>li.getAttribute('aria-checked')==='true'),a=on(l1).filter(Boolean).length,b=on(l2).filter(Boolean).length;
   r.signs={[top]:on(l1),...(cmp?{[sec]:on(l2)}:{})};
-  $('#tally').innerHTML=!cmp?`<span>Signs seen:</span> <b>${a} / ${l1.length}</b>${a===0?'':' · <span>'+(a>=Math.ceil(l1.length/2)?'The field signs support this type.':'Few signs match: take another photo or ask a geologist.')+'</span>'}`:
+  $('#tally').innerHTML=!cmp?`<span>Signs seen:</span> <b>${a} / ${l1.length}</b>${a===0?'':', <span>'+(a>=Math.ceil(l1.length/2)?'The field signs support this type.':'Few signs match: take another photo or ask a geologist.')+'</span>'}`:
   `<div class="cmp"><div class="${a/l1.length>b/l2.length?'lead':''}">${esc(N[top])}<b>${a}/${l1.length}</b></div><div class="${b/l2.length>a/l1.length?'lead':''}">${esc(N[sec])}<b>${b}/${l2.length}</b></div></div><p class="hungr u-t2">The type with the larger share of signs seen is the better field match.</p>`};
  l1=tickList(ul1,()=>{upd();cur&&cur.__id&&finish(cur)},sv[top]);if(ul2)l2=tickList(ul2,()=>{upd();cur&&cur.__id&&finish(cur)},sv[sec]);upd()}
 function gloss(){const card=findDims();if(!card||card.querySelector('.what'))return;
@@ -699,7 +702,7 @@ function fuse(sv){const x=new XMLHttpRequest();x.open('POST','fuse?'+params({}))
  x.onload=()=>{if(x.status!==200)return;let s;try{s=JSON.parse(x.responseText)}catch(_){return}sess.set('site',JSON.stringify(s));siteCard(s)};x.send(JSON.stringify({shots:Object.values(sv)}))}
 const num=v=>v>=100?Math.round(v).toLocaleString():v;
 function siteCard(s){const N=D.names,t=s.type.ranked,d=s.dimensions,old=$('#sitecard');
- let h=`<section class="card" id="sitecard"><div class="kicker">Site result · ${s.n} shots combined</div><h2>${esc(N[t[0][0]])} · ${Math.round(t[0][1]*100)}%</h2>
+ let h=`<section class="card" id="sitecard"><div class="kicker">Site result, ${s.n} shots combined</div><h2>${esc(N[t[0][0]])}, ${Math.round(t[0][1]*100)}%</h2>
  <div class="probs">${t.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(N[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>`;
  if(d&&d.available)h+=d.measures.map(m=>`<div class="drow"><span>${esc(m.name)}</span><b>${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small></b></div>`).join('')+
   (d.measures.some(m=>m.between_photo_log_sd>.7)?`<p class="note">${esc(tr('The shots disagree strongly on size (more than 2x). Check that they show the same landslide, or retake the whole-slope shot with the distance typed in.'))}</p>`:'')+
@@ -730,7 +733,7 @@ const cardOf=h=>['N','NE','E','SE','S','SW','W','NW'][Math.round(h/45)%8];
 const osm=p=>`https://www.openstreetmap.org/?mlat=${p.lat.toFixed(6)}&mlon=${p.lon.toFixed(6)}#map=17/${p.lat.toFixed(6)}/${p.lon.toFixed(6)}`;
 const ll=p=>`${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}`,pm=a=>a?` ±${Math.round(a)} m`:'';
 function locHTML(L){if(!L)return '<p>No location recorded.</p>';const c=L.cam;
- let h=`<table><tr><td>Camera position</td><td><a href="${osm(c)}">${ll(c)}</a>${pm(c.acc)}<br>${dmsOf(c.lat,'N','S')} ${dmsOf(c.lon,'E','W')}${c.alt!=null?` · ${Math.round(c.alt)} m altitude`:''}</td></tr>
+ let h=`<table><tr><td>Camera position</td><td><a href="${osm(c)}">${ll(c)}</a>${pm(c.acc)}<br>${dmsOf(c.lat,'N','S')} ${dmsOf(c.lon,'E','W')}${c.alt!=null?`, ${Math.round(c.alt)} m altitude`:''}</td></tr>
  <tr><td>Location source</td><td>${c.src==='photo'?'GPS stored in the photo':'Phone GPS'+(c.age>2?` (${c.age} min from the photo time)`:'')}</td></tr>`;
  if(L.head)h+=`<tr><td>Camera facing</td><td>${Math.round(L.head.deg)}° ${cardOf(L.head.deg)}${L.head.acc?` (±${Math.round(L.head.acc)}°)`:''}</td></tr>`;
  if(L.tgt)h+=`<tr><td>Landslide (estimated)</td><td><a href="${osm(L.tgt)}">${ll(L.tgt)}</a>${pm(L.tgt.acc)}<br>${Math.round(L.tgt.dist)} m along the camera bearing (${L.tgt.typed?'your distance':'model depth'})</td></tr>`;
@@ -781,10 +784,10 @@ function wrapT(x,s,X,Y,maxW,lh){const words=String(s??'').split(/\s+/);let line=
 const STW={ok:'Confident',uncertain:'Uncertain',bad_photo:'Not reliable'};
 async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D.names,d=r.dimensions,L=locOf(mt,r),T=s=>tr(s),miss=[];
  const cv=document.createElement('canvas');cv.width=W;cv.height=8000;const x=cv.getContext('2d');if(!x)throw new Error('no canvas');
- const F=(sz,wt=400)=>`${wt} ${sz}px system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Nirmala UI",sans-serif`,ink='#13201c',ink2='#4d5c56',line='#d7e0dc';
+ const F=(sz,wt=400)=>`${wt} ${sz}px ${wt>=600?'"DIN Alternate",Bahnschrift,':''}system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Nirmala UI",sans-serif`,ink='#15242a',ink2='#3a4c50',line='#c9d3cb';
  x.fillStyle='#fff';x.fillRect(0,0,W,cv.height);
  x.fillStyle='#13463b';x.fillRect(0,0,W,124);x.fillStyle='#fff';x.font=F(40,700);x.fillText(T('Landslide observation'),M,62);
- x.font=F(24);x.fillStyle='#cfe5dd';x.fillText(new Date(mt.t||Date.now()).toLocaleString()+(mt.shot?' · '+T(mt.shot):'')+(mt.set?' · '+mt.set:''),M,102);
+ x.font=F(24);x.fillStyle='#cfe5dd';x.fillText(new Date(mt.t||Date.now()).toLocaleString()+(mt.shot?', '+T(mt.shot):'')+(mt.set?', '+mt.set:''),M,102);
  let y=152;
  const sec=t=>{y+=14;x.fillStyle='#17695a';x.font=F(30,700);x.fillText(T(t),M,y+28);y+=42;x.fillStyle=line;x.fillRect(M,y,IW,2);y+=26};
  const part=(name,f)=>{const y0=y;try{f()}catch(e){x.fillStyle='#fff';x.fillRect(0,y0,W,Math.max(0,y-y0)+80);y=y0;miss.push(name)}};
@@ -794,16 +797,16 @@ async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D
   x.drawImage(im,X,y,w,h);const sh=L?(L.tgt?118:86):54;x.fillStyle='rgba(0,0,0,.64)';x.fillRect(X,y+h-sh,w,sh);x.fillStyle='#fff';
   if(L){const c=L.cam;pin(x,X+36,y+h-sh/2+20,34,'#d93a2b');x.font=F(25,700);
    x.fillText(`${dmsOf(c.lat,'N','S')}  ${dmsOf(c.lon,'E','W')}${pm(c.acc)}`,X+70,y+h-sh+34);x.font=F(20);x.fillStyle='#e6efeb';
-   x.fillText(`${ll(c)}${c.alt!=null?' · '+Math.round(c.alt)+' m':''}${L.head?' · '+T('facing')+' '+Math.round(L.head.deg)+'° '+cardOf(L.head.deg):''} · ${new Date(mt.t||Date.now()).toLocaleString()}`,X+70,y+h-sh+64,w-90);
+   x.fillText(`${ll(c)}${c.alt!=null?', '+Math.round(c.alt)+' m':''}${L.head?', '+T('facing')+' '+Math.round(L.head.deg)+'° '+cardOf(L.head.deg):''}, ${new Date(mt.t||Date.now()).toLocaleString()}`,X+70,y+h-sh+64,w-90);
    if(L.tgt){x.fillStyle='#ffd7d2';x.fillText(`${T('Landslide about')} ${ll(L.tgt)}${pm(L.tgt.acc)}`,X+70,y+h-sh+96,w-90)}}
-  else{x.font=F(21);x.fillText(T('No location recorded')+' · '+new Date(mt.t||Date.now()).toLocaleString(),X+18,y+h-20)}
+  else{x.font=F(21);x.fillText(T('No location recorded')+', '+new Date(mt.t||Date.now()).toLocaleString(),X+18,y+h-20)}
   y+=h+12;if(d&&d.available&&d.overlay){x.font=F(19);x.fillStyle=ink2;x.fillText(T('Outlined area = the measured landslide'),M,y+18);y+=30}}
  else miss.push('photo');
  // 2 location: map panel + coordinates
  sec('Location');
  if(L){const mw=470,mh=350;let used=false;try{used=await drawMap(x,M,y,mw,mh,L,tiles)}catch(e){miss.push('map')}
   const X=M+mw+26,TW=IW-mw-26;let ty=y+26;const kv=(k,v,col)=>{x.font=F(19,600);x.fillStyle=ink2;x.fillText(T(k),X,ty);ty+=28;x.font=F(22);x.fillStyle=col||ink;for(const s of v)ty=wrapT(x,s,X,ty,TW,30);ty+=10};
-  const c=L.cam;kv('Camera position',[`${dmsOf(c.lat,'N','S')} ${dmsOf(c.lon,'E','W')}`,ll(c)+pm(c.acc)+(c.alt!=null?' · '+Math.round(c.alt)+' m':'')],'#1e6edc');
+  const c=L.cam;kv('Camera position',[`${dmsOf(c.lat,'N','S')} ${dmsOf(c.lon,'E','W')}`,ll(c)+pm(c.acc)+(c.alt!=null?', '+Math.round(c.alt)+' m':'')],'#1e6edc');
   kv('Location source',[c.src==='photo'?T('GPS stored in the photo'):T('Phone GPS')+(c.age>2?` (${c.age} min)`:'')]);
   if(L.head)kv('Camera facing',[`${Math.round(L.head.deg)}° ${cardOf(L.head.deg)}${L.head.acc?' ±'+Math.round(L.head.acc)+'°':''}`]);
   if(L.tgt)kv('Landslide (estimated)',[ll(L.tgt)+pm(L.tgt.acc),`${Math.round(L.tgt.dist)} m ${T('along the camera bearing')} (${T(L.tgt.typed?'your distance':'model depth')})`],'#d93a2b');
@@ -813,14 +816,14 @@ async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D
  // 3 type
  part('type',()=>{sec('Landslide type');x.font=F(38,700);x.fillStyle=ink;y=wrapT(x,T(N[r.label]||r.label),M,y+30,IW,46);
   x.font=F(23);x.fillStyle=r.status==='ok'?'#17695a':r.status==='uncertain'?'#8a5d00':'#b8381f';
-  x.fillText(`${Math.round((r.confidence||0)*100)}% · ${T(STW[r.status]||r.status)}${r.family?' · '+T(r.family)+' '+T('family'):''}`,M,y+6);y+=40;
+  x.fillText(`${Math.round((r.confidence||0)*100)}%, ${T(STW[r.status]||r.status)}${r.family?', '+T(r.family)+' '+T('family'):''}`,M,y+6);y+=40;
   for(const [c,p] of (r.ranked||[]).slice(0,3)){x.font=F(21);x.fillStyle=ink;x.fillText(T(N[c]||c),M,y+20);x.fillStyle='#e3ebe7';x.fillRect(M+430,y+4,IW-530,22);
    x.fillStyle='#17695a';x.fillRect(M+430,y+4,(IW-530)*Math.max(0,Math.min(1,p)),22);x.fillStyle=ink;x.fillText(Math.round(p*100)+'%',M+IW-80,y+22);y+=36}
   if(r.fieldRanked&&r.answers&&r.answers.some(a=>a.a!=='not sure')){x.font=F(21,600);x.fillStyle=ink;x.fillText(`${T('With your field answers')}: ${T(N[r.fieldRanked[0][0]])} ${Math.round(r.fieldRanked[0][1]*100)}%`,M,y+22);y+=36}});
  // 4 photo quality
  part('quality',()=>{const ql=qLevel(r);sec('Photo quality');x.font=F(23,700);x.fillStyle=['#17695a','#7a5c00','#9a4a00','#b8381f'][ql];x.fillText(T(QL[ql]),M,y+22);y+=34;
   x.font=F(20);x.fillStyle=ink2;const iss=(r.quality&&r.quality.issues||[]).map(i=>T(i[0])+(i[2]===2?' ('+T('serious')+')':''));
-  if(r.status==='bad_photo')iss.unshift(T('photo check failed: the result is not reliable'));if(iss.length)y=wrapT(x,iss.join(' · '),M,y+26,IW,28)});
+  if(r.status==='bad_photo')iss.unshift(T('photo check failed: the result is not reliable'));if(iss.length)y=wrapT(x,iss.join(', '),M,y+26,IW,28)});
  // 5 sizes
  part('sizes',()=>{if(!d)return;sec('Estimated dimensions');
   if(!d.available){x.font=F(21);x.fillStyle=ink2;y=wrapT(x,d.reason||T('No size estimate for this photo.'),M,y+6,IW,30);return}
@@ -830,7 +833,7 @@ async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D
   if(d.size_class)row(T('Size class'),T(d.size_class),'');if(d.slope_angle_deg!=null)row(T('Slope angle'),d.slope_angle_deg+'°','');
   if(d.distance_m)row(T('Distance to the slope'),(mt.dist||d.distance_m)+' m',mt.dist?T('your distance'):T('model depth'));
   if(d.grains&&d.grains.reliable)row(T('Grain size D16 / D50 / D84'),`${d.grains.D16_m} / ${d.grains.D50_m} / ${d.grains.D84_m} m`,'');
-  x.font=F(19);x.fillStyle=ink2;y=wrapT(x,`${T('Scale')}: ${d.scale_source||''} · ${T('Depth trust')}: ${T(d.depth_trust||'')}${(d.cut_edges||[]).length?' · '+T('sizes are minimums')+' ('+d.cut_edges.map(T).join(', ')+')':''}`,M,y+18,IW,26)});
+  x.font=F(19);x.fillStyle=ink2;y=wrapT(x,`${T('Scale')}: ${d.scale_source||''}, ${T('Depth trust')}: ${T(d.depth_trust||'')}${(d.cut_edges||[]).length?', '+T('sizes are minimums')+' ('+d.cut_edges.map(T).join(', ')+')':''}`,M,y+18,IW,26)});
  // 6 field check, notes
  part('field',()=>{const ans=r.answers||[],sg=r.signs||{},seen=Object.values(sg).map(v=>v.filter(Boolean).length+' / '+v.length);
   if(!ans.length&&!seen.length&&!mt.notes&&!mt.weather)return;sec('Field check');x.font=F(20);x.fillStyle=ink;
@@ -839,7 +842,7 @@ async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D
   if(mt.weather)y=wrapT(x,`${T('Weather')}: ${T(mt.weather)}`,M,y+4,IW,28);if(mt.notes)y=wrapT(x,`${T('Notes')}: ${mt.notes}`,M,y+4,IW,28)});
  // footer
  y+=20;x.fillStyle=line;x.fillRect(M,y,IW,2);y+=10;x.font=F(18);x.fillStyle=ink2;
- y=wrapT(x,T('Decision support only: confirm with a geologist or geotechnical engineer before acting.')+(r.model?' · '+r.model:'')+' · WGS-84'+(mt.__tiles?' · Map © OpenStreetMap contributors':'')+(miss.length?' · not drawn: '+miss.join(', '):''),M,y+22,IW,26);
+ y=wrapT(x,T('Decision support only: confirm with a geologist or geotechnical engineer before acting.')+(r.model?', '+r.model:'')+', WGS-84'+(mt.__tiles?', Map © OpenStreetMap contributors':'')+(miss.length?', not drawn: '+miss.join(', '):''),M,y+22,IW,26);
  const tiled=!!mt.__tiles;delete mt.__tiles;
  const o=document.createElement('canvas');o.width=W;o.height=Math.ceil(y+24);const ox=o.getContext('2d');ox.drawImage(cv,0,0);
  const jb=await new Promise((res,rej)=>{try{o.toBlob(b=>b?res(b):rej(new Error('toBlob')),'image/jpeg',.9)}catch(e){rej(e)}});   // a tainted canvas throws here
@@ -904,13 +907,13 @@ function repShow(blob,name,tiles,ok){$('#repcard')?.remove();let u='';try{u=URL.
 
 /* ---------- page report: a standalone HTML page (opens anywhere, prints to PDF) and a short shareable text ---------- */
 const RCSS='body{font:15px/1.5 system-ui,sans-serif;max-width:780px;margin:24px auto;padding:0 16px;color:#13201c}h1{font-size:1.35rem}h2{font-size:1.05rem;margin-top:22px}table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid #ddd;padding:6px;text-align:left;vertical-align:top}img{max-width:100%;border-radius:8px;margin:8px 0}.m{color:#5c6b65;font-size:.9rem}';
-function metaHTML(mt){mt=mt||{};const g=mt.gps&&isFinite(mt.gps.lat)?mt.gps:null;return `<p class="m">${new Date(mt.t||Date.now()).toLocaleString()}${g?` · <a href="${osm(g)}">${g.lat.toFixed(5)}, ${g.lon.toFixed(5)}</a>${pm(g.acc)}`:''}${mt.weather?' · '+esc(mt.weather):''}${mt.shot?' · '+esc(mt.shot):''}${mt.set?' · '+esc(mt.set):''}${mt.dist?' · distance '+esc(mt.dist)+' m':''}</p>${mt.notes?`<p><b>Notes:</b> ${esc(mt.notes)}</p>`:''}`}
+function metaHTML(mt){mt=mt||{};const g=mt.gps&&isFinite(mt.gps.lat)?mt.gps:null;return `<p class="m">${new Date(mt.t||Date.now()).toLocaleString()}${g?`, <a href="${osm(g)}">${g.lat.toFixed(5)}, ${g.lon.toFixed(5)}</a>${pm(g.acc)}`:''}${mt.weather?', '+esc(mt.weather):''}${mt.shot?', '+esc(mt.shot):''}${mt.set?', '+esc(mt.set):''}${mt.dist?', distance '+esc(mt.dist)+' m':''}</p>${mt.notes?`<p><b>Notes:</b> ${esc(mt.notes)}</p>`:''}`}
 // every section is written on its own: a missing or odd field costs that section, never the whole report
 const partH=(name,f)=>{try{return f()}catch(e){return `<p class="m">(${esc(name)}: this part could not be written)</p>`}};
 function resultHTML(r,photo,mt){const N=D.names,d=r.dimensions;let h=photo?`<img src="${photo}" alt="photo">`:'';
  h+=partH('location',()=>`<h2>Location</h2>${locHTML(locOf(mt,r))}`);
- h+=partH('photo quality',()=>{const ql=qLevel(r);return `<h2>Photo quality</h2><p><b>${QL[ql]}</b>${r.quality&&r.quality.issues&&r.quality.issues.length?': '+r.quality.issues.map(x=>esc(x[0])+(x[2]===2?' (serious)':'')).join(', '):''}${r.status==='bad_photo'?' · photo check failed: the result is not reliable':''}</p>`});
- h+=partH('type',()=>`<h2>Type</h2><p><b>${esc(N[r.label]||r.label)}</b> · ${Math.round((r.confidence||0)*100)}% (${esc(r.status)}${r.family?', '+esc(r.family)+' family':''})</p><table>${(r.ranked||[]).map(([c,p])=>`<tr><td>${esc(N[c]||c)}</td><td>${Math.round(p*100)}%</td></tr>`).join('')}</table>`);
+ h+=partH('photo quality',()=>{const ql=qLevel(r);return `<h2>Photo quality</h2><p><b>${QL[ql]}</b>${r.quality&&r.quality.issues&&r.quality.issues.length?': '+r.quality.issues.map(x=>esc(x[0])+(x[2]===2?' (serious)':'')).join(', '):''}${r.status==='bad_photo'?', photo check failed: the result is not reliable':''}</p>`});
+ h+=partH('type',()=>`<h2>Type</h2><p><b>${esc(N[r.label]||r.label)}</b>, ${Math.round((r.confidence||0)*100)}% (${esc(r.status)}${r.family?', '+esc(r.family)+' family':''})</p><table>${(r.ranked||[]).map(([c,p])=>`<tr><td>${esc(N[c]||c)}</td><td>${Math.round(p*100)}%</td></tr>`).join('')}</table>`);
  if(r.answers&&r.answers.length)h+=partH('field questions',()=>`<h2>Field questions</h2><table>${r.answers.map(a=>`<tr><td>${esc(a.q)}</td><td>${esc(a.a)}</td></tr>`).join('')}</table>${r.fieldRanked?`<p>With these answers: <b>${esc(N[r.fieldRanked[0][0]])}</b> ${Math.round(r.fieldRanked[0][1]*100)}%</p>`:''}`);
  if(r.signs)h+=partH('signs',()=>`<h2>Signs checked on site</h2><table>${Object.entries(r.signs).map(([c,v])=>v.map((on,i)=>`<tr><td>${esc(((D.info[c]||{}).check||[])[i]||'sign '+(i+1))}</td><td>${on?'seen':'not seen'}</td></tr>`).join('')).join('')}</table>`);
  if(d&&d.available)h+=partH('dimensions',()=>`<h2>Estimated dimensions</h2>${d.overlay?`<img src="${d.overlay}" alt="measured outline">`:''}<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${(d.measures||[]).map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td><td>${m.range?esc(num(m.range[0]))+' – '+esc(num(m.range[1])):''}</td></tr>`).join('')}
@@ -927,7 +930,7 @@ function saveReport(){if(!cur)return;const mt=curMeta||meta();
 async function siteReport(){let s=null;try{s=JSON.parse(sess.get('site')||'null')}catch(_){}const hs=store.get('hist',[]),N=D.names,mt=meta();
  const ids=hs.filter(o=>o.site===siteId()).map(o=>o.id),rs=(await Promise.all(ids.map(id=>safe(()=>DB.get('results',id),null)))).filter(Boolean).reverse();
  let h=`<h1>Landslide site survey</h1>${metaHTML(mt)}`;
- if(s)h+=partH('site result',()=>{const t=s.type.ranked,d=s.dimensions;let q=`<h2>Site result (${s.n} shots combined)</h2><p><b>${esc(N[t[0][0]])}</b> · ${Math.round(t[0][1]*100)}%</p>`;
+ if(s)h+=partH('site result',()=>{const t=s.type.ranked,d=s.dimensions;let q=`<h2>Site result (${s.n} shots combined)</h2><p><b>${esc(N[t[0][0]])}</b>, ${Math.round(t[0][1]*100)}%</p>`;
   if(d&&d.available)q+=`<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${d.measures.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td><td>${esc(num(m.range[0]))} – ${esc(num(m.range[1]))}</td></tr>`).join('')}</table><p class="m">Median of the whole-slope shots; the spread between photos is added to the range.</p>`;
   if(s.grains)q+=`<p>Grain size D16 / D50 / D84: ${esc(s.grains.D16_m)} / ${esc(s.grains.D50_m)} / ${esc(s.grains.D84_m)} m</p>`;return q});
  for(const x of rs)h+=partH('photo',()=>`<hr><h2>${esc(x.meta&&x.meta.shot||'Photo')}</h2>${metaHTML(x.meta)}${resultHTML(x.r,x.photo,x.meta)}`);
@@ -974,7 +977,7 @@ async function saveResult(id,r,mt,photo,queued,blob,site){await safe(()=>DB.put(
  h.sort((a,b)=>b.t-a.t);const keep=h.slice(0,20);store.set('hist',keep);
  const ids=new Set(keep.map(o=>o.id));for(const x of await safe(()=>DB.all('results'),[]))if(!ids.has(x.id))safe(()=>DB.del('results',x.id));drawHist()}
 function drawHist(){const h=store.get('hist',[]),el=$('#history');if(!h.length){el.innerHTML='';return}
- el.innerHTML=`<section class="card"><div class="kicker">Recent observations (this phone)</div><ul class="hist">${h.map(o=>`<li ${o.id?`data-id="${o.id}" role="button" tabindex="0"`:''}>${o.th?`<img src="${o.th}" alt="">`:'<span></span>'}<span><b>${esc(D.names[o.label]||o.label)}</b>${o.q>=2?` <span class="sev s${o.q-1}">${o.q===3?'Very poor photo':'Poor photo'}</span>`:''}${o.status==='uncertain'?' <span>(uncertain)</span>':''}${o.queued?' <span>(sent later)</span>':''}<br>${esc([o.shot,o.size].filter(Boolean).join(' · '))}</span><span>${Math.round(o.conf*100)}%<br><small>${new Date(o.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></span></li>`).join('')}</ul></section>`;
+ el.innerHTML=`<section class="card"><div class="kicker">Recent observations (this phone)</div><ul class="hist">${h.map(o=>`<li ${o.id?`data-id="${o.id}" role="button" tabindex="0"`:''}>${o.th?`<img src="${o.th}" alt="">`:'<span></span>'}<span><b>${esc(D.names[o.label]||o.label)}</b>${o.q>=2?` <span class="sev s${o.q-1}">${o.q===3?'Very poor photo':'Poor photo'}</span>`:''}${o.status==='uncertain'?' <span>(uncertain)</span>':''}${o.queued?' <span>(sent later)</span>':''}<br>${esc([o.shot,o.size].filter(Boolean).join(', '))}</span><span>${Math.round(o.conf*100)}%<br><small>${new Date(o.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></span></li>`).join('')}</ul></section>`;
  el.querySelectorAll('li[data-id]').forEach(li=>{const go=()=>openHist(+li.dataset.id);li.onclick=go;li.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}})}
 async function openHist(id){const x=await safe(()=>DB.get('results',id),null);if(!x){toast('This result is no longer stored on the phone.');return}
  cur=x.r;curMeta=x.meta;curPhoto=x.photo||'';lastBlob=x.blob||null;lastDist=x.meta&&x.meta.dist||null;job=null;

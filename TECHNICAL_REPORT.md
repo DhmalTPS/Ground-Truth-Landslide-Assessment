@@ -1007,6 +1007,86 @@ phone width (rendered in an iframe, because headless Edge cannot be narrower tha
 
 The checks for U2, U3, U13, U15, U16, U18, U20, V7, V15, V16 and V20 are in the headless test (§10.2).
 
+
+### 10.5 Visual design: "Contour", and the wording of every block
+
+**Who reads the page, and in what state.** Two readers use the same page.
+- **The site engineer** is standing below an unstable slope, often in glare or rain, holding a phone in one hand,
+  sometimes under time pressure from traffic or weather. They need to see three things at a glance:
+  what it most likely is, whether it is safe to stand here, and what to do next.
+- **The office engineer or reviewer** reads the saved report later, at a desk. They need to know:
+  what was observed, where and when, by which method, how strong the answer is, and what its limits are.
+
+Under stress, attention narrows. People read the first words of each block, notice one colour that stands out,
+and trust a page that looks calm and orderly. Every design choice below follows from that.
+
+**Concept.** The app is drawn as a topographic field instrument, the visual language engineers already read every
+day on survey sheets. No generic app template is used.
+
+| Element | Choice | Why (perception) |
+|---|---|---|
+| Paper | cool lichen grey `#E9EDE6`; night-survey `#0F1A1B` in dark mode | low chroma and cool hue keep arousal low for a stressed user; not the cream/terracotta or black/neon look of template pages |
+| Ink | spruce-slate `#15242A` | about 14 : 1 on the paper, so text stays readable in glare without the harshness of pure black |
+| Accent | the logo's moss teal `#17695A` (dark mode `#5FD1A8`) | one accent only, always meaning "you can act here or this is done" |
+| Hazard | survey flagging-tape orange `#FF6A1A`, striped with ink | the only saturated warm colour on the page, so the eye finds it before reading (Von Restorff). It reuses a signal crews already know from flagged slopes |
+| Headings and numbers | DIN family from the phone itself: "DIN Alternate" on iOS, Bahnschrift on Windows, a condensed Roboto on Android | road-sign and map lettering, designed to be read at a glance and at a distance; fixed-width numbers line up in columns; no font download, so the page still works offline |
+| Body | the system UI face, plus Noto Sans Devanagari | the face people already read all day; Hindi renders correctly |
+| Structure | information sits on open paper, separated by a wavy contour line; only blocks you **act on** (capture, save, questions) or must **stop for** (result, safety, errors, photo problems) get a container | removes the "identical rounded cards" look. A boxed panel now means something (common region): a box is either a decision or a warning |
+| Corner radius | 12 px on buttons and 18 px on panels | the radius follows the hierarchy, not one value for everything |
+| Header | static contour lines of a hillside behind the title, with a slide hollow above and its deposit lobe below, fading out | says "landslide field tool" before any word is read; static, so it never competes with the content |
+| Journey | the five stations rise along a trail towards "Report" | goal-gradient as an ascent: each completed step is visibly higher, and the report is the summit |
+| Safety | a filled panel with a flagging-tape band on top | a domain signal, not decoration; the one block designed to interrupt |
+| **Signature: summit gauge** | the type glyph stands on its summit, surrounded by 6 contour rings. The ring shape is drawn from a seed (the type name), so every type has its own terrain. Confidence inks the rings from the foot upward: 87 % inks 5 of 6 rings, 46 % inks 3. Colour: teal for a confident answer, amber for uncertain, red for a failed photo | confidence is shown as how far up the hill the answer has climbed. Pre-attentive (count, colour), but the exact number sits beside it, so nothing is hidden behind the metaphor |
+| Motion | one orchestrated moment only: the inked rings draw in from the foot upward (70 ms apart, about 1 s in all), when a result appears. Nothing moves on scroll. Reduced motion shows the final state | one peak of delight at the moment of the answer (peak-end); no scattered effects |
+
+**Wording: what each block says, and why it is placed there.**
+
+| Block, in order | Text | Reasoning |
+|---|---|---|
+| Header | "Landslide Type Check" / "Field classifier after Hungr 2014" | names the job and the standard. A reviewer trusts a named classification more than a brand. The middle-dot separator is gone |
+| Journey | Safe spot, Frame, Check, Result, Report | starts with safety, so the first thing asked is "are you standing somewhere safe"; ends with the deliverable the office needs |
+| Capture | "Photograph the slope from below" plus 3 numbered steps | an imperative heading tells the user the action; the three steps are a real sequence, so numbering is honest |
+| Distance | "Distance to the slope (optional)" / "Makes the sizes more accurate. 40, 40 m or 130 ft all work." | says why to fill it in and which inputs work, at the moment of input |
+| Result kicker | "**Most likely type**", was "Landslide type" | a model gives a hypothesis to check, not a verdict. Engineers are trained to verify; the wording invites that instead of false certainty |
+| Confidence | "**Model confidence: High / Moderate / Low** 87 %" plus "Answers below 60 % are marked uncertain." | a bare percentage is read as a probability of being right. The band word (High ≥ 80 %, Moderate ≥ the 60 % threshold, Low below it) gives the meaning in one word, and the one-line rule tells the office reader how the threshold works. The word "model" assigns the claim to the tool, not to the engineer |
+| Class line | "Hungr et al. 2014: …" on its own line under the head | the standard term a report needs, given full width so it no longer squeezes the title |
+| Safety (2nd) | type-specific, one paragraph | serial position: read second, right after the answer, before any detail |
+| All types (top 3, then "Show all 6 types") | names + score | shows what to rule out; the full list is one tap away |
+| Check on site | "Tap each sign you can see on site." + tally | turns the model's answer into the engineer's own observation, so the record shows what a person confirmed |
+| Sizes | value + 90 % range on every line; "More measurements" folded | every number carries its uncertainty, which an office reviewer will ask for |
+| Save and share | one primary "Save report" | the deliverable; one obvious action |
+| Meta line | "model, seconds" | traceability without clutter. The threshold moved to the confidence block, where it is understood |
+| Footer | "Decision support only: confirm with a geologist or geotechnical engineer before acting." | states responsibility plainly, as a firm's QA process expects |
+
+All middle-dot meta strings in the page, the reports and the Hindi text were changed to commas or colons, with the
+English keys and Hindi translations changed together.
+
+**Coverage of the 40 points (§10.4) by this pass.**
+- **Aesthetic-usability, Visual hierarchy:** the identity above; the result now has one focal element.
+- **Von Restorff:** the hazard tape is the only saturated warm colour.
+- **Goal-gradient:** the climbing journey and the summit.
+- **Peak-end:** the one draw-in moment, plus the existing "Report saved" end.
+- **Common region, Similarity:** a box means action or warning; buttons, panels and chips each have one radius.
+- **Recognition over recall:** a band word next to the number.
+- **Feedback:** the gauge colour follows the status.
+- **Machine-made signs:**
+  - no gradients in the UI. The tape stripe is a hazard signal, not a background, and the page background stays flat; this is checked;
+  - no glass effect, no emoji, no Inter;
+  - no identical cards;
+  - no eyebrow badges;
+  - no middle-dot or em-dash strings;
+  - no animation on scroll;
+  - no serif-italic accents.
+
+**Measured after the redesign:**
+- **Contrast:** 0 text elements below WCAG AA, checked on 75–90 text elements in each of the ok, uncertain, family and bad-photo results, in light and dark mode.
+- **Tap targets:** 0 controls under 44 px in the single, survey and photo-set modes.
+- **Headless tests:** 51/51 guidance checks in English and in Hindi; the photo-set suite completes in both languages with 0 script errors.
+
+**Not built yet (from the same review):**
+- **Observer name and organisation on the report.** A firm's reviewer will expect it. It needs a stored profile field and consent, so it was left for a later change.
+- **A short reference ID printed on the report** for correspondence. Today the file name carries the date and time.
+
 ---
 
 ## 11. Deployment
@@ -1077,6 +1157,8 @@ The checks for U2, U3, U13, U15, U16, U18, U20, V7, V15, V16 and V20 are in the 
 | 32 | Flat tokens, one accent, AA contrast measured in-page | keep gradient UI | 0 text elements below AA (was 5); gradients read as template output |
 | 33 | Safety directly after the answer; one primary action per card | equal-weight cards | serial position and Von Restorff: the field-critical warning is seen second |
 | 34 | Liberal distance input (units, commas, Devanagari digits) | strict number box | phones type "40 m" or "130 ft"; the box rejected them silently |
+| 35 | "Contour" visual identity: survey paper, DIN numerals, flagging-tape hazard, summit confidence gauge (§10.5) | generic card UI | a field engineer reads map conventions at a glance; one saturated warm colour = danger |
+| 36 | "Most likely type" + Model confidence band (High / Moderate / Low) | "Landslide type" + bare % | a model output is a hypothesis to verify; a band word gives the meaning of the number |
 
 ---
 
@@ -1099,6 +1181,7 @@ The checks for U2, U3, U13, U15, U16, U18, U20, V7, V15, V16 and V20 are in the 
 | 11-04 | Graded photo quality, results always shown | 56 headless checks pass |
 | 11-04/05 | Deployment: HF Space files, Cloudflare tunnel | public link: 40 s full result |
 | 11-14 | GPS marker: photo EXIF GPS, compass bearing, landslide position, image report with map + EXIF, robust saving | 12 new headless checks; EXIF round-trip exact to 1e-6° |
+| 11-14 | "Contour" redesign and engineer-facing wording (§10.5) | AA 0 failures light + dark in 4 result states; controls < 44 px: 0; 51/51 tests en + hi |
 | 11-14 | UX audit against 20 UX laws + 20 machine-made signs (§10.4) | AA failures 5 → 0; controls < 44 px → 0; 11 new checks; 2 latent bugs fixed |
 
 ---
@@ -1205,7 +1288,7 @@ kept within 85–95 %).
 | Landslide position error | σ_d typed 5 %, model depth 30 %; GPS default 10 m; Earth R 6,371,008.8 m | guide.py |
 | Late GPS fix attached | ≤ 3 min after the photo; silent refresh maximumAge 20 s | guide.py |
 | Image report | 1,080 px wide, photo ≤ 920 px high, JPEG q 0.9, map 470 × 350, zoom ≤ 18, tiles 5 s | guide.py |
-| UI tokens | spacing 4/8/12/16/24/32 px; tap ≥ 44–48 px; text ≥ 4.5 : 1 (AA); accent #17695a light / #5fd1a8 dark | ui.py |
+| UI tokens | spacing 4/8/12/16/24/32 px; tap ≥ 44–48 px; text ≥ 4.5 : 1 (AA); paper #e9ede6 / #0f1a1b, ink #15242a, hazard tape #ff6a1a, summit gauge 6 rings, DIN headings; accent #17695a light / #5fd1a8 dark | ui.py |
 
 ## Appendix B: file map
 

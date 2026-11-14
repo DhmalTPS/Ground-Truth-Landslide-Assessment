@@ -1,11 +1,13 @@
-"""Field app interface: one design system shared by the logo, type glyphs and page.
+"""Field app interface: one design system shared by the logo, type glyphs and page ("Contour").
 
-Palette (from the logo; complementary pair, analogous gradients):
-  ground / interface   mint #B4F0D3 -> emerald #34B08C -> deep teal #084045
-  signal / movement    amber #FFC862 -> coral #FF745E -> rose #E04282   (only for moving mass and warnings)
-  neutrals             warm paper #F5F4EF / ink #13201C (light), #0D1311 / #E6EEEA (dark)
-Glyphs: same 64x64 grammar as the logo (contour arcs, round caps): mint->teal ground, the moving
-mass in the sunset gradient; transparent backgrounds, nothing painted behind the shapes.
+The app is drawn as a topographic field instrument:
+  paper     cool lichen grey #E9EDE6 / night survey #0F1A1B, spruce-slate ink #15242A
+  accent    the logo's moss teal #17695A (dark #5FD1A8); survey flagging-tape orange #FF6A1A for hazards only
+  type      DIN family for headings and numbers (road-sign / map lettering, read at a glance), system body face
+  form      information sits on open paper divided by contour lines; only blocks you act on (capture, save,
+            questions) or must stop for (safety, errors, photo problems) get a container
+  signature the summit gauge: seeded contour rings around the type glyph, inked from the foot up to the confidence
+Glyphs: same 64x64 grammar as the logo (contour arcs, round caps).
 The page works offline (system fonts, inline SVG, no external files) and has a demo mode:
   /?demo=ok | uncertain | family | bad | error   renders a sample result (no photo needed).
 """
@@ -87,105 +89,131 @@ UI_ICONS = {
 }
 
 CSS = """
-/* Design tokens. Flat colours (no decorative gradients: those stay in the logo and type glyphs only), one accent,
-   every text colour >= 4.5:1 on its background in light and dark (WCAG AA, checked), spacing on a 4 px scale. */
+/* "Contour": the app as a topographic field instrument. Survey paper (cool lichen grey, not cream), spruce-slate ink,
+   the logo's moss teal, and survey flagging-tape orange kept for hazards only. Headings and numbers in the DIN family
+   (road-sign and map lettering, built to be read at a glance) from the phone's own fonts, body in the system face
+   (Devanagari included). Information sits on open paper divided by contour lines; only things you act on or must
+   stop for get a container. Every text colour is >= 4.5:1 (measured in-page). */
 :root{--teal-950:#082f2a;--teal-800:#0e4d45;--teal-600:#17695a;--teal-400:#4fa587;--sage-300:#8fc9a9;--sage-100:#e4f1e9;
---amber:#f7b74a;--orange:#b13e1f;--ruby:#b8381f;
---bg:#f5f4ef;--surface:#ffffff;--surface-2:#f9f8f4;--ink:#13201c;--ink-2:#3c4b45;--mute:#5d6a64;--line:#e4e2da;
---brand:#17695a;--on-brand:#ffffff;--link:#17695a;--caution:#8a5d00;--dup:#3a62c4;--warn:#b13e1f;--warn-bg:#fdf1ec;--warn-line:#f0c6b8;
---g-ground:#17695a;--g-signal:#d9622b;--g-track:#9fd8bf;--tint-signal:rgba(217,98,43,.09);--tint-ground:rgba(23,105,90,.08);
---shadow:0 1px 2px rgba(16,33,26,.06),0 6px 18px -10px rgba(16,33,26,.16);--r:16px;
+--amber:#e8a400;--orange:#a63d12;--ruby:#b8381f;
+--bg:#e9ede6;--surface:#f6f7f2;--surface-2:#eef1ea;--ink:#15242a;--ink-2:#3a4c50;--mute:#53625f;--line:#c9d3cb;--contour:#a9bcb1;
+--brand:#17695a;--on-brand:#ffffff;--link:#135c4f;--warn:#a63d12;--warn-bg:#fbefe6;--warn-line:#efc3a6;--tape:#ff6a1a;--tape-ink:#15242a;
+--caution:#7f5600;--dup:#3a62c4;--focus:#e8a400;
+--g-ground:#17695a;--g-signal:#d9622b;--g-track:#a9cfbd;--tint-signal:rgba(255,106,26,.1);--tint-ground:rgba(23,105,90,.09);
+--lift:0 1px 0 rgba(21,36,42,.06),0 14px 28px -22px rgba(21,36,42,.45);--shadow:var(--lift);--r:18px;
+--f-sign:"DIN Alternate","DIN Next","Bahnschrift","sans-serif-condensed","Roboto Condensed","Arial Narrow",ui-sans-serif,system-ui,sans-serif;
+--f-body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Nirmala UI",sans-serif;
 --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--tap:48px;
 color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--bg:#0c1210;--surface:#141c19;--surface-2:#18221e;--ink:#e6eeea;--ink-2:#bccac3;--mute:#8b9b94;
---line:#2a3833;--brand:#5fd1a8;--on-brand:#062b23;--link:#7fd3b3;--caution:#ffc862;--dup:#9db8ff;--teal-600:#7fd3b3;--warn:#ff9a7a;--orange:#ff9a7a;--warn-bg:#2a1d18;--warn-line:#5a3427;
---g-ground:#5fd1a8;--g-signal:#ff9a7a;--g-track:#2f6b5a;--tint-signal:rgba(255,154,122,.1);--tint-ground:rgba(95,209,168,.09);
---shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px -12px rgba(0,0,0,.6);color-scheme:dark}}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1a1b;--surface:#152325;--surface-2:#1a2a2c;--ink:#e3ece8;--ink-2:#b7c7c2;--mute:#8fa19d;
+--line:#2b3e40;--contour:#335152;--brand:#5fd1a8;--on-brand:#06261f;--link:#86dcbb;--teal-600:#86dcbb;--warn:#ffa071;--orange:#ffa071;
+--warn-bg:#2a1c15;--warn-line:#5c3624;--tape:#ff7a33;--caution:#f2c25a;--dup:#9db8ff;--focus:#f2c25a;
+--g-ground:#5fd1a8;--g-signal:#ffa071;--g-track:#2f6555;--tint-signal:rgba(255,122,51,.12);--tint-ground:rgba(95,209,168,.1);
+--lift:0 1px 0 rgba(0,0,0,.35),0 16px 30px -22px rgba(0,0,0,.8);color-scheme:dark}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;color:var(--ink);background:var(--bg);font:16px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Noto Sans Devanagari",sans-serif}
-main{max-width:620px;margin:0 auto;padding:var(--s4) var(--s4) var(--s6)}
+body{margin:0;min-height:100vh;color:var(--ink);background:var(--bg);font:16px/1.55 var(--f-body)}
+main{position:relative;max-width:620px;margin:0 auto;padding:var(--s4) var(--s4) var(--s6)}
 svg{display:block}
 a{color:var(--link);text-underline-offset:2px}
-:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
-header{display:flex;align-items:center;gap:var(--s2);margin:var(--s1) 0 var(--s4)}
-header .logo svg{width:36px;height:36px}
+/* the map sheet edge behind the header: static contour lines of a slope, drawn once from a fixed seed */
+.topo{position:absolute;left:0;right:0;top:0;height:170px;z-index:0;pointer-events:none;color:var(--contour);
+-webkit-mask-image:linear-gradient(#000 35%,transparent);mask-image:linear-gradient(#000 35%,transparent)}
+.topo svg{width:100%;height:100%}
+header{position:relative;z-index:1;display:flex;align-items:center;gap:var(--s2);margin:var(--s1) 0 var(--s4)}
+header .logo svg{width:38px;height:38px}
 .brand{min-width:0;flex:1}
-.brand b{display:block;font-size:1rem;letter-spacing:-.01em;font-weight:720;line-height:1.2}
-.brand span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.8rem;color:var(--mute);margin-top:1px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4);margin-top:var(--s3)}
-/* section label: plain sentence-case text, not an uppercase eyebrow badge */
-.kicker{font-size:.85rem;color:var(--ink-2);font-weight:650;margin:0 0 var(--s1)}
-h2{font-size:1.08rem;margin:0 0 var(--s3);letter-spacing:-.01em;line-height:1.3}
+.brand b{display:block;font:600 1.22rem/1.15 var(--f-sign);letter-spacing:.01em}
+.brand span{display:block;font-size:.82rem;color:var(--mute);margin-top:2px}
+/* open section on the paper: a contour line above it instead of a box */
+.card{position:relative;z-index:1;margin-top:var(--s5);padding:var(--s5) 2px 0;background:none;border:0;border-radius:0;box-shadow:none}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:var(--contour);
+-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='8'%3E%3Cpath d='M0 4c12-5 20 3 32 0s20-4 32 0 20 3 32 0' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") repeat-x 0 0/96px 8px;
+mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='8'%3E%3Cpath d='M0 4c12-5 20 3 32 0s20-4 32 0 20 3 32 0' fill='none' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") repeat-x 0 0/96px 8px}
+/* containers only where you act (capture, save) or must stop (safety, errors, photo problems) */
+.card.panel,#repsec,#askcard,.card.result,.card.safety,.card.bad,.card.qband{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--lift);padding:var(--s4)}
+.card.panel::before,#repsec::before,#askcard::before,.card.result::before,.card.qband::before,.card.bad::before{display:none}
+.kicker{font-size:.88rem;color:var(--ink-2);font-weight:650;margin:0 0 var(--s1)}
+h2{font:600 1.3rem/1.2 var(--f-sign);margin:0 0 var(--s3);letter-spacing:.005em}
 .tips{display:grid;gap:var(--s2);margin:0 0 var(--s4);padding:0;list-style:none;counter-reset:tp}
-.tips li{display:grid;grid-template-columns:24px 1fr;gap:var(--s2);align-items:start;color:var(--ink-2);font-size:.95rem;counter-increment:tp}
-.tips li::before{content:counter(tp);display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--tint-ground);color:var(--link);font-weight:700;font-size:.8rem}
+.tips li{display:grid;grid-template-columns:26px 1fr;gap:var(--s2);align-items:start;color:var(--ink-2);font-size:.96rem;counter-increment:tp}
+.tips li::before{content:counter(tp);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--contour);color:var(--link);font:600 .9rem/1 var(--f-sign)}
 .tips .ico{display:none}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
-.btn{position:relative;display:flex;align-items:center;justify-content:center;gap:var(--s2);min-height:52px;padding:var(--s3) var(--s4);border-radius:12px;border:0;
-font-weight:650;font-size:.98rem;line-height:1.2;font-family:inherit;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .15s ease,transform .08s ease}
-.btn.primary{color:var(--on-brand);background:var(--brand)}
+.btn{position:relative;display:flex;align-items:center;justify-content:center;gap:var(--s2);min-height:54px;padding:var(--s3) var(--s4);border-radius:12px;border:0;
+font-weight:650;font-size:1rem;line-height:1.2;font-family:inherit;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .15s ease,transform .08s ease}
+.btn.primary{color:var(--on-brand);background:var(--brand);box-shadow:0 1px 0 rgba(0,0,0,.12),inset 0 -2px 0 rgba(0,0,0,.14)}
 .btn.primary:hover{background:#0f574a}.btn:active{transform:translateY(1px)}
-@media (prefers-color-scheme:dark){.btn.primary:hover{background:#78dcb8}}
-.btn.ghost{color:var(--link);background:var(--surface);border:1.5px solid var(--line)}
-.btn.ghost:hover{border-color:var(--link)}
+@media (prefers-color-scheme:dark){.btn.primary:hover{background:#7fdcb9}}
+.btn.ghost{color:var(--link);background:transparent;border:1.5px solid var(--contour)}
+.btn.ghost:hover{border-color:var(--link);background:var(--tint-ground)}
 .btn.text{background:none;color:var(--link);min-height:var(--tap);text-decoration:underline;text-underline-offset:3px}
 .btn[disabled]{opacity:.6;cursor:progress}
 .btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.btn:focus-within{outline:3px solid var(--amber);outline-offset:2px}
+.btn:focus-within{outline:3px solid var(--focus);outline-offset:2px}
 .span2{grid-column:1/-1}
-figure{position:relative;margin:var(--s3) 0 0;display:none}
-figure img{width:100%;max-height:62vh;object-fit:cover;border-radius:var(--r);display:block}
-/* status chip on the photo: solid, readable on any photo, no blur */
-.chip{position:absolute;left:var(--s3);top:var(--s3);display:inline-flex;align-items:center;gap:7px;padding:6px 11px 6px 9px;border-radius:999px;
-font-size:.82rem;font-weight:650;color:#fff;background:rgba(10,22,18,.86)}
+figure{position:relative;z-index:1;margin:var(--s4) 0 0;display:none}
+figure img{width:100%;max-height:62vh;object-fit:cover;border-radius:var(--r);display:block;box-shadow:var(--lift)}
+.chip{position:absolute;left:var(--s3);top:var(--s3);display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;border-radius:999px;
+font-size:.84rem;font-weight:650;color:#fff;background:rgba(13,26,27,.86)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--sage-300)}
 .chip.signal .dot{background:var(--amber)}.chip.bad .dot{background:#ff8a6b}
-.spin{width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:sp .8s linear infinite}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;opacity:.8;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+/* the answer: the type glyph stands on its summit; confidence = how many contour rings are inked, foot to top */
 .result{padding:var(--s4)}
-.rhead{display:flex;gap:var(--s3);align-items:center}
-.glyph{width:64px;height:64px;flex:none;border-radius:16px;display:grid;place-items:center;background:var(--tint-ground)}
-.glyph.signal{background:var(--tint-signal)}.glyph svg{width:48px;height:48px}
-.title{font-size:1.45rem;font-weight:750;letter-spacing:-.02em;line-height:1.15;margin:2px 0 var(--s1)}
-.hungr{font-size:.86rem;color:var(--mute)}
+.rhead{display:grid;grid-template-columns:auto 1fr;gap:var(--s4);align-items:center}
+.summit{position:relative;width:112px;height:112px;flex:none;color:var(--brand)}
+.summit.signal{color:var(--caution)}.summit.bad{color:var(--ruby)}
+.summit svg.rings{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.rings path{fill:none;stroke:var(--line);stroke-width:1.1}
+.rings path.on{stroke:currentColor;stroke-width:1.7;stroke-dasharray:1;stroke-dashoffset:0;animation:climb .7s cubic-bezier(.3,.7,.2,1) both;animation-delay:calc(var(--i)*70ms)}
+.rings path.on.idx{stroke-width:2.6}
+@keyframes climb{from{stroke-dashoffset:1}}
+.summit .glyph{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:46%;height:46%;border-radius:50%;display:grid;place-items:center;background:var(--surface)}
+.summit .glyph svg{width:78%;height:78%}
+.glyph{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--tint-ground)}
+.glyph svg{width:48px;height:48px}
+.title{font:600 1.75rem/1.08 var(--f-sign);letter-spacing:0;margin:2px 0 var(--s1);text-wrap:balance}
+.hungr{font-size:.88rem;color:var(--mute)}
 .meter{margin-top:var(--s4)}
-.meter .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.88rem;color:var(--mute)}
-.meter .val{font-size:1.5rem;font-weight:750;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-.track{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.meter .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.94rem;color:var(--ink-2)}.meter .band{color:var(--ink)}
+.meter .val{font:600 1.7rem/1 var(--f-sign);color:var(--ink);font-variant-numeric:tabular-nums}
+.track{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:var(--s2)}
 .fill{height:100%;border-radius:99px;background:var(--brand)}
-.fill.signal{background:var(--g-signal)}
+.fill.signal{background:var(--caution)}
 .result.lowq{border:2px dashed var(--ruby)}.result.lowq .fill{background:var(--ruby)}
-.note{margin:var(--s3) 0 0;padding:var(--s3);border-radius:12px;background:var(--surface-2);color:var(--ink-2);font-size:.93rem;border:1px solid var(--line)}
-.probs{display:grid;gap:var(--s2);margin-top:var(--s1)}
-.prob{display:grid;grid-template-columns:28px 1fr 46px;gap:var(--s2);align-items:center}
+.note{margin:var(--s3) 0 0;padding:var(--s3);border-radius:12px;background:var(--surface-2);color:var(--ink-2);font-size:.94rem;border-left:3px solid var(--contour)}
+.probs{display:grid;gap:var(--s3);margin-top:var(--s1)}
+.prob{display:grid;grid-template-columns:28px 1fr 52px;gap:var(--s2);align-items:center}
 .prob svg{width:28px;height:28px}
-.prob .nm{font-size:.92rem;color:var(--ink-2);display:flex;flex-direction:column;gap:5px}
-.prob .tr{height:7px;border-radius:99px;background:var(--line);overflow:hidden}
+.prob .nm{font-size:.94rem;color:var(--ink-2);display:flex;flex-direction:column;gap:6px}
+.prob .tr{height:4px;border-radius:99px;background:var(--line);overflow:hidden}
 .prob .fl{height:100%;border-radius:99px;background:var(--g-track)}
 .prob.top .fl{background:var(--brand)}.prob.top .nm{color:var(--ink);font-weight:650}
-.prob .pc{text-align:right;font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--mute)}
-.prob.top .pc{color:var(--ink);font-weight:700}
-details.more{margin-top:var(--s2)}details.more>summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;color:var(--link);font-weight:600;font-size:.92rem}
+.prob .pc{text-align:right;font:500 1.02rem/1 var(--f-sign);font-variant-numeric:tabular-nums;color:var(--mute)}
+.prob.top .pc{color:var(--ink);font-weight:600}
+details.more{margin-top:var(--s2)}details.more>summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;color:var(--link);font-weight:600;font-size:.94rem}
 .list{list-style:none;padding:0;margin:0;display:grid;gap:var(--s1)}
-.list li{display:flex;gap:var(--s2);align-items:flex-start;font-size:.95rem;color:var(--ink-2)}
+.list li{display:flex;gap:var(--s2);align-items:flex-start;font-size:.96rem;color:var(--ink-2)}
 .list .ico{color:var(--link);margin-top:1px}
-/* safety: a filled warning panel (no accent stripe), the one deliberately different block on the result page */
-.safety{background:var(--warn-bg);border-color:var(--warn-line)}
+/* safety wears survey hazard tape: the one block on the page built to interrupt */
+.card.safety{background:var(--warn-bg);border-color:var(--warn-line);padding-top:calc(var(--s4) + 10px);overflow:hidden}
+.card.safety::before{display:block;height:10px;mask:none;-webkit-mask:none;border-radius:0;
+background:repeating-linear-gradient(-45deg,var(--tape) 0 12px,var(--tape-ink) 12px 24px)}
 .safety h2{display:flex;gap:var(--s2);align-items:center;color:var(--warn);margin-bottom:var(--s2)}.safety .ico{color:var(--warn)}
-.safety p{margin:0;color:var(--ink)}
+.safety p{margin:0;color:var(--ink);font-size:1rem}
 .card.bad{background:var(--warn-bg);border-color:var(--warn-line)}
 ol.steps{margin:var(--s2) 0 0;padding-left:1.2rem;color:var(--ink-2)}ol.steps li{margin:var(--s1) 0}
 .skel{height:14px;border-radius:8px;background:var(--line);margin:10px 0;animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.5}}
-.foot{margin-top:var(--s5);font-size:.82rem;color:var(--mute);text-align:center;line-height:1.55}
-.meta{display:block;margin-top:var(--s4);font-size:.8rem;color:var(--mute);text-align:center}
-.meta span+span::before{content:" \\00B7  "}
-/* spacing utilities on the 4 px scale (replace one-off inline margins) */
+.foot{position:relative;margin-top:var(--s6);padding-top:var(--s5);font-size:.84rem;color:var(--mute);text-align:center;line-height:1.6}
+.meta{display:block;margin-top:var(--s5);font-size:.84rem;color:var(--mute);text-align:center}
 .u-m0{margin:0!important}.u-t1{margin:4px 0 0!important}.u-t2{margin:8px 0 0!important}.u-t3{margin:12px 0 0!important}.u-t4{margin:16px 0 0!important}
 .u-b2{margin:0 0 8px!important}.u-b3{margin:0 0 12px!important}.u-tb{margin:4px 0 12px!important}.u-sub{margin:-4px 0 12px!important}.u-blk{display:block!important}
-@media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.28rem}}
+@media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.5rem}.summit{width:96px;height:96px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 """
 
@@ -201,23 +229,40 @@ async function shrink(file){
   const s=Math.min(1,1280/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');
   c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
   return await new Promise(r=>c.toBlob(r,'image/jpeg',0.9));}catch(e){return file;}}
+// summit gauge: contour rings of a hill drawn from a seed (the type name, so every type has its own terrain);
+// confidence = how many rings are inked, from the foot up towards the summit where the type glyph stands
+function summit(seed,conf,cls){let s=7;for(const ch of seed)s=(Math.imul(s,31)+ch.charCodeAt(0))>>>0;
+ const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296,K=[2,3,5,7];
+ const N=6,on=Math.max(1,Math.round(conf*N)),ph=K.map(()=>rnd()*6.2832),am=[.05,.03,.018,.01].map(a=>a*(.6+rnd()*.8));
+ let p='';for(let i=0;i<N;i++){const r0=58-i*5.6,k=1-i*.1;let d='';
+  for(let j=0;j<=60;j++){const t=j/60*6.2832;let w=0;for(let q=0;q<4;q++)w+=am[q]*Math.sin(K[q]*t+ph[q]);const r=r0*(1+k*w);
+   d+=(j?'L':'M')+(64+r*Math.cos(t)).toFixed(1)+' '+(64-i*1.1+r*Math.sin(t)*.9).toFixed(1)}
+  p+=`<path pathLength="1" d="${d}Z" class="${i<on?'on':''}${i%5===0?' idx':''}" style="--i:${i}"/>`}
+ return `<div class="summit ${cls}"><svg class="rings" viewBox="0 0 128 128" aria-hidden="true">${p}</svg><div class="glyph">${G[seed]}</div></div>`}
+// map-sheet edge behind the header: contours of a hillside with a slide hollow above and its deposit lobe below
+(function(){const el=document.getElementById('topo');if(!el)return;let p='';
+ for(let k=0;k<11;k++){const y0=8+k*15;let d='';
+  for(let x=0;x<=400;x+=8){const lobe=22*Math.exp(-(((x-275)/62)**2))*(k-4)/6;
+   d+=(x?'L':'M')+x+' '+(y0+7*Math.sin(x/61+k*.42)+3*Math.sin(x/19+k*1.3)+lobe).toFixed(1)}
+  p+=`<path d="${d}" fill="none" stroke="currentColor" stroke-width="${k%5===2?1.6:.9}" vector-effect="non-scaling-stroke"/>`}
+ el.innerHTML=`<svg viewBox="0 0 400 170" preserveAspectRatio="none">${p}</svg>`})();
 function probs(r){const top=r.ranked[0][0],one=([c,p])=>`<div class="prob ${c===top?'top':''}">${G[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(p*100).toFixed(1)}%"></div></div></div><div class="pc">${pct(p)}</div></div>`;
  const rest=r.ranked.slice(3);
  return r.ranked.slice(0,3).map(one).join('')+(rest.length?`<details class="more"><summary>Show all ${r.ranked.length} types</summary><div class="probs">${rest.map(one).join('')}</div></details>`:'')}
 function dims(d){
  if(!d.available)return `<section class="card"><div class="kicker">Dimensions</div><p class="hungr u-m0">${esc(d.reason)}</p></section>`;
  const num=v=>v>=100?Math.round(v).toLocaleString():v, row=(k,v)=>`<div class="drow"><span>${esc(k)}</span><b>${v}</b></div>`;
- let h=`<section class="card"><div class="kicker">Estimated dimensions · depth trust: ${esc(d.depth_trust)}</div>`,more='';
+ let h=`<section class="card"><div class="kicker">Estimated dimensions, depth trust: ${esc(d.depth_trust)}</div>`,more='';
  if(d.overlay)h+=`<img class="dimg" src="${d.overlay}" alt="Measured area outlined">`;
  h+=d.measures.map(m=>row(m.name,`${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small>`)).join('');
  if(d.size_class){const sp=d.size_class_prob||{};h+=row('Size class (Fell 1994)',esc(d.size_class)+(Object.keys(sp).length>1?' <small>('+Object.entries(sp).map(([k,v])=>esc(k)+' '+Math.round(v*100)+'%').join(', ')+')</small>':''));}
  h+=row('Slope angle',d.slope_angle_deg+'°'+(d.tilt==='phone sensor'?' (phone tilt)':''));
  if(d.grains&&d.grains.reliable)h+=row('Grain size D16 / D50 / D84',`${d.grains.D16_m} / ${d.grains.D50_m} / ${d.grains.D84_m} m <small>(D50 90%: ${d.grains.D50_90ci_m.join('–')})</small>`);
  else if(d.grains)more+=row('Grain size','not resolvable in this photo (take a closer photo of the deposit)');
- if(d.block_count!=null)more+=row('Blocks counted',d.block_count+(d.block_size_class?' · largest: '+esc(d.block_size_class):''));
+ if(d.block_count!=null)more+=row('Blocks counted',d.block_count+(d.block_size_class?', largest: '+esc(d.block_size_class):''));
  if(d.travel_angle_deg!=null)more+=row('Travel angle (H/L)',`${d.travel_angle_deg}° (${d.H_over_L})`);
  more+=row('Length / width',d.length_width_ratio)+row('Perimeter',num(d.perimeter_m)+' m')+row('Camera to slope',d.distance_m+' m');
- if(d.alternative){const a=d.alternative;more+=`<p class="hungr u-t2">If it is <b>${esc(D.names[a.label]||a.label)}</b> (${Math.round(a.prob*100)}%): ${a.measures.slice(0,3).map(m=>esc(m.name)+' '+num(m.value)+' '+m.unit).join(' · ')}</p>`;}
+ if(d.alternative){const a=d.alternative;more+=`<p class="hungr u-t2">If it is <b>${esc(D.names[a.label]||a.label)}</b> (${Math.round(a.prob*100)}%): ${a.measures.slice(0,3).map(m=>esc(m.name)+' '+num(m.value)+' '+m.unit).join(', ')}</p>`;}
  h+=`<details class="more"><summary>More measurements</summary>${more}</details>`;
  const notes=[...d.notes,...d.depth_issues.map(x=>'Depth check: '+x)];
  h+=`<p class="hungr u-t2">Scale: ${esc(d.scale_source)}. ${notes.map(esc).join(' ')}</p></section>`;
@@ -231,24 +276,24 @@ function render(r){
   const i=D.info[r.label],unsure=r.status==='uncertain',fam=unsure&&r.family?D.families[r.family]:null;
   const gname=fam?D.familyGlyph[r.family]:r.label, sig=(unsure&&!fam)||bp;
   setChip(bp?'bad':sig?'signal':'', bp?'Not reliable':fam?'Landslide family':unsure?'Uncertain':'Landslide type');
-  const kicker=bp?'Best guess · photo check failed':fam?'Landslide family':unsure?'Uncertain: most likely':'Landslide type';
+  const kicker=bp?'Best guess: photo check failed':fam?'Landslide family':unsure?'Uncertain: most likely':'Most likely type';
   const conf=fam?r.ranked[0][1]+r.ranked[1][1]:r.confidence;
   let note='';
   if(bp) note=`<p class="note"><b>Not reliable.</b> <span>This does not look like a ground photo of a slope</span> (${pct(r.usable)} <span>usable</span>). <span>This is the model's own answer, not adjusted. Retake the photo before relying on it:</span></p><ol class="steps">${D.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`;
   else if(fam) note=`<p class="note">Clearly a ${esc(r.family)}; the exact type is close between <b>${esc(n[r.ranked[0][0]])}</b> and <b>${esc(n[r.ranked[1][0]])}</b>. Check the points below for both.</p>`;
   else if(unsure) note=`<p class="note">Not confident. Second choice: <b>${esc(n[r.ranked[1][0]])}</b>. Take another photo with the whole slope in view, or check the points below for both types.</p>`;
-  h=`<section class="card result${bp?' lowq':''}" aria-live="polite"><div class="rhead"><div class="glyph ${gname==='no_landslide'?'':'signal'}">${G[gname]}</div><div>
-    <div class="kicker">${kicker}</div><div class="title">${esc(fam||i.title)}</div>
-    <div class="hungr">${fam?'':'Hungr et al. 2014 · '+esc(i.hungr)}</div></div></div>
-    <div class="meter"><div class="row"><span>Confidence${fam?' (family)':''}</span><span class="val">${pct(conf)}</span></div>
-    <div class="track"><div class="fill ${sig?'signal':''}" style="width:${(conf*100).toFixed(1)}%"></div></div></div>${note}</section>
+  h=`<section class="card result${bp?' lowq':''}" aria-live="polite"><div class="rhead">${summit(gname,conf,bp?'bad':sig?'signal':'')}<div>
+    <div class="kicker">${kicker}</div><div class="title">${esc(fam||i.title)}</div></div></div>
+    ${fam?'':`<p class="hungr u-t2"><span>Hungr et al. 2014</span>: ${esc(i.hungr)}</p>`}
+    <div class="meter"><div class="row"><span><span>Model confidence</span>${fam?' <span>(family)</span>':''}: <b class="band">${conf>=.8?'High':conf>=D.conf?'Moderate':'Low'}</b></span><span class="val">${pct(conf)}</span></div>
+    <p class="hungr u-t1">Answers below ${pct(D.conf)} are marked uncertain.</p></div>${note}</section>
    <section class="card safety"><h2>${ico('alert')}Safety</h2><p>${esc(i.safety)}</p></section>
    <section class="card"><div class="kicker">All types</div><div class="probs u-t3">${probs(r)}</div></section>
    <section class="card" id="checkcard"><div class="kicker">Check on site</div><h2>${esc(i.title)}</h2><ul class="list">${i.check.map(t=>`<li>${ico('check')}<span>${esc(t)}</span></li>`).join('')}</ul></section>`;
  }
- if(r.vlm){h+=`<section class="card"><div class="kicker">Second opinion · Qwen2.5-VL (zero-shot)</div><h2 style="display:flex;gap:8px;align-items:center">${ico('spark')}${esc(n[r.vlm.label]||r.vlm.label)} · ${pct(r.vlm.confidence)}</h2><p class="hungr u-m0">${esc(r.vlm.description)}</p></section>`;}
+ if(r.vlm){h+=`<section class="card"><div class="kicker">Second opinion from Qwen2.5-VL (zero-shot)</div><h2 style="display:flex;gap:8px;align-items:center">${ico('spark')}${esc(n[r.vlm.label]||r.vlm.label)}, ${pct(r.vlm.confidence)}</h2><p class="hungr u-m0">${esc(r.vlm.description)}</p></section>`;}
  if(r.dimensions)h+=dims(r.dimensions);
- h+=`<p class="meta"><span>${esc(r.model)}</span><span>${(r.ms/1000).toFixed(1)} s</span><span>confident ≥ ${pct(D.conf)}</span></p>`;
+ h+=`<p class="meta"><span>${esc(r.model)}</span>, <span>${(r.ms/1000).toFixed(1)} s</span></p>`;
  out.innerHTML=h;}
 function loading(){setChip('','Analysing…',true);
  out.innerHTML='<section class="card result" aria-busy="true"><div class="kicker">Analysing photo</div><div class="skel" style="width:60%;height:22px"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:40%"></div></section>';}
@@ -270,12 +315,14 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="48x48" href="favicon.ico">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#0e4d45">
+<meta name="theme-color" content="#e9ede6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1a1b" media="(prefers-color-scheme: dark)">
 <style>__CSS____GCSS____PCSS__.drow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.92rem}.drow b{text-align:right;font-weight:600}.drow small{opacity:.65;font-weight:400}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
 </style></head><body>__DEFS__<main>
-<header><div class="logo">__LOGO__</div><div class="brand"><b>Landslide Type Check</b><span>Field classifier &middot; Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
+<div class="topo" id="topo" aria-hidden="true"></div>
+<header><div class="logo">__LOGO__</div><div class="brand"><b>Landslide Type Check</b><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
 <div id="netbar" class="netbar" role="status" hidden>You are offline. Photos cannot be analysed until the connection is back.</div>
-<section class="card"><ol class="journey" id="journey" aria-label="Progress"></ol><div class="seg" id="mode" role="group" aria-label="Capture mode"></div><ul class="shots" id="shots"></ul><h2 id="capH">Photograph the slope from below</h2>
+<section class="card panel"><ol class="journey" id="journey" aria-label="Progress"></ol><div class="seg" id="mode" role="group" aria-label="Capture mode"></div><ul class="shots" id="shots"></ul><h2 id="capH">Photograph the slope from below</h2>
 <ul class="tips">
 <li>__I_pos__<span>Stand at the foot of the slope or across the road, facing up at it.</span></li>
 <li>__I_frame__<span>Fit the whole slope: the top (scarp or source) and the bottom (deposit).</span></li>
