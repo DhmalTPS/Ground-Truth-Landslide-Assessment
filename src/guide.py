@@ -132,10 +132,10 @@ CSS = """
 .seg button{border:0;border-radius:9px;padding:8px;min-height:44px;font-weight:600;font-size:.88rem;font-family:inherit;background:transparent;color:var(--ink-2);cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .shots{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}
-.shots li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);font-size:.88rem;color:var(--ink-2);cursor:pointer}
+.shots li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid transparent;font-size:.88rem;color:var(--ink-2);cursor:pointer}
 .shots li b{display:block;color:var(--ink);font-size:.93rem}
 .shots li .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:1.5px solid var(--line)}
-.shots li.cur{border-color:var(--teal-400);background:var(--tint-ground)}.shots li.cur .n{background:var(--brand);color:var(--on-brand);border:0}
+.shots li.cur{border-color:var(--brand);background:var(--tint-ground)}.shots li.newsite{border-color:var(--contour)}.shots li.cur .n{background:var(--brand);color:var(--on-brand);border:0}
 .shots li.done .n{background:var(--tint-ground);color:var(--link);border-color:var(--teal-400)}
 .pace{margin-top:8px;font-size:.85rem;color:var(--ink-2)}.pace summary{cursor:pointer;color:var(--link);font-weight:600;min-height:44px;display:flex;align-items:center}
 .pace .pr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
@@ -166,7 +166,7 @@ CSS = """
 .stages li.on{color:var(--ink);font-weight:650}.stages li.on::before{content:"\\25CF  ";color:var(--amber)}
 .tipline{margin-top:12px;font-size:.85rem;color:var(--ink-2);padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);min-height:3em}
 .acts{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:10px}
-.acts li{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;font-size:.92rem;color:var(--ink-2);padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+.acts li{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;font-size:.94rem;color:var(--ink-2);padding:10px 0;border-bottom:1px solid var(--line)}.acts li:last-child{border-bottom:0}.acts li:not(:first-child) .minibtn.pri{background:var(--surface);color:var(--link);border-color:var(--contour)}
 .acts li b{color:var(--ink)}
 .tick{cursor:pointer;border-radius:10px;padding:10px 6px;margin:0 -6px;min-height:44px}.tick:hover{background:var(--surface-2)}.tick[aria-checked=true] .ico{color:var(--on-brand);background:var(--brand);border-radius:50%}
 .tick[aria-checked=false] .ico{opacity:.45}.tally{margin-top:12px;font-size:.88rem;color:var(--ink-2)}
@@ -208,8 +208,8 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .qband{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:12px 14px;margin:14px 0;border-radius:14px;border:1.5px solid var(--line);background:var(--surface)}
 .qband .qd{width:14px;height:14px;border-radius:50%;margin-top:4px}.qband b{color:var(--ink)}.qband p{margin:4px 0 0;font-size:.88rem;color:var(--ink-2)}
 .qband ul{margin:6px 0 0;padding-left:18px;font-size:.88rem;color:var(--ink-2)}.qband .btns{margin-top:10px}
-.q0{--qc:#2f9e7e}.q1{--qc:#d39a2a}.q2{--qc:#e07a2b}.q3{--qc:#d2452b}
-.qband .qd{background:var(--qc)}.qband.q1,.qband.q2,.qband.q3{border-color:var(--qc)}.qband.q2{background:rgba(224,122,43,.08)}.qband.q3{background:rgba(210,69,43,.1);border-width:2px}
+.q0{--qc:#2f9e7e}.q1{--qc:#c9a227}.q2{--qc:#c8901a}.q3{--qc:#d2452b}
+.qband .qd{background:var(--qc)}.qband.q1,.qband.q2,.qband.q3{border-color:var(--qc)}.qband.q2{background:var(--surface)}.qband.q3{background:rgba(210,69,43,.1);border-width:2px}
 .qm{display:inline-flex;gap:3px;vertical-align:middle;margin-left:8px}.qm i{width:15px;height:6px;border-radius:3px;background:rgba(127,127,127,.35)}.qm i.on{background:var(--qc)}
 .sev{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font-size:.75rem;font-weight:700;color:#fff;background:#8a5d00;vertical-align:1px}.sev.s2{background:#b8381f}
 .vfq{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(152px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;background:rgba(0,0,0,.6);font-size:.8rem;font-weight:700;white-space:nowrap;color:var(--qc)}
@@ -589,7 +589,7 @@ function measure(d0){const slot=document.createElement('section');slot.className
   err:(m,s)=>{if(s===410&&lastBlob){fullSend(dv);return}
    slot.innerHTML=`<div class="kicker">Estimated dimensions</div><p class="hungr">${s===-2?'Sizes skipped.':'Sizes could not be measured: '+esc(m)}</p><button type="button" class="minibtn" id="dretry">Measure sizes</button>`;
    $('#dretry').onclick=()=>measure(dv);typeChip(cur);finish(cur)}})}
-function typeChip(r){A.setChip(r.status==='uncertain'?'signal':r.status==='bad_photo'?'bad':'',r.status==='uncertain'?'Uncertain':r.status==='bad_photo'?'Not reliable':'Landslide type')}
+function typeChip(r){A.setChip(r.status==='uncertain'?'signal':r.status==='bad_photo'?'bad':'',r.status==='uncertain'?'Uncertain':r.status==='bad_photo'?'Not reliable':'Most likely type')}
 // the quality of this analysis travels with the result (saved, reports, history)
 function withQ(r){const lv=Math.max(photoQ.level,r.status==='bad_photo'?3:0);r.quality={level:lv,issues:photoQ.issues.map(x=>[x[0],x[1],x[2]]),failed:r.status==='bad_photo'};photoQ={level:0,issues:[]};return r}
 function qLevel(r){return r.quality?r.quality.level:r.status==='bad_photo'?3:0}
@@ -599,7 +599,7 @@ function qBand(r){const q=r.quality||{level:qLevel(r),issues:[],failed:r.status=
  const items=q.issues.map(([k,v,s])=>`<li><b>${esc(k)}</b>${sevTag(s)} <span>${esc(v)}</span></li>`);
  if(q.failed)items.unshift(`<li><b>Photo check</b>${sevTag(2)} <span>This does not look like a ground photo of a slope</span> (${Math.round((r.usable||0)*100)}% <span>usable</span>).</li>`);
  const h=`<section class="qband q${l}" id="qband" role="status"><span class="qd"></span><div><b><span>Photo quality</span>: <span>${QL[l]}</span></b>${qmeter(l)}<p>${what}</p>
-  ${items.length?`<ul>${items.join('')}</ul>`:''}${l?`<p>Nothing is adjusted to look better: the confidence and ranges are the model's own, and the ranges were checked on usable photos only.</p>`:''}
+  ${items.length?`<ul>${items.join('')}</ul>`:''}${l?`<p>Nothing is adjusted to look better: the confidence and sizes are the model's own.</p>`:''}
   ${l>=2?`<div class="btns"><button type="button" class="btn ${l===3?'primary':'ghost'}" data-a="retake">${ICO('camera')}Retake</button></div>`:''}</div></section>`;
  const rc=out.querySelector('.card.result');if(l===0&&rc)rc.insertAdjacentHTML('beforeend',h.replace('class="qband q0"','class="qband q0 qlite"'));else out.insertAdjacentHTML('afterbegin',h);
  $('#qband [data-a=retake]')?.addEventListener('click',()=>act('retake'))}
@@ -638,7 +638,7 @@ function afterDims(r,replay){const d=r.dimensions;if(!d)return;locLine();const c
  if(d.grains&&!d.grains.reliable&&['debris_flow','fall_topple','earth_mud_flow'].includes(d.label))addAct('Grain size not readable. A close-up of the deposit (5–15 m) gives it.','Close-up','deposit');
  gloss();const m=d.measures&&d.measures[0];if(!replay&&m)say(tr(m.name)+' '+m.value+' '+(m.unit==='m'?tr('metres'):m.unit))}
 function cutMsg(e){const how={top:'tilt the phone up or step back so the scarp is inside the frame',bottom:'tilt down or step back so the toe and deposit are inside',left:'turn left or step back',right:'turn right or step back'};
- return `<b>${esc(tr('The landslide runs off the edge of the photo'))}</b> (${e.map(x=>esc(tr(x))).join(', ')}): ${esc(tr('sizes are minimums'))}. ${e.map(x=>esc(tr(how[x]))).join('; ')}.`}
+ return `<b>${esc(tr('The landslide runs off the edge of the photo'))}</b> (${e.map(x=>esc(tr(x))).join(', ')}): ${esc(tr('sizes are minimums'))}. ${(s=>s.charAt(0).toUpperCase()+s.slice(1))(e.map(x=>esc(tr(how[x]))).join('; '))}.`}
 function act(a){if(a==='retake'){gstate.retakes++;out.innerHTML='';$('#fig').style.display='none';step(1);lastSrc==='cam'?openCamera():galIn.click();return}
  if(a==='dist'){dist.scrollIntoView({behavior:'smooth',block:'center'});dist.focus();$('.pace').open=!dist.value;
   if(!$('#remeasure')){dist.insertAdjacentHTML('afterend','<button type="button" class="minibtn pri u-t2" id="remeasure">Re-measure this photo</button>');
@@ -658,11 +658,13 @@ function ask(r,replay){let p={};r.ranked.forEach(([c,v])=>p[c]=Math.max(v,1e-4))
  const gain=q=>{const py=Object.keys(p).reduce((s,c)=>s+p[c]*(q.L[c]??.5),0);return H(p)-(py*H(upd(p,q,1))+(1-py)*H(upd(p,q,0)))};
  const pick=()=>{let best=null,bg=0;for(const q of Q){if(asked.includes(q.id))continue;const g=gain(q);if(g>bg){bg=g;best=q}}return bg>=.05?best:null};
  for(const a of ans){const q=Q.find(x=>x.t===a.q);if(q){asked.push(q.id);if(a.a!=='not sure')p=upd(p,q,a.a==='yes')}}
- const draw=()=>{const rk=Object.entries(p).sort((a,b)=>b[1]-a[1]),q=!replay&&asked.length<5&&rk[0][1]<.85?pick():null;
+ const draw=()=>{const rk=Object.entries(p).sort((a,b)=>b[1]-a[1]),q=!replay&&asked.length<5&&rk[0][1]<.85?pick():null,moved=ans.some(a=>a.a!=='not sure');
+  // nothing to ask and nothing answered: no card (it would only repeat the type list below)
+  card.hidden=!q&&!ans.length;if(card.hidden)return;
   card.innerHTML=`<div class="kicker">Help decide: answer what you can see</div>${q?`<h2>${esc(q.t)}</h2>${q.hint?`<p class="hungr u-sub">${esc(q.hint)}</p>`:''}
   <div class="qa"><button type="button" class="minibtn pri" data-y="1">Yes</button><button type="button" class="minibtn pri" data-y="0">No</button><button type="button" class="minibtn" data-y="-">Not sure</button></div>`
   :`<h2>${ans.some(a=>a.a!=='not sure')?esc(tr('Your answers point to'))+' '+esc(tr(D.names[rk[0][0]]))+' ('+Math.round(rk[0][1]*100)+'%)':esc(tr('No further question would change the answer much'))}</h2>`}
-  <div class="probs u-t3">${rk.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>
+  ${moved?`<div class="probs u-t3">${rk.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>`:''}
   <p class="hungr u-t3">${ans.length?esc(tr('Model result combined with your answers.')):esc(tr('Starts from the model result.'))} ${esc(tr('The answer weights are expert rules of thumb from the Hungr 2014 type descriptions, not trained on data; a geologist has the final word.'))}</p>
   ${ans.length&&!replay?'<button type="button" class="minibtn u-t2" data-y="undo">Undo last answer</button>':''}`;
   card.querySelectorAll('[data-y]').forEach(b=>b.onclick=()=>{const y=b.dataset.y;

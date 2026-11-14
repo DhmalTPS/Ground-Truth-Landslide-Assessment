@@ -98,7 +98,7 @@ HI = {
     
     "Classification after Hungr, Leroueil & Picarelli (2014).": "वर्गीकरण: हंगर, लेरुइल और पिकारेली (2014)।",
     "Landslide type": "भूस्खलन का प्रकार", "Landslide family": "भूस्खलन समूह",
-    "Confidence": "विश्वास", "Model confidence": "मॉडल का विश्वास", "Most likely type": "सबसे संभावित प्रकार", "High": "उच्च", "Moderate": "मध्यम", "Low": "कम", "(family)": "(वर्ग)", "Confidence (family)": "विश्वास (समूह)", "All types": "सभी प्रकार", "Check on site": "स्थल पर जाँचें", "Safety": "सुरक्षा",
+    "Confidence": "विश्वास", "How the sizes were measured": "आकार कैसे मापे गए", "Model": "मॉडल", "Model confidence": "मॉडल का विश्वास", "Most likely type": "सबसे संभावित प्रकार", "High": "उच्च", "Moderate": "मध्यम", "Low": "कम", "(family)": "(वर्ग)", "Confidence (family)": "विश्वास (समूह)", "All types": "सभी प्रकार", "Check on site": "स्थल पर जाँचें", "Safety": "सुरक्षा",
     "Photo check": "फ़ोटो जाँच", "Retake the photo": "फ़ोटो दोबारा लें", "Retake photo": "फ़ोटो दोबारा लें",
     "Estimated dimensions": "अनुमानित आयाम", "Analysing photo": "फ़ोटो का विश्लेषण", "Something went wrong": "कुछ गलत हुआ",
     "Check the connection to the laptop running the app, then try again.": "ऐप चला रहे लैपटॉप से कनेक्शन जाँचें, फिर दोबारा कोशिश करें।",
@@ -374,7 +374,7 @@ HI = {
     'Small issues: the result is a little less reliable than usual.': 'छोटी कमियाँ: परिणाम सामान्य से थोड़ा कम भरोसेमंद है।',
     'Rough result: treat it as a first look and retake if you can.': 'मोटा परिणाम: इसे पहली झलक मानें और हो सके तो फ़ोटो दोबारा लें।',
     'Not reliable: shown only for reference. Retake before acting on it.': 'भरोसेमंद नहीं: केवल संदर्भ के लिए दिखाया गया। कोई कदम उठाने से पहले फ़ोटो दोबारा लें।',
-    "Nothing is adjusted to look better: the confidence and ranges are the model's own, and the ranges were checked on usable photos only.": 'कुछ भी बेहतर दिखाने के लिए बदला नहीं गया: भरोसा और दायरे मॉडल के अपने हैं, और दायरे केवल उपयोगी फ़ोटो पर जाँचे गए हैं।',
+    "Nothing is adjusted to look better: the confidence and sizes are the model's own.": 'कुछ भी बेहतर दिखाने के लिए बदला नहीं गया: विश्वास और आकार मॉडल के अपने हैं।',
     'Sizes from a photo that failed the photo check are not reliable, so they are not measured automatically.': 'फ़ोटो जाँच में विफल फ़ोटो से माप भरोसेमंद नहीं होते, इसलिए वे अपने-आप नहीं मापे जाते।',
     'Estimate sizes anyway': 'फिर भी माप का अनुमान लगाएँ',
     'The 90% ranges were checked on usable photos; with this photo the real error can be larger than shown.': '90% दायरे उपयोगी फ़ोटो पर जाँचे गए हैं; इस फ़ोटो में असली त्रुटि दिखाए गए से बड़ी हो सकती है।',

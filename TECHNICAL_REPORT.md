@@ -1087,6 +1087,34 @@ English keys and Hindi translations changed together.
 - **Observer name and organisation on the report.** A firm's reviewer will expect it. It needs a stored profile field and consent, so it was left for a later change.
 - **A short reference ID printed on the report** for correspondence. Today the file name carries the date and time.
 
+
+### 10.6 Fixes after review on a real phone session
+
+The redesign (§10.5) was then reviewed on a live session: dark mode, desktop width, survey mode, a real poor photo.
+Every problem found was fixed.
+
+| Problem seen | Cause | Fix |
+|---|---|---|
+| "High" printed on top of "Model confidence", inside a dashed orange box | the new class `band` already existed for the viewfinder's dashed framing guides (absolute position) | renamed it to `cband`; a new headless check (9 CLASH) fails if any viewfinder style reaches the result |
+| contour lines crossed the title, and stopped sharply at the column edges on a wide screen | lines at full strength, limited to the 620 px column | lines at 55 % strength, full window width |
+| at 94 % every ring was inked: a bullseye, plus a dark disc behind the glyph | ring count was rounded | rings are counted down (the top ring is inked only at 100 %); no disc |
+| photo-quality "Poor" panel was orange, like the hazard tape | old quality colours | quality uses amber; orange now means "hazard" and nothing else |
+| the same caveat ("ranges were checked on usable photos") appeared twice | quality panel and size block both said it | the quality panel says only "the confidence and sizes are the model's own"; the size caveat stays with the sizes |
+| three bright filled buttons under "Next steps" | every action used the primary style | only the first action is filled; rows sit on the paper with dividers |
+| every survey shot row was boxed | border on all rows | only the current shot is boxed |
+| the photo label said "Landslide type"; the result said "Most likely type" | two words for one thing | one wording |
+| "sizes are minimums. turn right or step back." | lowercase after a full stop | sentence case |
+| scale method text (depth ensemble, x2.075, n = 83) shown openly to the site user | | under "How the sizes were measured", kept for the office reader |
+| the model line had no label | | "Model: …" |
+| "Help decide" repeated the type list right above "All types", and sometimes said only "No further question would change the answer much" | card drawn even when there was nothing to ask | the card is hidden when there is nothing to ask and nothing answered; its bars appear only after an answer changes them |
+| section labels were small grey text, hard to find when scrolling | | labels in the DIN heading face, ink colour |
+
+After these fixes:
+- **Contrast:** 0 text elements below AA, light and dark, in 4 result states.
+- **Tap targets:** 0 controls under 44 px.
+- **Guide tests:** 52/52 checks in English and in Hindi (the earlier run of 51 plus the new 9 CLASH check).
+- **Photo-set suite:** complete in both languages, 0 script errors.
+
 ---
 
 ## 11. Deployment

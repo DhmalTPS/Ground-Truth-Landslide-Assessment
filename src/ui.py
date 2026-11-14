@@ -112,14 +112,14 @@ color-scheme:light}
 --lift:0 1px 0 rgba(0,0,0,.35),0 16px 30px -22px rgba(0,0,0,.8);color-scheme:dark}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;color:var(--ink);background:var(--bg);font:16px/1.55 var(--f-body)}
+body{margin:0;min-height:100vh;overflow-x:clip;color:var(--ink);background:var(--bg);font:16px/1.55 var(--f-body)}
 main{position:relative;max-width:620px;margin:0 auto;padding:var(--s4) var(--s4) var(--s6)}
 svg{display:block}
 a{color:var(--link);text-underline-offset:2px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 /* the map sheet edge behind the header: static contour lines of a slope, drawn once from a fixed seed */
-.topo{position:absolute;left:0;right:0;top:0;height:170px;z-index:0;pointer-events:none;color:var(--contour);
+.topo{position:absolute;left:50%;width:100vw;transform:translateX(-50%);top:0;height:170px;z-index:0;pointer-events:none;color:var(--contour);opacity:.55;
 -webkit-mask-image:linear-gradient(#000 35%,transparent);mask-image:linear-gradient(#000 35%,transparent)}
 .topo svg{width:100%;height:100%}
 header{position:relative;z-index:1;display:flex;align-items:center;gap:var(--s2);margin:var(--s1) 0 var(--s4)}
@@ -135,7 +135,8 @@ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96
 /* containers only where you act (capture, save) or must stop (safety, errors, photo problems) */
 .card.panel,#repsec,#askcard,.card.result,.card.safety,.card.bad,.card.qband{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--lift);padding:var(--s4)}
 .card.panel::before,#repsec::before,#askcard::before,.card.result::before,.card.qband::before,.card.bad::before{display:none}
-.kicker{font-size:.88rem;color:var(--ink-2);font-weight:650;margin:0 0 var(--s1)}
+.kicker{font:600 1rem/1.3 var(--f-sign);color:var(--ink);letter-spacing:.01em;margin:0 0 var(--s2)}
+.card.result .kicker{font:650 .9rem/1.3 var(--f-body);color:var(--ink-2);margin-bottom:var(--s1)}
 h2{font:600 1.3rem/1.2 var(--f-sign);margin:0 0 var(--s3);letter-spacing:.005em}
 .tips{display:grid;gap:var(--s2);margin:0 0 var(--s4);padding:0;list-style:none;counter-reset:tp}
 .tips li{display:grid;grid-template-columns:26px 1fr;gap:var(--s2);align-items:start;color:var(--ink-2);font-size:.96rem;counter-increment:tp}
@@ -172,14 +173,14 @@ font-size:.84rem;font-weight:650;color:#fff;background:rgba(13,26,27,.86)}
 .rings path.on{stroke:currentColor;stroke-width:1.7;stroke-dasharray:1;stroke-dashoffset:0;animation:climb .7s cubic-bezier(.3,.7,.2,1) both;animation-delay:calc(var(--i)*70ms)}
 .rings path.on.idx{stroke-width:2.6}
 @keyframes climb{from{stroke-dashoffset:1}}
-.summit .glyph{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:46%;height:46%;border-radius:50%;display:grid;place-items:center;background:var(--surface)}
+.summit .glyph{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:46%;height:46%;border-radius:50%;display:grid;place-items:center;background:none}
 .summit .glyph svg{width:78%;height:78%}
 .glyph{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--tint-ground)}
 .glyph svg{width:48px;height:48px}
 .title{font:600 1.75rem/1.08 var(--f-sign);letter-spacing:0;margin:2px 0 var(--s1);text-wrap:balance}
 .hungr{font-size:.88rem;color:var(--mute)}
 .meter{margin-top:var(--s4)}
-.meter .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.94rem;color:var(--ink-2)}.meter .band{color:var(--ink)}
+.meter .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.94rem;color:var(--ink-2)}.meter .cband{color:var(--ink)}
 .meter .val{font:600 1.7rem/1 var(--f-sign);color:var(--ink);font-variant-numeric:tabular-nums}
 .track{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:var(--s2)}
 .fill{height:100%;border-radius:99px;background:var(--brand)}
@@ -233,7 +234,7 @@ async function shrink(file){
 // confidence = how many rings are inked, from the foot up towards the summit where the type glyph stands
 function summit(seed,conf,cls){let s=7;for(const ch of seed)s=(Math.imul(s,31)+ch.charCodeAt(0))>>>0;
  const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296,K=[2,3,5,7];
- const N=6,on=Math.max(1,Math.round(conf*N)),ph=K.map(()=>rnd()*6.2832),am=[.05,.03,.018,.01].map(a=>a*(.6+rnd()*.8));
+ const N=6,on=Math.max(1,Math.floor(conf*N+1e-9)),ph=K.map(()=>rnd()*6.2832),am=[.05,.03,.018,.01].map(a=>a*(.6+rnd()*.8));
  let p='';for(let i=0;i<N;i++){const r0=58-i*5.6,k=1-i*.1;let d='';
   for(let j=0;j<=60;j++){const t=j/60*6.2832;let w=0;for(let q=0;q<4;q++)w+=am[q]*Math.sin(K[q]*t+ph[q]);const r=r0*(1+k*w);
    d+=(j?'L':'M')+(64+r*Math.cos(t)).toFixed(1)+' '+(64-i*1.1+r*Math.sin(t)*.9).toFixed(1)}
@@ -265,7 +266,7 @@ function dims(d){
  if(d.alternative){const a=d.alternative;more+=`<p class="hungr u-t2">If it is <b>${esc(D.names[a.label]||a.label)}</b> (${Math.round(a.prob*100)}%): ${a.measures.slice(0,3).map(m=>esc(m.name)+' '+num(m.value)+' '+m.unit).join(', ')}</p>`;}
  h+=`<details class="more"><summary>More measurements</summary>${more}</details>`;
  const notes=[...d.notes,...d.depth_issues.map(x=>'Depth check: '+x)];
- h+=`<p class="hungr u-t2">Scale: ${esc(d.scale_source)}. ${notes.map(esc).join(' ')}</p></section>`;
+ h+=`<details class="more"><summary>How the sizes were measured</summary><p class="hungr u-t1">Scale: ${esc(d.scale_source)}. ${notes.map(esc).join(' ')}</p></details></section>`;
  return h}
 function render(r){
  const n=D.names;let h='';
@@ -275,7 +276,7 @@ function render(r){
   const bp=r.status==='bad_photo';
   const i=D.info[r.label],unsure=r.status==='uncertain',fam=unsure&&r.family?D.families[r.family]:null;
   const gname=fam?D.familyGlyph[r.family]:r.label, sig=(unsure&&!fam)||bp;
-  setChip(bp?'bad':sig?'signal':'', bp?'Not reliable':fam?'Landslide family':unsure?'Uncertain':'Landslide type');
+  setChip(bp?'bad':sig?'signal':'', bp?'Not reliable':fam?'Landslide family':unsure?'Uncertain':'Most likely type');
   const kicker=bp?'Best guess: photo check failed':fam?'Landslide family':unsure?'Uncertain: most likely':'Most likely type';
   const conf=fam?r.ranked[0][1]+r.ranked[1][1]:r.confidence;
   let note='';
@@ -285,7 +286,7 @@ function render(r){
   h=`<section class="card result${bp?' lowq':''}" aria-live="polite"><div class="rhead">${summit(gname,conf,bp?'bad':sig?'signal':'')}<div>
     <div class="kicker">${kicker}</div><div class="title">${esc(fam||i.title)}</div></div></div>
     ${fam?'':`<p class="hungr u-t2"><span>Hungr et al. 2014</span>: ${esc(i.hungr)}</p>`}
-    <div class="meter"><div class="row"><span><span>Model confidence</span>${fam?' <span>(family)</span>':''}: <b class="band">${conf>=.8?'High':conf>=D.conf?'Moderate':'Low'}</b></span><span class="val">${pct(conf)}</span></div>
+    <div class="meter"><div class="row"><span><span>Model confidence</span>${fam?' <span>(family)</span>':''}: <b class="cband">${conf>=.8?'High':conf>=D.conf?'Moderate':'Low'}</b></span><span class="val">${pct(conf)}</span></div>
     <p class="hungr u-t1">Answers below ${pct(D.conf)} are marked uncertain.</p></div>${note}</section>
    <section class="card safety"><h2>${ico('alert')}Safety</h2><p>${esc(i.safety)}</p></section>
    <section class="card"><div class="kicker">All types</div><div class="probs u-t3">${probs(r)}</div></section>
@@ -293,7 +294,7 @@ function render(r){
  }
  if(r.vlm){h+=`<section class="card"><div class="kicker">Second opinion from Qwen2.5-VL (zero-shot)</div><h2 style="display:flex;gap:8px;align-items:center">${ico('spark')}${esc(n[r.vlm.label]||r.vlm.label)}, ${pct(r.vlm.confidence)}</h2><p class="hungr u-m0">${esc(r.vlm.description)}</p></section>`;}
  if(r.dimensions)h+=dims(r.dimensions);
- h+=`<p class="meta"><span>${esc(r.model)}</span>, <span>${(r.ms/1000).toFixed(1)} s</span></p>`;
+ h+=`<p class="meta"><span>Model</span>: <span>${esc(r.model)}</span>, <span>${(r.ms/1000).toFixed(1)} s</span></p>`;
  out.innerHTML=h;}
 function loading(){setChip('','Analysing…',true);
  out.innerHTML='<section class="card result" aria-busy="true"><div class="kicker">Analysing photo</div><div class="skel" style="width:60%;height:22px"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:40%"></div></section>';}
