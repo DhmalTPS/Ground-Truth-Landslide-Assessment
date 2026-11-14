@@ -270,6 +270,8 @@ TEXT = {
 
 
 CSS = """
+.pit .px::after{content:"";position:absolute;inset:-6px}
+.psteps input{min-height:44px;padding:6px 8px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:inherit;font:inherit}
 #pano[hidden],.pgide[hidden],.tips[hidden],.psteps[hidden]{display:none}
 .pgide{margin:0 0 12px}.pgide .pk{margin-bottom:10px}
 .pil{max-height:170px}.pil .cone{fill:var(--teal-400);fill-opacity:.16;stroke:var(--teal-400);stroke-width:1.2}
@@ -279,20 +281,20 @@ CSS = """
 .tray:empty{display:none}
 .pit{position:relative;flex:0 0 auto;width:84px;height:64px;border-radius:9px;overflow:hidden;border:1.5px solid var(--line);scroll-snap-align:start;background:var(--surface-2)}
 .pit img{width:100%;height:100%;object-fit:cover;display:block}
-.pit .pn{position:absolute;left:4px;top:4px;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.6);color:#fff;font:700 .72rem/20px inherit;text-align:center}
-.pit .px{position:absolute;right:3px;top:3px;width:24px;height:24px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font:700 .9rem/1 inherit;cursor:pointer}
+.pit .pn{position:absolute;left:4px;top:4px;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:.72rem;line-height:20px;font-family:inherit;text-align:center}
+.pit .px{position:absolute;right:2px;top:2px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:.9rem;line-height:1;font-family:inherit;cursor:pointer}
 .pit.cam::after{content:"";position:absolute;right:5px;bottom:5px;width:7px;height:7px;border-radius:50%;background:#5fd1a8}
 .plink{flex:0 0 auto;min-width:46px;margin:0 2px;text-align:center;font-size:.7rem;font-weight:700;color:var(--mute)}
 .plink i{display:block;height:4px;border-radius:2px;margin:3px 4px 0;background:var(--line)}
 .plink.good{color:var(--teal-600)}.plink.good i{background:var(--teal-400)}
-.plink.weak,.plink.dup{color:#b07a00}.plink.weak i{background:var(--amber)}.plink.dup i{background:#5b8def}
+.plink.weak,.plink.dup{color:var(--caution)}.plink.weak i{background:var(--amber)}.plink.dup i{background:#5b8def}
 .plink.gap{color:var(--ruby)}.plink.gap i{background:var(--ruby)}
 .pstat{font-size:.82rem;color:var(--mute);margin:2px 0 10px}
 .pex{width:100%;height:auto;color:var(--ink-2)}
 .exgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
 .excard{border:1.5px solid var(--line);border-radius:12px;padding:6px 8px 8px;font-size:.78rem;line-height:1.3;color:var(--ink-2)}
 .excard b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;color:#fff;font-size:.7rem;margin-right:4px;vertical-align:-3px}
-.excard.ok{border-color:var(--teal-400)}.excard.ok b{background:var(--teal-600)}.excard.no b{background:var(--ruby)}
+.excard.ok{border-color:var(--teal-400)}.excard.ok b{background:var(--brand);color:var(--on-brand)}.excard.no b{background:var(--ruby)}
 .omap{position:relative;border-radius:12px;overflow:hidden;margin:8px 0 6px;background:#000}
 .omap img{display:block;width:100%;height:auto}.omap svg{position:absolute;inset:0;width:100%;height:100%}
 .omap .q{fill:none;stroke:#fff;stroke-width:2.2;vector-effect:non-scaling-stroke;opacity:.9}
@@ -308,16 +310,16 @@ CSS = """
 .obar .z{position:absolute;top:0;bottom:0;background:var(--tint-ground);border-left:1px dashed var(--teal-400);border-right:1px dashed var(--teal-400)}
 .obar .v{position:absolute;top:2px;bottom:2px;left:0;border-radius:3px}
 .obar .v.good{background:var(--teal-400)}.obar .v.weak{background:var(--amber)}.obar .v.gap{background:var(--ruby)}.obar .v.dup{background:#5b8def}
-.olinks .st{font-size:.74rem;font-weight:700;text-align:right}.olinks .st.good{color:var(--teal-600)}.olinks .st.weak{color:#b07a00}.olinks .st.gap{color:var(--ruby)}.olinks .st.dup{color:#3d6fd6}
+.olinks .st{font-size:.74rem;font-weight:700;text-align:right}.olinks .st.good{color:var(--teal-600)}.olinks .st.weak{color:var(--caution)}.olinks .st.gap{color:var(--ruby)}.olinks .st.dup{color:var(--dup)}
 .oiss{list-style:none;margin:6px 0 12px;padding:0;display:grid;gap:8px}
 .oiss li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:.88rem;padding:8px 10px;border-radius:10px;background:var(--surface-2)}
 .oiss li.bad{box-shadow:inset 3px 0 0 var(--ruby)}.oiss li.warn{box-shadow:inset 3px 0 0 var(--amber)}.oiss li.info{box-shadow:inset 3px 0 0 #5b8def}
 .oiss li.hl{outline:2px solid #ffd166}
 .vbadge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.78rem;font-weight:700;margin-bottom:4px}
-.vbadge.ready{background:var(--tint-ground);color:var(--teal-800)}.vbadge.warn{background:var(--tint-signal);color:#8a5a00}.vbadge.fix{background:#fde3e3;color:#a12a2a}
+.vbadge.ready{background:var(--tint-ground);color:var(--link)}.vbadge.warn{background:var(--tint-signal);color:var(--caution)}.vbadge.fix{background:var(--warn-bg);color:var(--warn)}
 .perset{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:8px 0}
 .perset div{border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.74rem}
-.perset img{width:100%;height:58px;object-fit:cover;display:block}.perset p{margin:4px 6px 6px}.perset .agree{color:var(--teal-600)}.perset .dis{color:#b07a00}
+.perset img{width:100%;height:58px;object-fit:cover;display:block}.perset p{margin:4px 6px 6px}.perset .agree{color:var(--teal-600)}.perset .dis{color:var(--caution)}
 .vfg[data-frame=pano] .band{display:none}
 .pghost{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .pghost img{position:absolute;opacity:.42;transition:transform .35s ease-out,opacity .3s;filter:saturate(.6);outline:2px dashed rgba(255,209,102,.9)}
@@ -331,9 +333,9 @@ CSS = """
 .pstrip{position:absolute;left:0;right:0;bottom:calc(104px + env(safe-area-inset-bottom));display:flex;gap:6px;justify-content:center;pointer-events:none}
 .pstrip img{width:44px;height:33px;object-fit:cover;border-radius:5px;border:1.5px solid #fff;opacity:.9}
 .vf.pano .vfr{display:none}
-.vfb .pdone,.vfb .pdir{grid-row:1;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font:700 .8rem inherit;cursor:pointer}
+.vfb .pdone,.vfb .pdir{grid-row:1;min-height:44px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font-weight:700;font-size:.8rem;font-family:inherit;cursor:pointer}
 .vfb .pdone{grid-column:3;justify-self:end;background:#2bb38a}
-.vf .pauto{position:absolute;top:calc(56px + env(safe-area-inset-top));right:12px;border:0;border-radius:99px;padding:7px 12px;background:rgba(0,0,0,.5);color:#fff;font:700 .78rem inherit;cursor:pointer}
+.vf .pauto{min-height:44px;position:absolute;top:calc(56px + env(safe-area-inset-top));right:12px;border:0;border-radius:99px;padding:7px 12px;background:rgba(0,0,0,.5);color:#fff;font-weight:700;font-size:.78rem;font-family:inherit;cursor:pointer}
 .vf .pauto.on{background:#2bb38a}.vf:not(.pano) .pauto{display:none}.vfb .pdir{grid-column:1;justify-self:start;margin-left:96px}
 .pflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .25s}.pflash.on{opacity:.55;transition:none}
 """
@@ -451,11 +453,11 @@ async function onPicks(files,cam){if(g.mode()!=='pano')return false;g.step(1);
 function build(){const card=$('#capH').closest('.card');
  card.querySelector('#shots').insertAdjacentHTML('afterend',`<div class="pgide" hidden><div class="seg pk" role="group" aria-label="${esc(L('mode_turn'))} / ${esc(L('mode_walk'))}">
   <button type="button" data-k="turn">${esc(L('mode_turn'))}</button><button type="button" data-k="walk">${esc(L('mode_walk'))}</button></div>
-  <p class="pintro hungr" style="margin:0 0 6px"></p><div class="pdiag"></div><ol class="prules"></ol>
-  <p class="pvid hungr" style="margin:0 0 6px">${esc(L('vid_hint'))}</p><label class="psteps hungr" style="display:block;margin:0 0 8px"><span class="pstq">${esc(L('steps_q'))}</span> <input type="number" inputmode="numeric" min="1" max="50" step="1" style="width:4.5em"></label>
+  <p class="pintro hungr u-b2"></p><div class="pdiag"></div><ol class="prules"></ol>
+  <p class="pvid hungr u-b2">${esc(L('vid_hint'))}</p><label class="psteps hungr u-blk u-b2"><span class="pstq">${esc(L('steps_q'))}</span> <input type="number" inputmode="numeric" min="1" max="50" step="1" style="width:4.5em"></label>
   <button type="button" class="minibtn" data-a="examples">${esc(L('examples'))}</button></div>`);
  card.querySelector('.btns').insertAdjacentHTML('afterend',`<div id="pano" hidden><div class="tray" aria-live="polite"></div><p class="pstat"></p>
-  <div class="row" style="margin:0 0 6px"><button type="button" class="btn primary" data-a="check" disabled>${esc(L('check'))}</button><button type="button" class="minibtn" data-a="clear">${esc(L('clear'))}</button></div></div>`);
+  <div class="row u-b2"><button type="button" class="btn primary" data-a="check" disabled>${esc(L('check'))}</button><button type="button" class="minibtn" data-a="clear">${esc(L('clear'))}</button></div></div>`);
  const gd=card.querySelector('.pgide');
  gd.addEventListener('click',e=>{const k=e.target.closest('[data-k]')?.dataset.k;if(k){S.kind=k;g.store.set('pkind',k);S.rep=null;$('#ovcard')?.remove();drawGuide();render()}
   if(e.target.dataset.a==='examples')examples()});
@@ -475,7 +477,7 @@ const vidTimes=()=>{const it=S.items;return it.length>1&&it.every(i=>i.vt!=null&
 function steps(){const v=+($('.pgide .psteps input')?.value||0),t=vidTimes();if(S.kind!=='walk'||!(v>0))return null;
  if(t.length>1&&S.vidT){const x=v*((t[t.length-1]-t[0])/(t.length-1))/S.vidT;return x>0&&x<=50?Math.round(x*10)/10:null}
  return v<=50?Math.round(v):null}
-function examples(){const m=$('#mTour');m.firstElementChild.innerHTML=`<div class="row" style="margin:0"><h2 id="tourT" style="margin:0">${esc(L('ex_title'))}</h2><button type="button" class="minibtn" data-a="x" data-f>${esc(L('close'))}</button></div>
+function examples(){const m=$('#mTour');m.firstElementChild.innerHTML=`<div class="row u-m0"><h2 id="tourT" class="u-m0">${esc(L('ex_title'))}</h2><button type="button" class="minibtn" data-a="x" data-f>${esc(L('close'))}</button></div>
  <div class="exgrid">${P.examples.map(([k,ok,svg])=>`<div class="excard ${ok?'ok':'no'}">${svg}<b>${ok?'&#10003;':'&#10005;'}</b>${esc(L('ex_'+k))}</div>`).join('')}</div>`;
  m.hidden=false;m.querySelector('[data-f]').focus();m.onclick=e=>{if(e.target===m||e.target.dataset.a==='x')m.hidden=true}}
 function render(){const tr=$('#pano .tray');if(!tr)return;
@@ -551,7 +553,7 @@ function check(){if(S.items.length<2)return;if(!navigator.onLine){g.toast(L('nee
    ok:r=>{if(r.ms)g.store.set('etaO',g.ema('etaO',r.ms,3000));reorder(r);S.rep=r;render();report(r)},
    err:(m,s)=>s===-2?g.cancelled():pfail(m,check)})})()}
 function pfail(m,again){A.fail(m);const c=g.out.firstElementChild;g.say(m);g.buzz([80,60,80]);
- c.insertAdjacentHTML('beforeend',`<div class="btns" style="margin-top:12px"><button type="button" class="btn primary" data-a="again">${esc(L('check'))}</button></div>`);
+ c.insertAdjacentHTML('beforeend',`<div class="btns u-t3"><button type="button" class="btn primary" data-a="again">${esc(L('check'))}</button></div>`);
  c.querySelector('[data-a=again]').textContent=again===check?L('check'):L('join');c.querySelector('[data-a=again]').onclick=()=>again()}
 function reorder(r){const items=r.order.map(i=>S.items[i]);const map={};r.order.forEach((i,k)=>{map[i]=k});r._map=map;
  const fix=x=>map[x];r.issues.forEach(x=>{['a','b'].forEach(k=>{if(x[k]!=null)x[k]=fix(x[k])});if(x.group)x.group=x.group.map(fix)});
@@ -567,26 +569,26 @@ const SEVI={bad:'alert',warn:'alert',info:'check'};
 function report(r){const out=g.out,n=S.items.length,ICO=g.ICO,B=r.bands,vt={ready:L('v_ready'),warn:L('v_warn'),fix:L('v_fix')}[r.verdict];
  const kname=L(r.joined||r.kind==='turn'?'mode_turn':'mode_walk');
  let h=`<section class="card" id="ovcard"><div class="kicker">${esc(L('kick',{n,k:kname}))}</div><span class="vbadge ${r.verdict}">${esc(vt)}</span>
- <h2 style="margin:4px 0 2px">${esc(r.joined?L('sum_join',{a:r.main.length,n}):L('sum_walk',{a:r.main.length,n}))}</h2>
- ${r.span_deg?`<p class="hungr" style="margin:0 0 6px">${esc(L('sum_span',{x:Math.round(r.span_deg[0]),y:Math.round(r.span_deg[1])}))}</p>`:''}`;
+ <h2 class="u-t1">${esc(r.joined?L('sum_join',{a:r.main.length,n}):L('sum_walk',{a:r.main.length,n}))}</h2>
+ ${r.span_deg?`<p class="hungr u-b2">${esc(L('sum_span',{x:Math.round(r.span_deg[0]),y:Math.round(r.span_deg[1])}))}</p>`:''}`;
  if(r.preview){const p=r.preview,R=Math.max(p.w,p.h)/28;
   h+=`<div class="omap"><img src="${p.src}" alt=""><svg viewBox="0 0 ${p.w} ${p.h}" preserveAspectRatio="none">`;
   for(const l of r.links){const poly=p.shared[l.a+'-'+l.b];if(poly&&poly.length)h+=`<polygon class="sh ${l.status}" points="${poly.map(q=>q.join(',')).join(' ')}"/>`}
   for(const [i,q] of Object.entries(p.quads))h+=`<polygon class="q" data-i="${i}" points="${q.map(v=>v.join(',')).join(' ')}"/>`;
   for(const [i,q] of Object.entries(p.quads)){const cx=q.reduce((s,v)=>s+v[0],0)/4,cy=q.reduce((s,v)=>s+v[1],0)/4;
    h+=`<g class="nb" data-i="${i}" role="button" tabindex="0" aria-label="${esc(L('per_photo',{k:+i+1}))}"><circle cx="${cx}" cy="${cy}" r="${R}"/><text x="${cx}" y="${cy}" font-size="${R*1.15}">${+i+1}</text></g>`}
-  h+=`</svg></div><div class="olegend"><span><i style="background:#2bb38a"></i>${esc(L('legend_good'))}</span><span><i style="background:#f2a900"></i>${esc(L('legend_weak'))}</span><span><i style="background:#e04848"></i>${esc(L('legend_gap'))}</span><span><i style="background:#5b8def"></i>${esc(L('legend_dup'))}</span></div><p class="hungr" style="margin:0 0 8px">${esc(L('map_note'))}</p>`}
+  h+=`</svg></div><div class="olegend"><span><i style="background:#2bb38a"></i>${esc(L('legend_good'))}</span><span><i style="background:#f2a900"></i>${esc(L('legend_weak'))}</span><span><i style="background:#e04848"></i>${esc(L('legend_gap'))}</span><span><i style="background:#5b8def"></i>${esc(L('legend_dup'))}</span></div><p class="hungr u-b2">${esc(L('map_note'))}</p>`}
  else{h+=`<div class="ostrip">${S.items.map((it,k)=>{const l=r.links.find(x=>x.a===k&&x.b===k+1);const lk=k<n-1?(l?`<div class="plink ${l.status}">${pct(l.overlap)}%<i></i></div>`:'<div class="plink gap">&mdash;<i></i></div>'):'';
   return `<div class="pit" style="${r.main.includes(k)?'':'opacity:.4'}"><img src="${it.thumb}" alt=""><span class="pn">${k+1}</span></div>${lk}`}).join('')}</div>`}
- if(r.links.length){h+=`<h3 style="margin:10px 0 2px">${esc(L('links_h'))}</h3><p class="hungr" style="margin:0">${esc(L('ideal',{a:pct(B.ideal[0]),b:pct(B.ideal[1])}))}</p><ul class="olinks">`;
+ if(r.links.length){h+=`<h3 class="u-t3">${esc(L('links_h'))}</h3><p class="hungr u-m0">${esc(L('ideal',{a:pct(B.ideal[0]),b:pct(B.ideal[1])}))}</p><ul class="olinks">`;
   for(const l of r.links)h+=`<li data-a="${l.a}" data-b="${l.b}"><span><b>${l.a+1} &harr; ${l.b+1}</b></span><span class="obar"><span class="z" style="left:${B.ideal[0]*100}%;width:${(B.ideal[1]-B.ideal[0])*100}%"></span><span class="v ${l.status}" style="width:${Math.min(100,pct(l.overlap))}%"></span></span>
    <span class="st ${l.status}">${pct(l.overlap)}% ${esc(L('s_'+l.status))}${l.motion==='moved'&&r.kind==='turn'?'<br>'+esc(L('moved_tag')):''}</span></li>`;h+='</ul>'}
  const iss=r.issues;
- h+=`<h3 style="margin:10px 0 4px">${esc(L('fix_h'))}</h3><ul class="oiss">${iss.length?iss.map(x=>`<li class="${x.sev}" data-a="${x.a??''}" data-b="${x.b??''}"><span>${ICO(SEVI[x.sev])}</span><span>${esc(issueText(x))}</span></li>`).join(''):`<li class="info"><span>${ICO('check')}</span><span>${esc(L('all_good'))}</span></li>`}</ul>`;
+ h+=`<h3 class="u-t3">${esc(L('fix_h'))}</h3><ul class="oiss">${iss.length?iss.map(x=>`<li class="${x.sev}" data-a="${x.a??''}" data-b="${x.b??''}"><span>${ICO(SEVI[x.sev])}</span><span>${esc(issueText(x))}</span></li>`).join(''):`<li class="info"><span>${ICO('check')}</span><span>${esc(L('all_good'))}</span></li>`}</ul>`;
  const drop=r.issues.filter(x=>x.code==='dup'||x.code==='unmatched').length;
  h+=`<div class="btns">${r.joinable?`<button type="button" class="btn primary" data-a="join">${esc(L(r.joined?'join':'together'))}</button>`:''}
   ${drop?`<button type="button" class="btn ghost" data-a="drop">${esc(L('drop'))}</button>`:''}<button type="button" class="btn ghost" data-a="more">${esc(L('addmore'))}</button></div>
-  <div class="row" style="margin-top:8px"><button type="button" class="minibtn" data-a="restart">${esc(L('restart'))}</button><span></span></div></section>`;
+  <div class="row u-t2"><button type="button" class="minibtn" data-a="restart">${esc(L('restart'))}</button><span></span></div></section>`;
  out.innerHTML=h;g.step(r.verdict==='fix'?1:2);const c=$('#ovcard');c.scrollIntoView({behavior:'smooth',block:'start'});
  g.say(vt+'. '+(iss.length?issueText(iss[0]):L('all_good')));g.buzz(r.verdict==='ready'?40:[40,80,40]);
  const sel=i=>{c.querySelectorAll('.q').forEach(q=>{q.classList.toggle('sel',q.dataset.i==i);q.classList.toggle('dim',i!=null&&q.dataset.i!=i)});
@@ -612,9 +614,9 @@ function perPhoto(r,items,r0){const N=A.D.names,top=r.label,rows=[];
  if(r.set.joined_type)rows.push({img:r.image,t:L('per_joined'),lab:r.set.joined_type.label,c:r.set.joined_type.confidence});
  r.set.photos.forEach(p=>{const k=r0._map[p.i];rows.push({img:items[k]?.thumb,t:L('per_photo',{k:k+1}),lab:p.label,c:p.confidence})});
  const agree=rows.filter(x=>x.lab===top).length;
- const html=`<section class="card" id="percard"><div class="kicker">${esc(L('per_h'))}</div><p class="hungr" style="margin:2px 0 4px">${esc(L('per_note'))}</p>
-  <p style="margin:0"><b>${esc(L('agree',{a:agree,n:rows.length}))}</b></p>
-  ${r.set.stereo_points?`<p class="hungr" style="margin:4px 0 0">${esc(L('stereo_ok',{n:r.set.stereo_points,p:r.set.stereo_pairs||1}))}</p>`:(r.set.steps_given?`<p class="hungr" style="margin:4px 0 0">${esc(L('stereo_no'))}</p>`:'')}<div class="perset">${rows.map(x=>`<div><img src="${x.img||''}" alt=""><p><b>${esc(x.t)}</b><br><span class="${x.lab===top?'agree':'dis'}">${esc(N[x.lab]||x.lab)} ${pct(x.c)}%</span></p></div>`).join('')}</div></section>`;
+ const html=`<section class="card" id="percard"><div class="kicker">${esc(L('per_h'))}</div><p class="hungr u-t1">${esc(L('per_note'))}</p>
+  <p class="u-m0"><b>${esc(L('agree',{a:agree,n:rows.length}))}</b></p>
+  ${r.set.stereo_points?`<p class="hungr u-t1">${esc(L('stereo_ok',{n:r.set.stereo_points,p:r.set.stereo_pairs||1}))}</p>`:(r.set.steps_given?`<p class="hungr u-t1">${esc(L('stereo_no'))}</p>`:'')}<div class="perset">${rows.map(x=>`<div><img src="${x.img||''}" alt=""><p><b>${esc(x.t)}</b><br><span class="${x.lab===top?'agree':'dis'}">${esc(N[x.lab]||x.lab)} ${pct(x.c)}%</span></p></div>`).join('')}</div></section>`;
  const anchor=g.out.querySelector('.card.result')||g.out.firstElementChild;if(anchor)anchor.insertAdjacentHTML('afterend',html)}
 
 A.f35Of=f35Of;A.gpsOf=gpsOf;   // also used by single photos (src/guide.py): the shrunk upload has no EXIF

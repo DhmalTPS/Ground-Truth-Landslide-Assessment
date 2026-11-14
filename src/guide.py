@@ -119,63 +119,65 @@ TOUR = [
 ]
 
 CSS = """
-.iconbtn{margin-left:auto;width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:700 1.05rem/1 inherit;cursor:pointer;box-shadow:var(--shadow)}
+.iconbtn{margin-left:0;flex:none;min-width:44px;height:44px;border-radius:22px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:1.02rem;line-height:1;font-family:inherit;cursor:pointer}
 .journey{display:flex;gap:6px;margin:2px 0 14px;padding:0;list-style:none;counter-reset:j}
 .journey li{flex:1;font-size:.7rem;color:var(--mute);text-align:center;counter-increment:j}
 .journey li::before{content:counter(j);display:grid;place-items:center;width:24px;height:24px;margin:0 auto 4px;border-radius:50%;border:1.5px solid var(--line);font-weight:700;background:var(--surface)}
-.journey li.done::before{content:"\\2713";background:var(--tint-ground);border-color:var(--teal-400);color:var(--teal-600)}
-.journey li.on{color:var(--ink);font-weight:650}.journey li.on::before{background:var(--g-ground);color:#fff;border-color:transparent}
+.journey li.done::before{content:"\\2713";background:var(--tint-ground);border-color:var(--teal-400);color:var(--link)}
+.journey li.on{color:var(--ink);font-weight:650}.journey li.on::before{background:var(--brand);color:var(--on-brand);border-color:transparent}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;padding:4px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);margin:0 0 14px}
-.seg button{border:0;border-radius:9px;padding:9px;font:600 .88rem inherit;background:transparent;color:var(--ink-2);cursor:pointer}
+.seg button{border:0;border-radius:9px;padding:8px;min-height:44px;font-weight:600;font-size:.88rem;font-family:inherit;background:transparent;color:var(--ink-2);cursor:pointer}
 .seg button[aria-pressed=true]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .shots{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}
 .shots li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);font-size:.88rem;color:var(--ink-2);cursor:pointer}
 .shots li b{display:block;color:var(--ink);font-size:.93rem}
 .shots li .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:1.5px solid var(--line)}
-.shots li.cur{border-color:var(--teal-400);background:var(--tint-ground)}.shots li.cur .n{background:var(--g-ground);color:#fff;border:0}
-.shots li.done .n{background:var(--tint-ground);color:var(--teal-600);border-color:var(--teal-400)}
-.pace{margin-top:8px;font-size:.85rem;color:var(--ink-2)}.pace summary{cursor:pointer;color:var(--teal-600);font-weight:600}
+.shots li.cur{border-color:var(--teal-400);background:var(--tint-ground)}.shots li.cur .n{background:var(--brand);color:var(--on-brand);border:0}
+.shots li.done .n{background:var(--tint-ground);color:var(--link);border-color:var(--teal-400)}
+.pace{margin-top:8px;font-size:.85rem;color:var(--ink-2)}.pace summary{cursor:pointer;color:var(--link);font-weight:600;min-height:44px;display:flex;align-items:center}
 .pace .pr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
-.pace input{width:76px;padding:8px;border-radius:9px;border:1px solid var(--line);font:inherit;background:transparent;color:inherit}
-.locl{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);font-size:.9rem;line-height:1.45}.locl a{color:var(--teal-600);word-break:break-all}.locl small{opacity:.7}.lpin{flex:none;width:16px;height:16px;margin-top:2px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#d93a2b;box-shadow:inset 0 0 0 4px #fff,0 0 0 1px #d93a2b}
-.minibtn{border:1.5px solid rgba(31,122,104,.45);background:var(--surface);color:var(--teal-600);border-radius:10px;padding:8px 12px;font:650 .86rem inherit;cursor:pointer}
-.minibtn.pri{background:var(--g-ground);color:#fff;border-color:transparent}
-.fieldmsg{font-size:.8rem;color:var(--orange);margin-top:4px;min-height:1em}
-.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:end center;background:rgba(6,16,13,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.pace input{width:76px;min-height:44px;padding:8px;border-radius:9px;border:1px solid var(--line);font:inherit;background:transparent;color:inherit}
+.locl{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);font-size:.9rem;line-height:1.45}.locl a{color:var(--link);word-break:break-all}.locl small{opacity:.7}.lpin{flex:none;width:16px;height:16px;margin-top:2px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#d93a2b;box-shadow:inset 0 0 0 4px #fff,0 0 0 1px #d93a2b}
+.minibtn{min-height:44px;border:1.5px solid var(--line);background:var(--surface);color:var(--link);border-radius:10px;padding:8px 14px;font-weight:650;font-size:.9rem;font-family:inherit;cursor:pointer}.minibtn:hover{border-color:var(--link)}
+.minibtn.pri{background:var(--brand);color:var(--on-brand);border-color:transparent}
+.fieldmsg.okmsg{color:var(--link)}.qband.qlite{margin:var(--s3) 0 0;padding:var(--s2) 0 0;border:0;border-top:1px solid var(--line);border-radius:0;background:none}.qband.qlite p{display:none}
+.done-line{margin:0 0 var(--s2);display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.done-line b{color:var(--link)}
+.fieldmsg{font-size:.84rem;color:var(--warn);margin-top:4px;min-height:1em}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:end center;background:rgba(6,16,13,.62)}
 .modal[hidden]{display:none}
 .sheet{width:min(620px,100%);max-height:92vh;overflow:auto;background:var(--surface);color:var(--ink);border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));box-shadow:var(--shadow)}
 @media (min-width:700px){.modal{place-items:center}.sheet{border-radius:22px}}
 .sheet h2{margin-top:0}.sheet h3{font-size:.95rem;margin:18px 0 6px}.sheet p,.sheet li{color:var(--ink-2);font-size:.92rem}
 .sheet .row{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:16px}
 .il{width:100%;height:auto;max-height:150px;color:var(--ink-2);margin:4px 0 8px}
-.dots{display:flex;gap:6px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}.dots i.on{background:var(--teal-600)}
+.dots{display:flex;gap:6px}.dots i{width:7px;height:7px;border-radius:50%;background:var(--line)}.dots i.on{background:var(--brand)}
 .chk{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:12px;border:1px solid var(--line);margin:8px 0;cursor:pointer;font-size:.92rem;color:var(--ink-2)}
-.chk input{width:22px;height:22px;margin:0;flex:none;accent-color:#1f7a68}
+.chk input{width:22px;height:22px;margin:0;flex:none;accent-color:#17695a}
 .qc li{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:.92rem;color:var(--ink-2)}
 .qc{list-style:none;margin:8px 0 12px;padding:0}.qc b{color:var(--ink)}
-.qc .ok{color:var(--teal-600)}.qc .warn{color:var(--orange)}
+.qc .ok{color:var(--link)}.qc .warn{color:var(--warn)}
 .prog{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:12px 0 6px}
-.prog i{display:block;height:100%;width:0;background:var(--g-ground);transition:width .4s linear}
+.prog i{display:block;height:100%;width:0;background:var(--brand);transition:width .4s linear}
 .stages{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px;font-size:.88rem;color:var(--mute)}
-.stages li::before{content:"\\25CB  "}.stages li.done{color:var(--ink-2)}.stages li.done::before{content:"\\2713  ";color:var(--teal-600)}
+.stages li::before{content:"\\25CB  "}.stages li.done{color:var(--ink-2)}.stages li.done::before{content:"\\2713  ";color:var(--link)}
 .stages li.on{color:var(--ink);font-weight:650}.stages li.on::before{content:"\\25CF  ";color:var(--amber)}
 .tipline{margin-top:12px;font-size:.85rem;color:var(--ink-2);padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);min-height:3em}
 .acts{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:10px}
 .acts li{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;font-size:.92rem;color:var(--ink-2);padding:10px 12px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
 .acts li b{color:var(--ink)}
-.tick{cursor:pointer;border-radius:10px;padding:4px;margin:-4px}.tick[aria-checked=true] .ico{color:#fff;background:#1f7a68;border-radius:50%}
+.tick{cursor:pointer;border-radius:10px;padding:10px 6px;margin:0 -6px;min-height:44px}.tick:hover{background:var(--surface-2)}.tick[aria-checked=true] .ico{color:var(--on-brand);background:var(--brand);border-radius:50%}
 .tick[aria-checked=false] .ico{opacity:.45}.tally{margin-top:12px;font-size:.88rem;color:var(--ink-2)}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}.cmp div{padding:10px;border-radius:12px;border:1px solid var(--line);text-align:center;font-size:.85rem}
 .cmp b{display:block;font-size:1.3rem}.cmp .lead{border-color:var(--teal-400);background:var(--tint-ground)}
 .gloss dt{font-weight:650;color:var(--ink);margin-top:8px;font-size:.9rem}.gloss dd{margin:2px 0 0;color:var(--ink-2);font-size:.88rem}
-details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointer;color:var(--teal-600);font-weight:600}
+details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointer;color:var(--link);font-weight:600;min-height:44px;display:flex;align-items:center}
 .hist{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:8px}
-.hist li{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;font-size:.86rem;color:var(--ink-2)}
+.hist li{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;min-height:56px;padding:4px;font-size:.88rem;color:var(--ink-2)}
 .hist img{width:48px;height:48px;object-fit:cover;border-radius:10px}.hist b{color:var(--ink)}
 .netbar{position:sticky;top:0;z-index:40;margin:-8px -4px 10px;padding:9px 12px;border-radius:12px;background:#7a2b1d;color:#fff;font-size:.86rem;text-align:center}
 .netbar[hidden]{display:none}
-.switch{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:.92rem}
-.switch input{width:22px;height:22px;accent-color:#1f7a68}
+.switch{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.switch input{width:22px;height:22px;accent-color:#17695a}
 .vf{position:fixed;inset:0;z-index:60;background:#000;color:#fff;overflow:hidden}.vf[hidden]{display:none}
 .vf video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .vfg{position:absolute;inset:7% 5% 20%;pointer-events:none}
@@ -187,14 +189,14 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .lvl{position:absolute;left:50%;top:50%;width:46%;height:0;border-top:2px solid #ff745e;transform:translate(-50%,-50%);transition:transform .15s linear,border-color .2s}
 .lvl.ok{border-color:#5fd1a8}.lvl::before,.lvl::after{content:"";position:absolute;top:-6px;width:2px;height:10px;background:inherit;border-left:2px solid currentColor;opacity:.6}
 .vft{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;background:linear-gradient(rgba(0,0,0,.6),transparent)}
-.vft button{width:42px;height:42px;border-radius:50%;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:1.1rem;cursor:pointer}
+.vft button{width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.45);color:#fff;font-size:1.1rem;cursor:pointer}
 .vfs{font-size:.86rem;font-weight:650;text-align:center;flex:1}
 .pills{position:absolute;left:0;right:0;top:calc(62px + env(safe-area-inset-top));display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 10px}
 .pills span{padding:4px 10px;border-radius:99px;font-size:.75rem;font-weight:650;background:rgba(0,0,0,.5)}
 .pills .ok{box-shadow:inset 0 0 0 1.5px #5fd1a8}.pills .warn{box-shadow:inset 0 0 0 1.5px #ffc862;color:#ffd58a}
 .vfmsg{position:absolute;left:12px;right:12px;bottom:calc(118px + env(safe-area-inset-bottom));text-align:center;font-weight:650;font-size:.95rem;text-shadow:0 1px 3px #000}
 .vfb{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.7))}
-.vfb .alt{justify-self:start;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font:600 .8rem inherit;cursor:pointer}
+.vfb .alt{justify-self:start;min-height:44px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font-weight:600;font-size:.8rem;font-family:inherit;cursor:pointer}
 .shutter{width:78px;height:78px;border-radius:50%;border:4px solid #ffc862;background:transparent;padding:5px;cursor:pointer;transition:border-color .2s}
 .shutter span{display:block;width:100%;height:100%;border-radius:50%;background:#fff}.shutter.ready{border-color:#5fd1a8;box-shadow:0 0 0 6px rgba(95,209,168,.25)}
 .vfr{justify-self:end;font-size:.78rem;font-weight:650}
@@ -206,19 +208,19 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .q0{--qc:#2f9e7e}.q1{--qc:#d39a2a}.q2{--qc:#e07a2b}.q3{--qc:#d2452b}
 .qband .qd{background:var(--qc)}.qband.q1,.qband.q2,.qband.q3{border-color:var(--qc)}.qband.q2{background:rgba(224,122,43,.08)}.qband.q3{background:rgba(210,69,43,.1);border-width:2px}
 .qm{display:inline-flex;gap:3px;vertical-align:middle;margin-left:8px}.qm i{width:15px;height:6px;border-radius:3px;background:rgba(127,127,127,.35)}.qm i.on{background:var(--qc)}
-.sev{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font-size:.72rem;font-weight:700;color:#fff;background:#d39a2a;vertical-align:1px}.sev.s2{background:#d2452b}
+.sev{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:99px;font-size:.75rem;font-weight:700;color:#fff;background:#8a5d00;vertical-align:1px}.sev.s2{background:#b8381f}
 .vfq{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(152px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;background:rgba(0,0,0,.6);font-size:.8rem;font-weight:700;white-space:nowrap;color:var(--qc)}
 .vfq.q0{--qc:#5fd1a8}.vfq.q1{--qc:#ffc862}.vfq.q2{--qc:#ff9a52}.vfq.q3{--qc:#ff745e}.vfq:empty{display:none}
 .vfarrow{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-size:68px;line-height:1;color:#ffc862;text-shadow:0 2px 10px #000;pointer-events:none;animation:nudge 1.2s ease-in-out infinite}
 .vfarrow:empty{display:none}@keyframes nudge{50%{transform:translate(-50%,-62%)}}@media (prefers-reduced-motion:reduce){.vfarrow{animation:none}}
 .pills .bad{box-shadow:inset 0 0 0 1.5px #ff745e;color:#ffb3a3}.shutter.poor{border-color:#ff745e}.netbar.sync{background:#0e4d45}
 .qa{display:flex;gap:8px;flex-wrap:wrap}.qa .minibtn{min-width:84px;min-height:44px}
-.quiz{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0}.quiz button{border:2px solid var(--line);border-radius:14px;background:var(--surface-2);padding:6px;cursor:pointer;color:var(--ink-2);font:700 .9rem inherit}
+.quiz{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0}.quiz button{border:2px solid var(--line);border-radius:14px;background:var(--surface-2);padding:6px;cursor:pointer;color:var(--ink-2);font-weight:700;font-size:.9rem;font-family:inherit}
 .quiz svg{width:100%;height:auto;max-height:190px}.quiz .right{border-color:#34b08c;box-shadow:0 0 0 3px rgba(52,176,140,.25)}.quiz .wrong{opacity:.5}
 #obsbox textarea,#obsbox select{width:100%;margin-top:8px;padding:9px;border-radius:10px;border:1px solid var(--line);font:inherit;background:transparent;color:inherit}#obsbox select{width:auto}
 .hist li[role=button]{cursor:pointer;border-radius:10px}.hist li[role=button]:hover{background:var(--surface-2)}
 .shots li.newsite{border-style:dashed}.switch select{font:inherit;padding:4px 6px;border-radius:8px;background:transparent;color:inherit;border:1px solid var(--line)}
-.langbtn{margin-left:8px;width:auto;padding:0 12px;border-radius:21px;font-size:.85rem}
+.langbtn{margin-left:6px;width:auto;padding:0 10px;border-radius:21px;font-size:.85rem}
 body.sun{--mute:var(--ink-2);--line:#9aa6a0;font-size:17.5px}body.sun .card{border-width:2px}body.sun .hungr{color:var(--ink-2)}
 """
 
@@ -235,7 +237,7 @@ const LIVE=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&windo
 if(store.get('sun',false))document.body.classList.add('sun');
 
 /* ---------- journey stepper, mode and survey shot list ---------- */
-const J=['Safe spot','Frame','Check','Result'];
+const J=['Safe spot','Frame','Check','Result','Report'];
 $('#journey').innerHTML=J.map(t=>`<li>${t}</li>`).join('');
 function step(i){[...$('#journey').children].forEach((li,k)=>{li.className=k<i?'done':k===i?'on':''})}
 step(sess.get('safe')?1:0);
@@ -256,16 +258,23 @@ const curShot=()=>mode==='survey'?G.shots[shot]:null;
 
 /* ---------- distance helper ---------- */
 const dist=$('#dist');
-dist.insertAdjacentHTML('afterend',`<div class="fieldmsg" id="distmsg" aria-live="polite"></div>
+function parseDist(v){v=String(v||'').trim().toLowerCase().replace(/[०-९]/g,c=>'०१२३४५६७८९'.indexOf(c)).replace(/(\d),(\d)/,'$1.$2');if(!v)return null;
+ const m=v.match(/^(\d+(?:\.\d+)?)\s*(m|mtr|mtrs|meter|meters|metre|metres|मी|मीटर|ft|feet|foot|'|yd|yds|yard|yards|km)?\.?$/);if(!m)return NaN;
+ const k={ft:.3048,feet:.3048,foot:.3048,"'":.3048,yd:.9144,yds:.9144,yard:.9144,yards:.9144,km:1000}[m[2]]||1;return Math.round(parseFloat(m[1])*k*10)/10}
+A._parseDist=v=>parseDist(v);const distM=()=>{const v=parseDist(dist.value);return v>=1&&v<=3000?v:null};
+($('#disthint')||dist).insertAdjacentHTML('afterend',`<div class="fieldmsg" id="distmsg" aria-live="polite"></div>
 <details class="pace"><summary>Don't know the distance?</summary>
 <div class="pr">Pace it to the toe (only where safe): <input id="steps" type="number" min="1" inputmode="numeric" placeholder="steps"> &times;
 <input id="stride" type="number" step="0.05" min="0.4" max="1.2" value="${store.get('stride',0.75)}" aria-label="metres per step"> m =
 <b id="paced">&ndash;</b><button type="button" class="minibtn" id="usepace">Use</button></div>
-<p style="margin:8px 0 0">Other ways: a laser rangefinder, or Google Maps &rarr; right-click &rarr; <i>Measure distance</i> from where you stand to the slope. A normal walking step is about 0.75 m; measure 10 of your steps once to know yours.</p></details>`);
+<p class="u-t2">Other ways: a laser rangefinder, or Google Maps &rarr; right-click &rarr; <i>Measure distance</i> from where you stand to the slope. A normal walking step is about 0.75 m; measure 10 of your steps once to know yours.</p></details>`);
 const paced=()=>{const s=parseFloat($('#steps').value),k=parseFloat($('#stride').value);return s>0&&k>0?Math.round(s*k*10)/10:null};
 $('#steps').oninput=$('#stride').oninput=()=>{const p=paced();$('#paced').textContent=p?p+' m':'–';if(+$('#stride').value)store.set('stride',+$('#stride').value)};
-$('#usepace').onclick=()=>{const p=paced();if(p){dist.value=p;dist.dispatchEvent(new Event('input'))}};
-dist.addEventListener('input',()=>{const v=parseFloat(dist.value);$('#distmsg').textContent=dist.value&&!(v>=1&&v<=3000)?'Use a distance between 1 and 3000 m (or leave it empty).':''});
+$('#usepace').onclick=()=>{const p=paced();if(p){dist.value=p;dist.dispatchEvent(new Event('input'));buzz(15)}};
+dist.addEventListener('input',()=>{const v=parseDist(dist.value),el=$('#distmsg');el.classList.remove('okmsg');
+ if(!dist.value.trim()){el.textContent='';return}
+ if(!(v>=1&&v<=3000)){el.textContent=tr('Use a distance between 1 and 3000 m (or leave it empty).');return}
+ el.classList.add('okmsg');el.textContent=tr('Sizes will use')+' '+v+' m'});
 
 /* ---------- modals: tour, safety, help ---------- */
 document.body.insertAdjacentHTML('beforeend',`<div class="modal" id="mTour" hidden role="dialog" aria-modal="true" aria-labelledby="tourT"><div class="sheet"></div></div>
@@ -302,7 +311,7 @@ function safety(then){
  m.onclick=e=>{const a=e.target.dataset.a;if(a==='cancel'||e.target===m)closeM('mSafe');if(a==='ok'){sess.set('safe','1');closeM('mSafe');step(1);buzz(15);then()}}}
 
 function help(){const g=G.glossary;
- openM('mHelp',`<div class="row" style="margin:0"><h2 id="helpT" style="margin:0">Help &amp; guide</h2><button type="button" class="minibtn" data-a="x" data-f aria-label="Close help">Close</button></div>
+ openM('mHelp',`<div class="row u-m0"><h2 id="helpT" class="u-m0">Help &amp; guide</h2><button type="button" class="minibtn" data-a="x" data-f aria-label="Close help">Close</button></div>
  <h3>Taking a good photo</h3><ol class="steps"><li>Stand below the slope or across the road, 20&ndash;80 m away; never on it.</li><li>Fit the scarp (top) and the toe (bottom) in one frame. Portrait or landscape both work.</li>
  <li>Daylight, sun behind or beside you. Wipe the lens. Hold level with two hands, tap the slope to focus.</li><li>Unsure result? Take more photos from other spots, or use <b>Site survey</b> mode.</li><li>Type the distance (or pace it) for better sizes; a person or car near the toe also helps.</li></ol>
  <h3>Safety</h3><ul class="steps">${G.safety.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
@@ -331,7 +340,10 @@ $('#helpBtn').onclick=help;
 
 /* ---------- capture entry points ---------- */
 const camIn=$('#cam'),galIn=$('#gal');
-function openCamera(){if(LIVE)openFinder();else camIn.click()}
+function autoGps(){if(store.get('gpsAsked',0)||!navigator.geolocation||!window.isSecureContext)return;store.set('gpsAsked',1);
+ navigator.geolocation.getCurrentPosition(setGps,()=>{},{enableHighAccuracy:true,timeout:20000,maximumAge:60000})}
+function openCamera(){autoGps();if(LIVE)openFinder();else camIn.click()}
+camIn.addEventListener('click',()=>autoGps());
 camIn.parentElement.addEventListener('click',e=>{if(e.target===camIn)return;   // the input's own click (label activation or programmatic) passes through
  if(!sess.get('safe')){e.preventDefault();safety(openCamera);return}
  if(LIVE){e.preventDefault();openFinder()}});
@@ -458,7 +470,7 @@ function trTree(n){if(n.nodeType===3){const v=tr(n.nodeValue);if(v!==n.nodeValue
  n.childNodes.forEach(trTree)}
 if(lang==='hi'){document.documentElement.lang='hi';trTree(document.body);
  new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(trTree)}).observe(document.body,{childList:true,subtree:true})}
-$('#langBtn').textContent=lang==='hi'?'EN':'हिं';$('#langBtn').onclick=()=>{store.set('lang',lang==='hi'?'en':'hi');location.reload()};
+$('#langBtn').textContent=lang==='hi'?'English':'हिंदी';$('#langBtn').onclick=()=>{store.set('lang',lang==='hi'?'en':'hi');location.reload()};
 
 /* ---------- local database: offline queue and full results (IndexedDB, this phone only) ---------- */
 const DB=(()=>{let p=null;const open=()=>p||(p=new Promise((res,rej)=>{try{const r=indexedDB.open('landslide-guide',1);
@@ -470,7 +482,9 @@ function toast(t){let el=$('#toast');if(!el){document.body.insertAdjacentHTML('b
  el.textContent=t;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),5000)}
 async function photoURL(blob,max){try{const b=await createImageBitmap(blob),s=Math.min(1,max/Math.max(b.width,b.height)),c=document.createElement('canvas');c.width=Math.round(b.width*s);c.height=Math.round(b.height*s);
  c.getContext('2d').drawImage(b,0,0,c.width,c.height);return c.toDataURL('image/jpeg',max>200?.82:.6)}catch(_){return ''}}
-async function urlShrink(u,max){if(!u)return '';try{return await photoURL(await (await fetch(u)).blob(),max)}catch(_){return ''}}
+// thumbnail from a data URL: decoded as an image with a time limit (no fetch(), which can stall and hold up the save queue)
+async function urlShrink(u,max){if(!u)return '';try{const i=await loadImg(u,false,5000);if(!i)return '';const s=Math.min(1,max/Math.max(i.naturalWidth,i.naturalHeight)),c=document.createElement('canvas');
+ c.width=Math.max(1,Math.round(i.naturalWidth*s));c.height=Math.max(1,Math.round(i.naturalHeight*s));c.getContext('2d').drawImage(i,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.6)}catch(_){return ''}}
 
 /* ---------- observation record: notes, weather, location ---------- */
 $('.pace').insertAdjacentHTML('afterend',`<details class="pace" id="obsbox"><summary>Notes &amp; location (for the report)</summary>
@@ -523,7 +537,7 @@ async function start(file,fromCam,t,live){lastSrc=fromCam?'cam':'gal';gstate.liv
  const l=photoQ.level;A.setChip(l===3?'bad':'signal',tr('Photo quality')+': '+tr(QL[l]));say(tr('Photo quality')+': '+tr(QL[l])+'. '+tr(bad[0][1]));buzz([40,60,40]);
  out.innerHTML=`<section class="card qband q${l}" aria-live="polite" style="display:block"><div class="kicker">Instant photo check</div><h2><span>Photo quality</span>: <span>${QL[l]}</span>${qmeter(l)}</h2>
  <ul class="qc">${c.map(([k,v,s])=>`<li>${v?`<span class="warn">${ICO('alert')}</span><span><b>${k}:</b>${sevTag(s)} <span>${esc(v)}</span></span>`:`<span class="ok">${ICO('check')}</span><span><b>${k}</b> <span>OK</span></span>`}</li>`).join('')}</ul>
- <p class="hungr" style="margin:0 0 12px">${l===3?'The answer from this photo is likely to be wrong. Retaking is strongly advised.':'The answer from this photo will be rough.'} <span>You can still analyse it: the result is shown as computed and marked with this quality.</span></p>
+ <p class="hungr u-b3">${l===3?'The answer from this photo is likely to be wrong. Retaking is strongly advised.':'The answer from this photo will be rough.'} <span>You can still analyse it: the result is shown as computed and marked with this quality.</span></p>
  <div class="btns"><button type="button" class="btn primary" data-a="retake">${ICO('camera')}Retake</button><button type="button" class="btn ghost" data-a="send">Analyse anyway</button></div></section>`;
  out.querySelector('[data-a=retake]').onclick=()=>{gstate.retakes++;fig.style.display='none';out.innerHTML='';step(1);lastSrc==='cam'?openCamera():galIn.click()};
  out.querySelector('[data-a=send]').onclick=()=>{gstate.override=true;send()}}
@@ -547,9 +561,9 @@ function post(url,body,P,h){const x=new XMLHttpRequest();xhr=x;x.open('POST',url
  x.ontimeout=()=>{P&&P.stop();h.err('The server took more than 4 minutes. It may be busy or out of memory; try again.',-1)};
  x.onabort=()=>{P&&P.stop();h.err(null,-2)};x.send(body||null);return x}
 function busy(title){out.innerHTML=`<section class="card result" aria-busy="true"><div class="kicker">${esc(title)}${curShot()?' · '+esc(curShot().t):''}</div><div id="pg"></div><div class="tipline" id="ptip"></div>
- <div style="margin-top:12px"><button type="button" class="minibtn" id="pcancel">Cancel</button></div></section>`;tipRot($('#ptip'));$('#pcancel').onclick=()=>xhr&&xhr.abort()}
+ <div class="u-t3"><button type="button" class="minibtn" id="pcancel">Cancel</button></div></section>`;tipRot($('#ptip'));$('#pcancel').onclick=()=>xhr&&xhr.abort()}
 function cancelled(){A.setChip('','Cancelled');out.innerHTML='';step(1)}
-function send(){const dv=parseFloat(dist.value);lastDist=dv>=1&&dv<=3000?dv:null;curMeta=meta();job=null;
+function send(){lastDist=distM();curMeta=meta();job=null;
  if(!navigator.onLine){queueIt();return}
  A.setChip('','Identifying…',true);busy('Analysing photo');
  const P=prog($('#pg'),G.stagesType,store.get('etaT',4000),true);
@@ -562,8 +576,8 @@ function fullSend(d0){A.setChip('','Analysing…',true);busy('Sending the photo 
   ok:r=>{if(d0)lastDist=d0;const id=cur&&cur.__id;cur=r;if(id)r.__id=id;job=null;withQ(r);A.render(r);afterType(r);if(r.dimensions)afterDims(r);finish(r)},
   err:(m,s)=>s===-2?cancelled():fail(m,s===0)})}
 function measure(d0){const slot=document.createElement('section');slot.className='card';slot.id='dimslot';
- slot.innerHTML=`<div class="kicker">Estimated dimensions</div><p class="hungr" style="margin:4px 0 0">The type is ready above. Measuring the size now; you can already tick the signs and answer the questions.</p><div id="dpg"></div>
- <button type="button" class="minibtn" id="dcancel" style="margin-top:10px">Skip sizes</button>`;
+ slot.innerHTML=`<div class="kicker">Estimated dimensions</div><p class="hungr u-t1">The type is ready above. Measuring the size now; you can already tick the signs and answer the questions.</p><div id="dpg"></div>
+ <button type="button" class="minibtn u-t3" id="dcancel">Skip sizes</button>`;
  const old=$('#dimcard');if(old)old.replaceWith(slot);else{const m=out.querySelector('.meta');m?out.insertBefore(slot,m):out.appendChild(slot)}
  A.setChip('','Measuring…',true);$('#dcancel').onclick=()=>xhr&&xhr.abort();
  const dv=d0??lastDist,P=prog($('#dpg'),G.stagesDims,store.get('etaD',28000),false);
@@ -584,17 +598,18 @@ function qBand(r){const q=r.quality||{level:qLevel(r),issues:[],failed:r.status=
  const h=`<section class="qband q${l}" id="qband" role="status"><span class="qd"></span><div><b><span>Photo quality</span>: <span>${QL[l]}</span></b>${qmeter(l)}<p>${what}</p>
   ${items.length?`<ul>${items.join('')}</ul>`:''}${l?`<p>Nothing is adjusted to look better: the confidence and ranges are the model's own, and the ranges were checked on usable photos only.</p>`:''}
   ${l>=2?`<div class="btns"><button type="button" class="btn ${l===3?'primary':'ghost'}" data-a="retake">${ICO('camera')}Retake</button></div>`:''}</div></section>`;
- out.insertAdjacentHTML('afterbegin',h);$('#qband [data-a=retake]')?.addEventListener('click',()=>act('retake'))}
+ const rc=out.querySelector('.card.result');if(l===0&&rc)rc.insertAdjacentHTML('beforeend',h.replace('class="qband q0"','class="qband q0 qlite"'));else out.insertAdjacentHTML('afterbegin',h);
+ $('#qband [data-a=retake]')?.addEventListener('click',()=>act('retake'))}
 // sizes: measured straight away, except after a failed photo check, where one tap asks for them
 function sizes(r){if(!job){finish(r);return}if(r.status!=='bad_photo'){measure();return}
  const slot=document.createElement('section');slot.className='card';slot.id='dimslot';
- slot.innerHTML=`<div class="kicker">Estimated dimensions</div><p class="hungr" style="margin:4px 0 10px">Sizes from a photo that failed the photo check are not reliable, so they are not measured automatically.</p><button type="button" class="minibtn" id="dany">Estimate sizes anyway</button>`;
+ slot.innerHTML=`<div class="kicker">Estimated dimensions</div><p class="hungr u-tb">Sizes from a photo that failed the photo check are not reliable, so they are not measured automatically.</p><button type="button" class="minibtn" id="dany">Estimate sizes anyway</button>`;
  const m=out.querySelector('.meta');m?out.insertBefore(slot,m):out.appendChild(slot);$('#dany').onclick=()=>measure();finish(r)}
 function findDims(){return $('#dimcard')||[...out.querySelectorAll('.card')].find(c=>/^Estimated dimensions|^अनुमानित आयाम/.test((c.querySelector('.kicker')?.textContent||'').trim())&&c.id!=='dimslot')}
 function placeDims(r){const w=document.createElement('div');w.innerHTML=A.dims(r.dimensions);const c=w.firstElementChild;c.id='dimcard';
- if(qLevel(r)>=2&&r.dimensions.available)c.insertAdjacentHTML('afterbegin',`<p class="note" style="margin:0 0 10px"><b>${esc(tr('Photo quality'))}: ${esc(tr(QL[qLevel(r)]))}.</b> <span>The 90% ranges were checked on usable photos; with this photo the real error can be larger than shown.</span></p>`);const s=$('#dimslot')||$('#dimcard');s?s.replaceWith(c):out.appendChild(c);typeChip(r)}
+ if(qLevel(r)>=2&&r.dimensions.available)c.insertAdjacentHTML('afterbegin',`<p class="note u-b3"><b>${esc(tr('Photo quality'))}: ${esc(tr(QL[qLevel(r)]))}.</b> <span>The 90% ranges were checked on usable photos; with this photo the real error can be larger than shown.</span></p>`);const s=$('#dimslot')||$('#dimcard');s?s.replaceWith(c):out.appendChild(c);typeChip(r)}
 function fail(msg,net){A.fail(msg);const c=out.firstElementChild;
- c.insertAdjacentHTML('beforeend',`<div class="btns" style="margin-top:12px"><button type="button" class="btn primary" data-a="retry">Try again</button>${net?'<button type="button" class="btn ghost" data-a="later">Send later</button>':'<button type="button" class="btn ghost" data-a="new">New photo</button>'}</div>`);
+ c.insertAdjacentHTML('beforeend',`<div class="btns u-t3"><button type="button" class="btn primary" data-a="retry">Try again</button>${net?'<button type="button" class="btn ghost" data-a="later">Send later</button>':'<button type="button" class="btn ghost" data-a="new">New photo</button>'}</div>`);
  c.querySelector('[data-a=retry]').onclick=()=>lastBlob&&send();
  c.querySelector('[data-a=later]')?.addEventListener('click',queueIt);c.querySelector('[data-a=new]')?.addEventListener('click',()=>{out.innerHTML='';$('#fig').style.display='none';step(1)});
  say(tr('Something went wrong')+'. '+tr(msg));buzz([80,60,80])}
@@ -603,8 +618,8 @@ function fail(msg,net){A.fail(msg);const c=out.firstElementChild;
 function addAct(t,l,a){const nc=$('#nextcard');if(!nc)return;nc.hidden=false;const li=document.createElement('li');
  li.innerHTML=`<span>${t}</span>${l?`<button type="button" class="minibtn${a==='next'||a==='retake'?' pri':''}" data-a="${a}">${l}</button>`:''}`;
  nc.querySelector('.acts').appendChild(li);li.querySelector('button')?.addEventListener('click',()=>act(a))}
-function afterType(r,replay){step(3);const N=D.names,top=r.ranked[0][0],sec=r.ranked[1][0],close=r.ranked[0][1]-r.ranked[1][1]<.2;
- out.querySelector('.card.result').insertAdjacentHTML('afterend','<section class="card" id="nextcard" hidden><div class="kicker">Next steps</div><ul class="acts"></ul></section>');
+function afterType(r,replay){step(4);const N=D.names,top=r.ranked[0][0],sec=r.ranked[1][0],close=r.ranked[0][1]-r.ranked[1][1]<.2;
+ (out.querySelector('.card.safety')||out.querySelector('.card.result')).insertAdjacentHTML('afterend','<section class="card" id="nextcard" hidden><div class="kicker">Next steps</div><ul class="acts"></ul></section>');
  qBand(r);
  if(r.status==='bad_photo')addAct('Retake from below with the whole slope in view.','Retake','retake');
  else if(r.status==='uncertain')addAct(r.family?`Answer the questions or tick the signs below to tell <b>${esc(N[top])}</b> from <b>${esc(N[sec])}</b>.`:'Not sure. Answer the questions below, or take a second photo from another spot.','Another photo','retake');
@@ -623,11 +638,12 @@ function cutMsg(e){const how={top:'tilt the phone up or step back so the scarp i
  return `<b>${esc(tr('The landslide runs off the edge of the photo'))}</b> (${e.map(x=>esc(tr(x))).join(', ')}): ${esc(tr('sizes are minimums'))}. ${e.map(x=>esc(tr(how[x]))).join('; ')}.`}
 function act(a){if(a==='retake'){gstate.retakes++;out.innerHTML='';$('#fig').style.display='none';step(1);lastSrc==='cam'?openCamera():galIn.click();return}
  if(a==='dist'){dist.scrollIntoView({behavior:'smooth',block:'center'});dist.focus();$('.pace').open=!dist.value;
-  if(!$('#remeasure')){dist.insertAdjacentHTML('afterend','<button type="button" class="minibtn pri" id="remeasure" style="margin-top:8px">Re-measure this photo</button>');
-   $('#remeasure').onclick=()=>{const v=parseFloat(dist.value);if(!(v>=1&&v<=3000)){$('#distmsg').textContent='Type a distance between 1 and 3000 m first.';return}
+  if(!$('#remeasure')){dist.insertAdjacentHTML('afterend','<button type="button" class="minibtn pri u-t2" id="remeasure">Re-measure this photo</button>');
+   $('#remeasure').onclick=()=>{const v=distM();if(!v){$('#distmsg').textContent='Type a distance between 1 and 3000 m first.';return}
     $('#remeasure').remove();if(job){findDims()?.scrollIntoView({behavior:'smooth',block:'center'});measure(v)}else if(lastBlob)fullSend(v);else toast('Re-measuring needs the photo: take it again.')}}
   return}
  if(a==='sitereport'){siteReport();return}
+ if(a==='newobs'){out.innerHTML='';$('#fig').style.display='none';cur=null;curMeta=null;step(1);A.setChip('','');window.scrollTo({top:0,behavior:'smooth'});return}
  const k={scale:3,deposit:2,next:shot}[a];if(k!=null){if(a!=='next'){mode='survey';store.set('mode','survey')}shot=k;saveShots();drawMode();out.innerHTML='';$('#fig').style.display='none';step(1);openCamera()}}
 
 /* decision questions: Bayes update of the model's probabilities with yes/no field answers; the next question is
@@ -640,12 +656,12 @@ function ask(r,replay){let p={};r.ranked.forEach(([c,v])=>p[c]=Math.max(v,1e-4))
  const pick=()=>{let best=null,bg=0;for(const q of Q){if(asked.includes(q.id))continue;const g=gain(q);if(g>bg){bg=g;best=q}}return bg>=.05?best:null};
  for(const a of ans){const q=Q.find(x=>x.t===a.q);if(q){asked.push(q.id);if(a.a!=='not sure')p=upd(p,q,a.a==='yes')}}
  const draw=()=>{const rk=Object.entries(p).sort((a,b)=>b[1]-a[1]),q=!replay&&asked.length<5&&rk[0][1]<.85?pick():null;
-  card.innerHTML=`<div class="kicker">Help decide · answer what you can see</div>${q?`<h2>${esc(q.t)}</h2>${q.hint?`<p class="hungr" style="margin:-6px 0 10px">${esc(q.hint)}</p>`:''}
+  card.innerHTML=`<div class="kicker">Help decide · answer what you can see</div>${q?`<h2>${esc(q.t)}</h2>${q.hint?`<p class="hungr u-sub">${esc(q.hint)}</p>`:''}
   <div class="qa"><button type="button" class="minibtn pri" data-y="1">Yes</button><button type="button" class="minibtn pri" data-y="0">No</button><button type="button" class="minibtn" data-y="-">Not sure</button></div>`
   :`<h2>${ans.some(a=>a.a!=='not sure')?esc(tr('Your answers point to'))+' '+esc(tr(D.names[rk[0][0]]))+' ('+Math.round(rk[0][1]*100)+'%)':esc(tr('No further question would change the answer much'))}</h2>`}
-  <div class="probs" style="margin-top:12px">${rk.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>
-  <p class="hungr" style="margin:10px 0 0">${ans.length?esc(tr('Model result combined with your answers.')):esc(tr('Starts from the model result.'))} ${esc(tr('The answer weights are expert rules of thumb from the Hungr 2014 type descriptions, not trained on data; a geologist has the final word.'))}</p>
-  ${ans.length&&!replay?'<button type="button" class="minibtn" data-y="undo" style="margin-top:8px">Undo last answer</button>':''}`;
+  <div class="probs u-t3">${rk.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>
+  <p class="hungr u-t3">${ans.length?esc(tr('Model result combined with your answers.')):esc(tr('Starts from the model result.'))} ${esc(tr('The answer weights are expert rules of thumb from the Hungr 2014 type descriptions, not trained on data; a geologist has the final word.'))}</p>
+  ${ans.length&&!replay?'<button type="button" class="minibtn u-t2" data-y="undo">Undo last answer</button>':''}`;
   card.querySelectorAll('[data-y]').forEach(b=>b.onclick=()=>{const y=b.dataset.y;
    if(y==='undo'){const l=ans.pop();asked.pop();p=l.prev||p;draw();return}
    ans.push({q:q.t,a:y==='1'?'yes':y==='0'?'no':'not sure',prev:p});asked.push(q.id);if(y!=='-')p=upd(p,q,y==='1');r.fieldRanked=Object.entries(p).sort((a,b)=>b[1]-a[1]);draw();buzz(15);
@@ -654,14 +670,14 @@ function ask(r,replay){let p={};r.ranked.forEach(([c,v])=>p[c]=Math.max(v,1e-4))
 function tickList(ul,cb,saved){const lis=[...ul.querySelectorAll('li')];lis.forEach((li,i)=>{li.classList.add('tick');li.setAttribute('role','checkbox');li.setAttribute('aria-checked',saved&&saved[i]?'true':'false');li.tabIndex=0;
   const tg=()=>{li.setAttribute('aria-checked',li.getAttribute('aria-checked')==='true'?'false':'true');cb()};li.onclick=tg;li.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();tg()}}});return lis}
 function ticks(r){const card=$('#checkcard');if(!card)return;const N=D.names,top=r.ranked[0][0],sec=r.ranked[1][0],cmp=r.status==='uncertain'&&sec!=='no_landslide'&&D.info[sec];
- card.querySelector('h2').insertAdjacentHTML('afterend','<p class="hungr" style="margin:-6px 0 10px">Tap each sign you can see on site.</p>');
- if(cmp)card.insertAdjacentHTML('beforeend',`<h2 style="margin-top:16px">${esc(D.info[sec].title)} (second choice)</h2><ul class="list" id="ck2">${D.info[sec].check.map(t=>`<li>${ICO('check')}<span>${esc(t)}</span></li>`).join('')}</ul>`);
+ card.querySelector('h2').insertAdjacentHTML('afterend','<p class="hungr u-sub">Tap each sign you can see on site.</p>');
+ if(cmp)card.insertAdjacentHTML('beforeend',`<h2 class="u-t4">${esc(D.info[sec].title)} (second choice)</h2><ul class="list" id="ck2">${D.info[sec].check.map(t=>`<li>${ICO('check')}<span>${esc(t)}</span></li>`).join('')}</ul>`);
  card.insertAdjacentHTML('beforeend','<div class="tally" id="tally" aria-live="polite"></div>');
  const ul1=card.querySelector('ul.list'),ul2=$('#ck2'),sv=r.signs||{};let l1=[],l2=[];
  const upd=()=>{const on=l=>l.map(li=>li.getAttribute('aria-checked')==='true'),a=on(l1).filter(Boolean).length,b=on(l2).filter(Boolean).length;
   r.signs={[top]:on(l1),...(cmp?{[sec]:on(l2)}:{})};
   $('#tally').innerHTML=!cmp?`<span>Signs seen:</span> <b>${a} / ${l1.length}</b>${a===0?'':' · <span>'+(a>=Math.ceil(l1.length/2)?'The field signs support this type.':'Few signs match: take another photo or ask a geologist.')+'</span>'}`:
-  `<div class="cmp"><div class="${a/l1.length>b/l2.length?'lead':''}">${esc(N[top])}<b>${a}/${l1.length}</b></div><div class="${b/l2.length>a/l1.length?'lead':''}">${esc(N[sec])}<b>${b}/${l2.length}</b></div></div><p class="hungr" style="margin:8px 0 0">The type with the larger share of signs seen is the better field match.</p>`};
+  `<div class="cmp"><div class="${a/l1.length>b/l2.length?'lead':''}">${esc(N[top])}<b>${a}/${l1.length}</b></div><div class="${b/l2.length>a/l1.length?'lead':''}">${esc(N[sec])}<b>${b}/${l2.length}</b></div></div><p class="hungr u-t2">The type with the larger share of signs seen is the better field match.</p>`};
  l1=tickList(ul1,()=>{upd();cur&&cur.__id&&finish(cur)},sv[top]);if(ul2)l2=tickList(ul2,()=>{upd();cur&&cur.__id&&finish(cur)},sv[sec]);upd()}
 function gloss(){const card=findDims();if(!card||card.querySelector('.what'))return;
  card.insertAdjacentHTML('beforeend',`<details class="what"><summary>What do these numbers mean?</summary><dl class="gloss">${Object.entries(G.glossary).slice(4).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl></details>`)}
@@ -687,9 +703,9 @@ function siteCard(s){const N=D.names,t=s.type.ranked,d=s.dimensions,old=$('#site
  <div class="probs">${t.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(N[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>`;
  if(d&&d.available)h+=d.measures.map(m=>`<div class="drow"><span>${esc(m.name)}</span><b>${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small></b></div>`).join('')+
   (d.measures.some(m=>m.between_photo_log_sd>.7)?`<p class="note">${esc(tr('The shots disagree strongly on size (more than 2x). Check that they show the same landslide, or retake the whole-slope shot with the distance typed in.'))}</p>`:'')+
-  `<p class="hungr" style="margin:8px 0 0">${esc(tr('Sizes: median of the whole-slope shots, with the spread between photos added to the range.'))} (${s.size_shots.map(k=>esc((G.shots.find(x=>x.id===k)||{}).t||k)).join(', ')})</p>`;
+  `<p class="hungr u-t2">${esc(tr('Sizes: median of the whole-slope shots, with the spread between photos added to the range.'))} (${s.size_shots.map(k=>esc((G.shots.find(x=>x.id===k)||{}).t||k)).join(', ')})</p>`;
  if(s.grains)h+=`<div class="drow"><span>Grain size D16 / D50 / D84</span><b>${s.grains.D16_m} / ${s.grains.D50_m} / ${s.grains.D84_m} m</b></div>`;
- h+=`<div style="margin-top:12px"><button type="button" class="minibtn pri" data-a="sitereport">Save site report</button></div></section>`;
+ h+=`<div class="u-t3"><button type="button" class="minibtn pri" data-a="sitereport">Save site report</button></div></section>`;
  const w=document.createElement('div');w.innerHTML=h;const c=w.firstElementChild,first=out.querySelector('.card.result');if(old)old.replaceWith(c);else if(first)first.after(c);else return;c.querySelector('[data-a]').onclick=siteReport}
 
 /* ---------- location: where the photo was taken and, with a compass bearing and a distance, where the landslide is ----------
@@ -770,7 +786,7 @@ async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D
  x.fillStyle='#13463b';x.fillRect(0,0,W,124);x.fillStyle='#fff';x.font=F(40,700);x.fillText(T('Landslide observation'),M,62);
  x.font=F(24);x.fillStyle='#cfe5dd';x.fillText(new Date(mt.t||Date.now()).toLocaleString()+(mt.shot?' · '+T(mt.shot):'')+(mt.set?' · '+mt.set:''),M,102);
  let y=152;
- const sec=t=>{y+=14;x.fillStyle='#1f7a68';x.font=F(30,700);x.fillText(T(t),M,y+28);y+=42;x.fillStyle=line;x.fillRect(M,y,IW,2);y+=26};
+ const sec=t=>{y+=14;x.fillStyle='#17695a';x.font=F(30,700);x.fillText(T(t),M,y+28);y+=42;x.fillStyle=line;x.fillRect(M,y,IW,2);y+=26};
  const part=(name,f)=>{const y0=y;try{f()}catch(e){x.fillStyle='#fff';x.fillRect(0,y0,W,Math.max(0,y-y0)+80);y=y0;miss.push(name)}};
  // 1 photo (with the measured outline when there is one) and the GPS stamp on it
  const im=(d&&d.available&&d.overlay?await loadImg(d.overlay):null)||await blobImg(blob)||await loadImg(photo);
@@ -796,13 +812,13 @@ async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D
  else{x.font=F(22);x.fillStyle=ink2;y=wrapT(x,T('No location recorded. Tap Add my location (needs https) or use a photo with GPS.'),M,y+6,IW,32)+6}
  // 3 type
  part('type',()=>{sec('Landslide type');x.font=F(38,700);x.fillStyle=ink;y=wrapT(x,T(N[r.label]||r.label),M,y+30,IW,46);
-  x.font=F(23);x.fillStyle=r.status==='ok'?'#1f7a68':r.status==='uncertain'?'#b06b00':'#c0392b';
+  x.font=F(23);x.fillStyle=r.status==='ok'?'#17695a':r.status==='uncertain'?'#8a5d00':'#b8381f';
   x.fillText(`${Math.round((r.confidence||0)*100)}% · ${T(STW[r.status]||r.status)}${r.family?' · '+T(r.family)+' '+T('family'):''}`,M,y+6);y+=40;
   for(const [c,p] of (r.ranked||[]).slice(0,3)){x.font=F(21);x.fillStyle=ink;x.fillText(T(N[c]||c),M,y+20);x.fillStyle='#e3ebe7';x.fillRect(M+430,y+4,IW-530,22);
-   x.fillStyle='#1f7a68';x.fillRect(M+430,y+4,(IW-530)*Math.max(0,Math.min(1,p)),22);x.fillStyle=ink;x.fillText(Math.round(p*100)+'%',M+IW-80,y+22);y+=36}
+   x.fillStyle='#17695a';x.fillRect(M+430,y+4,(IW-530)*Math.max(0,Math.min(1,p)),22);x.fillStyle=ink;x.fillText(Math.round(p*100)+'%',M+IW-80,y+22);y+=36}
   if(r.fieldRanked&&r.answers&&r.answers.some(a=>a.a!=='not sure')){x.font=F(21,600);x.fillStyle=ink;x.fillText(`${T('With your field answers')}: ${T(N[r.fieldRanked[0][0]])} ${Math.round(r.fieldRanked[0][1]*100)}%`,M,y+22);y+=36}});
  // 4 photo quality
- part('quality',()=>{const ql=qLevel(r);sec('Photo quality');x.font=F(23,700);x.fillStyle=['#1f7a68','#8a7a00','#b06b00','#c0392b'][ql];x.fillText(T(QL[ql]),M,y+22);y+=34;
+ part('quality',()=>{const ql=qLevel(r);sec('Photo quality');x.font=F(23,700);x.fillStyle=['#17695a','#7a5c00','#9a4a00','#b8381f'][ql];x.fillText(T(QL[ql]),M,y+22);y+=34;
   x.font=F(20);x.fillStyle=ink2;const iss=(r.quality&&r.quality.issues||[]).map(i=>T(i[0])+(i[2]===2?' ('+T('serious')+')':''));
   if(r.status==='bad_photo')iss.unshift(T('photo check failed: the result is not reliable'));if(iss.length)y=wrapT(x,iss.join(' · '),M,y+26,IW,28)});
  // 5 sizes
@@ -818,7 +834,7 @@ async function reportImage(r,mt,photo,blob,tiles){const W=1080,M=40,IW=W-2*M,N=D
  // 6 field check, notes
  part('field',()=>{const ans=r.answers||[],sg=r.signs||{},seen=Object.values(sg).map(v=>v.filter(Boolean).length+' / '+v.length);
   if(!ans.length&&!seen.length&&!mt.notes&&!mt.weather)return;sec('Field check');x.font=F(20);x.fillStyle=ink;
-  for(const a of ans)y=wrapT(x,`${T(a.q)} — ${T(a.a)}`,M,y+4,IW,28);
+  for(const a of ans)y=wrapT(x,`${T(a.q)}: ${T(a.a)}`,M,y+4,IW,28);
   for(const [c,v] of Object.entries(sg))y=wrapT(x,`${T('Signs seen:')} ${v.filter(Boolean).length} / ${v.length} (${T(N[c]||c)})`,M,y+4,IW,28);
   if(mt.weather)y=wrapT(x,`${T('Weather')}: ${T(mt.weather)}`,M,y+4,IW,28);if(mt.notes)y=wrapT(x,`${T('Notes')}: ${mt.notes}`,M,y+4,IW,28)});
  // footer
@@ -861,26 +877,28 @@ function saveBlob(blob,name){try{const u=URL.createObjectURL(blob),a=document.cr
 async function shareBlob(blob,name,text){try{const f=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:text||''});return true}}
  catch(e){if(e&&e.name==='AbortError')return true}return false}
 function openBlob(blob){try{return !!window.open(URL.createObjectURL(blob),'_blank')}catch(_){return false}}
-function reportBar(){$('#repbar')?.remove();$('#locline')?.remove();$('#repcard')?.remove();
- const b=document.createElement('div');b.className='btns';b.id='repbar';b.style.marginTop='14px';
- b.innerHTML=`<button type="button" class="btn primary" data-a="img" style="grid-column:1/-1">Save image report</button><button type="button" class="btn ghost" data-a="report">Save page report</button><button type="button" class="btn ghost" data-a="share">Share</button>`;
- const ln=document.createElement('div');ln.className='locl';ln.id='locline';
- const m=out.querySelector('.meta');if(m){out.insertBefore(ln,m);out.insertBefore(b,m)}else{out.appendChild(ln);out.appendChild(b)}
- b.onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='img')saveImageReport();if(a==='report')saveReport();if(a==='share')share()};locLine()}
+function reportBar(){$('#repsec')?.remove();
+ const c=document.createElement('section');c.className='card';c.id='repsec';
+ c.innerHTML=`<h2>Save and share</h2><p class="hungr u-b3">One image with the photo, the location marker and every result. It also opens offline.</p><div class="locl u-b3" id="locline"></div>
+ <div class="btns" id="repbar"><button type="button" class="btn primary span2" data-a="img">Save report</button><button type="button" class="btn ghost" data-a="share">Share</button><button type="button" class="btn ghost" data-a="report">Save as web page</button></div>`;
+ const m=out.querySelector('.meta');m?out.insertBefore(c,m):out.appendChild(c);
+ c.querySelector('#repbar').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='img')saveImageReport();if(a==='report')saveReport();if(a==='share')share()};locLine()}
 let repBusy=false;
-async function saveImageReport(){if(!cur||repBusy)return;repBusy=true;const btn=$('#repbar [data-a=img]');if(btn)btn.disabled=true;toast(tr('Making the image report…'));
+async function saveImageReport(){if(!cur||repBusy)return;repBusy=true;const btn=$('#repbar [data-a=img]'),bt=btn?btn.innerHTML:'';
+ if(btn){btn.disabled=true;btn.setAttribute('aria-busy','true');btn.innerHTML='<span class="spin"></span>'+esc(tr('Making the image report…'))}
  const r=cur,mt=curMeta||meta();let res=null;
  for(const tiles of [true,false]){try{res=await reportImage(r,mt,curPhoto,lastBlob,tiles);break}catch(_){res=null}}   // retry without map tiles (offline, blocked, tainted)
- repBusy=false;if(btn)btn.disabled=false;
+ repBusy=false;if(btn){btn.disabled=false;btn.removeAttribute('aria-busy');btn.innerHTML=bt}
  if(!res){toast(tr('The image report could not be drawn on this phone: the page report is saved instead.'));saveReport();return null}
- const name=fname('observation',mt.t,'jpg');repShow(res.blob,name,res.tiles);
- if(saveBlob(res.blob,name))toast(tr('Report saved')+': '+name);return res}
-function repShow(blob,name,tiles){$('#repcard')?.remove();let u='';try{u=URL.createObjectURL(blob)}catch(_){}
- const c=document.createElement('section');c.className='card';c.id='repcard';
- c.innerHTML=`<div class="kicker">Image report</div>${u?`<img class="dimg" src="${u}" alt="Image report with location and results">`:''}<p class="hungr" style="margin:0 0 10px"><span>If no file was downloaded, long-press the image to save it, or use Share.</span>${tiles?' <span>Map © OpenStreetMap contributors.</span>':''}</p>
- <div class="btns"><button type="button" class="btn ghost" data-a="dl">Save again</button><button type="button" class="btn ghost" data-a="sh">Share image</button></div>`;
- const bar=$('#repbar');bar?bar.after(c):out.appendChild(c);
+ const name=fname('observation',mt.t,'jpg');const ok=saveBlob(res.blob,name);repShow(res.blob,name,res.tiles,ok);
+ if(ok){toast(tr('Report saved')+': '+name);step(5);buzz(30)}return res}
+function repShow(blob,name,tiles,ok){$('#repcard')?.remove();let u='';try{u=URL.createObjectURL(blob)}catch(_){}
+ const c=document.createElement('div');c.id='repcard';c.className='u-t4';
+ c.innerHTML=`<p class="done-line" role="status"><b>${ok?esc(tr('Report saved')):esc(tr('Image report'))}</b> <span class="hungr">${esc(name)}</span></p>${u?`<img class="dimg" src="${u}" alt="Image report with location and results">`:''}<p class="hungr u-b3"><span>If no file was downloaded, long-press the image to save it, or use Share.</span>${tiles?' <span>Map © OpenStreetMap contributors.</span>':''}</p>
+ <div class="btns"><button type="button" class="btn ghost" data-a="sh">Share image</button><button type="button" class="btn ghost" data-a="dl">Save again</button><button type="button" class="btn primary span2" data-a="new">Start the next observation</button></div>`;
+ const sec=$('#repsec');sec?sec.appendChild(c):out.appendChild(c);
  c.onclick=async e=>{const a=e.target.closest('[data-a]')?.dataset.a;
+  if(a==='new'){act('newobs');return}
   if(a==='dl'&&!saveBlob(blob,name)&&!openBlob(blob))toast(tr('Could not save the report on this browser.'));
   if(a==='sh'&&!(await shareBlob(blob,name,shareText()))&&!openBlob(blob))toast(tr('Sharing is not available here: use Save report.'))}}
 
@@ -901,7 +919,7 @@ function resultHTML(r,photo,mt){const N=D.names,d=r.dimensions;let h=photo?`<img
  else if(d&&d.reason)h+=`<h2>Estimated dimensions</h2><p>${esc(d.reason)}</p>`;
  return h}
 const foot=m=>`<p class="m">Landslide Type Check field app${m?' ('+esc(m)+')':''}. Decision support only: confirm with a geologist or geotechnical engineer before acting. Coordinates WGS-84.</p>`;
-function download(name,html){const b=new Blob([html],{type:'text/html'});if(saveBlob(b,name))toast(tr('Report saved')+': '+name);else if(!openBlob(b))toast(tr('Could not save the report on this browser.'))}
+function download(name,html){const b=new Blob([html],{type:'text/html'});if(saveBlob(b,name)){toast(tr('Report saved')+': '+name);if(cur)step(5)}else if(!openBlob(b))toast(tr('Could not save the report on this browser.'))}
 const fname=(k,t,ext='html')=>`landslide_${k}_${new Date(t||Date.now()).toISOString().slice(0,16).replace(/[:T]/g,'-')}.${ext}`;
 const page=(title,body)=>`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>${RCSS}</style></head><body>${body}</body></html>`;
 function saveReport(){if(!cur)return;const mt=curMeta||meta();
@@ -930,7 +948,7 @@ async function queueIt(){const it={id:Date.now(),blob:lastBlob,q:params({stage:'
  const ok=await safe(async()=>{await DB.put('queue',it);return true},false);
  A.setChip('signal',ok?'Saved for later':'Offline');step(1);
  out.innerHTML=`<section class="card bad" aria-live="polite"><div class="kicker">No connection</div><h2>${ok?'Saved on the phone: it will be analysed automatically when the connection is back':'You are offline and this browser cannot store the photo'}</h2>
- <p class="hungr" style="margin:0">${ok?'Keep the app open or open it again later. You can keep photographing; each photo waits in the queue.':'Reconnect to the laptop or server and tap Try again.'}</p></section>`;
+ <p class="hungr u-m0">${ok?'Keep the app open or open it again later. You can keep photographing; each photo waits in the queue.':'Reconnect to the laptop or server and tap Try again.'}</p></section>`;
  if(ok&&mode==='survey'&&it.meta.shotId){done.add(it.meta.shotId);const nx=G.shots.findIndex(s=>!done.has(s.id));if(nx>=0)shot=nx;saveShots();drawMode()}
  gstate={flags:[],override:false,retakes:0,live:false};netUI()}
 let flushing=false;
@@ -964,7 +982,7 @@ async function openHist(id){const x=await safe(()=>DB.get('results',id),null);if
  $('#fig').scrollIntoView({behavior:'smooth',block:'start'})}
 drawHist();A._metrics=metrics;A._judge=judge;A._grade=grade;A._hold=hold;A._live=liveShow;A._fuse=fuse;A._flush=flush;A._q=()=>safe(()=>DB.all('queue'),[]);A._st=()=>({flushing,done:[...done],shot,mode,curId:cur&&cur.__id,metaShot:curMeta&&curMeta.shotId,site:!!sess.get('site')});   // exposed for tests
 /* ---------- shared with the overlapping-set module (src/pano.py) ---------- */
-function runSet(r,blob,g,label){lastBlob=blob;lastPGps=null;lastHead=null;lastSrc=g?'cam':'gal';lastTilt=g?{g}:null;const dv=parseFloat(dist.value);lastDist=dv>=1&&dv<=3000?dv:null;
+function runSet(r,blob,g,label){lastBlob=blob;lastPGps=null;lastHead=null;lastSrc=g?'cam':'gal';lastTilt=g?{g}:null;lastDist=distM();
  curMeta=meta();curMeta.set=label||'';cur=r;job=r.job||null;const fig=$('#fig');$('#prev').src=URL.createObjectURL(blob);fig.style.display='block';
  if(r.ms)store.set('etaT',ema('etaT',r.ms,4000));photoQ={level:0,issues:[]};withQ(r);A.render(r);afterType(r);sizes(r)}
 A._g={say,buzz,toast,tr,store,sess,step,safety,openFinder,closeFinder,openCamera,ICO,LIVE,prog,post,busy,cancelled,params,gx,runSet,fail,RX,out,vf,vid,

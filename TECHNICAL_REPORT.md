@@ -826,8 +826,8 @@ sizes with 90 % ranges, glossary; history (20 results, IndexedDB); offline queue
 every 60 s); image report, HTML report and share (§10.3); GPS, compass bearing and notes. **Hindi**: dictionary (~300 strings + ~18 patterns) applied
 by a MutationObserver to every text node and aria attribute (machine-drafted, needs native review).
 **Accessibility**: aria-live regions, dialogs with focus return, keyboard (Enter/Space/Esc), reduced motion,
-dark mode, high-contrast sun mode, spoken summary. Tested headlessly in Edge (English and Hindi): 40 guidance
-checks per language (incl. 12 location/report checks) and the photo-set suite, 0 failures.
+dark mode, high-contrast sun mode, spoken summary. Tested headlessly in Edge (English and Hindi): 51 guidance
+checks per language (incl. 12 location/report checks and 11 UX-law checks, §10.4) and the photo-set suite, 0 failures.
 
 
 ### 10.3 Location, GPS marker and reports (`guide.py`, `pano.py`)
@@ -927,6 +927,86 @@ report" and is covered by the OSM tile policy, with low-volume, user-initiated u
 - A late GPS fix is attached to the shown photo.
 - The image report is shown on the page and saved, and so is the page report.
 
+
+### 10.4 Interface audit: 20 UX laws and 20 "looks machine-made" signs
+
+The whole page was checked against two public lists:
+- 20 UX laws: Laws of UX, Yablonski;
+- 20 signs that an app "looks vibecoded".
+
+The checks covered every mode (single, survey, photo set), light and dark, English and Hindi, at a true 375 px
+phone width (rendered in an iframe, because headless Edge cannot be narrower than about 496 px).
+
+**Measured before → after.**
+
+| Measure | Before | After | How |
+|---|---|---|---|
+| Visible text below WCAG AA contrast (result page, light + dark) | 5, e.g. dark-mode links 3.34, light subtitle and footer 4.13; white on the gradient button down to 2.40 | **0** of 71–86 text elements | in-page scan of every text node against its effective background |
+| Controls under 44 px (all three modes) | many: small buttons ~34 px, summaries ~20 px, a 24 px delete button | **0** | in-page scan of every visible control |
+| Decorative gradients in the UI (logo and glyphs excluded) | 11 | 0 | source scan |
+| Glass blur (`backdrop-filter`) | 2 | 0 | source scan |
+| One-off inline margins | 46 | 0 (spacing utilities on a 4 px scale) | source scan |
+| Em dashes in visible text | 3 | 0 | source scan + in-page check |
+| Invalid `font:… inherit` shorthands | 9 (buttons fell back to 13.3 px) | 0 | source scan |
+| Types shown at once | 6 | 3 (+ "Show all 6 types") | UI test |
+| Size rows shown at once | 11 | 6 (+ "More measurements") | screenshot |
+| Report actions | 3 equal buttons | 1 primary + 2 secondary | UI test |
+
+**Each point and what was done.**
+
+| # | Point | Status before | Action |
+|---|---|---|---|
+| U1 | Aesthetic-usability | busy: gradients, blobs, pills | flat tokens, one accent, one type scale, 4 px spacing scale |
+| U2 | Hick's law | 3 equal report buttons, 6 types, 11 size rows | one primary action per card; top 3 types; key sizes first |
+| U3 | Fitts's law | many targets 20–34 px | every control ≥ 44 px (measured); the set-photo delete button has a 44 px hit area |
+| U4 | Jakob's law | mostly standard | help top right, segmented mode control, standard Save / Share words, share sheet |
+| U5 | Miller's law | 11 size rows in one list | chunked: measures + size class + slope + grains; the rest grouped |
+| U6 | Doherty threshold (< 400 ms) | report feedback only by toast | the button itself shows a spinner and "Making the image report…" in the same frame; the instant photo check stays on the phone |
+| U7 | Proximity | location line separate from report buttons; distance hint far from its box | location inside the report card; the hint directly under the distance box |
+| U8 | Similarity | two button systems with different colours | one button family (primary / ghost / small) on the same tokens |
+| U9 | Common region | report actions loose on the page | one "Save and share" card: location, actions, result of saving |
+| U10 | Visual hierarchy | a "Good" quality card above the answer competed with it | a clean photo is one quiet line inside the result card; problems stay on top in colour |
+| U11 | Progressive disclosure | everything open | "Show all 6 types", "More measurements", glossary, distance helper |
+| U12 | Recognition over recall | icon-only language button "हिं", steps only in text | language button names the language ("हिंदी" / "English"); the distance hint shows accepted forms; the saved file name is shown |
+| U13 | Von Restorff | safety had the same weight as other cards | safety is the one filled warning panel, placed right after the answer |
+| U14 | Peak-end rule | the page just stopped after saving | "Report saved" line + preview + "Start the next observation" |
+| U15 | Goal-gradient | 4-step journey ended at Result | 5th step "Report": Result done, Report highlighted until the report is saved (measured 5/5 after saving) |
+| U16 | Serial position | safety in the middle; tech pills last | answer first; safety second; save and next observation last; tech details as one quiet line |
+| U17 | Tesler's law | location only from a buried button | the first camera tap asks for location once (https), and fixes attach automatically (§10.3) |
+| U18 | Postel's law | number box rejected "40 m", "130 ft", "40,5" | accepts 40, 40.5, 40,5, 40 m, 40m, 130 ft, 0.5 km and Devanagari digits; says "Sizes will use 39.6 m" |
+| U19 | Occam's razor | eyebrow labels, three tech pills, "nothing to fix" card, decorative tip icons | removed or merged; tips became numbered steps |
+| U20 | Feedback loops | silent distance box | live parse feedback; ticks update a tally; save → spinner → "Report saved"; haptic tick on save |
+| V1 | Purple-to-blue gradient | none (teal brand) | kept none |
+| V2 | Gradient hero text | none | — |
+| V3 | Emojis in headings | none | — |
+| V4 | Inter everywhere | system UI fonts (offline, fast, Devanagari) | kept; Noto Sans Devanagari added to the stack |
+| V5 | Coloured border cards | gradient accent stripe on safety and error cards | removed; filled warning panel instead |
+| V6 | Glassmorphism | blurred chip and modal backdrop | solid 86 % chip, solid scrim (also cheaper on low-end phones) |
+| V7 | Low-contrast dark mode | links 3.34 : 1 | dark tokens ≥ 7.9 : 1 for links, 8.1 : 1 for the primary button |
+| V8 | 3 icon boxes in a row | none | — |
+| V9 | Badge above the headline | uppercase letter-spaced eyebrow on ~28 cards | plain sentence-case section labels; removed where they repeated the heading |
+| V10 | Lucide icons everywhere | decorative icons on tips | icons only where they carry meaning (camera, gallery, warning, ticks) |
+| V11 | Untouched shadcn UI | not used | — |
+| V12 | Fade-in on scroll | none (bars grew on load) | removed the bar animation; only spinners move; reduced motion respected |
+| V13 | Cursor-following beam | none | — |
+| V14 | Buttons fade on hover | brightness filter | solid colour change, 1 px press |
+| V15 | Inconsistent spacing | 46 inline margins of 18 sizes | 4 px scale tokens + utilities |
+| V16 | Em dashes everywhere | 3 in visible copy | replaced by colons (Hindi keys updated) |
+| V17 | Generic buzzword copy | none found (scan for 14 buzzwords) | copy stays concrete |
+| V18 | Serif italic accents | none | — |
+| V19 | Space Grotesk + Instrument Serif | none | — |
+| V20 | Grain over a gradient | three radial colour blobs behind the page | flat paper background |
+
+**Found on the way:**
+- **Invalid `font` shorthands.** Writing `font:650 .9rem inherit` is invalid CSS, so browsers dropped it, and every small button and segmented button had been showing the browser's 13.3 px default font.
+- **History thumbnails could stall saving.** The thumbnail used `fetch()` on a data URL. That can stall, and because results are saved in order, every later save waited behind it. It now decodes the image directly with a 5 s limit. This also removed a test flake.
+
+**Kept on purpose.**
+- Gradients stay in the logo and the type glyphs, where they are brand art.
+- The dashed red border on a failed-photo result and the coloured quality bands stay, because they are status information, not decoration.
+
+The checks for U2, U3, U13, U15, U16, U18, U20, V7, V15, V16 and V20 are in the headless test (§10.2).
+
 ---
 
 ## 11. Deployment
@@ -993,7 +1073,10 @@ report" and is covered by the OSM tile policy, with low-volume, user-initiated u
 | 28 | Landslide position = camera + distance along compass bearing | phone fix only; manual map tap | the fix alone is off by the viewing distance (20–300 m); stated σ instead of false precision |
 | 29 | Image report drawn on the phone (canvas) with EXIF GPS | server-rendered PDF; HTML only | works offline, no location sent to the server, opens in any gallery / WhatsApp, GIS-readable |
 | 30 | OSM tiles optional, all-or-nothing, grid fallback | bundled offline map; always online map | single-page app stays small; field phones are often offline |
-| 31 | Location asked only on tap, then refreshed silently | prompt on load | permission prompts on load are refused more often; https required anyway |
+| 31 | Location asked on the first camera tap, then refreshed silently | prompt on load; only a buried button | a prompt tied to a user action is understood; https required anyway |
+| 32 | Flat tokens, one accent, AA contrast measured in-page | keep gradient UI | 0 text elements below AA (was 5); gradients read as template output |
+| 33 | Safety directly after the answer; one primary action per card | equal-weight cards | serial position and Von Restorff: the field-critical warning is seen second |
+| 34 | Liberal distance input (units, commas, Devanagari digits) | strict number box | phones type "40 m" or "130 ft"; the box rejected them silently |
 
 ---
 
@@ -1016,6 +1099,7 @@ report" and is covered by the OSM tile policy, with low-volume, user-initiated u
 | 11-04 | Graded photo quality, results always shown | 56 headless checks pass |
 | 11-04/05 | Deployment: HF Space files, Cloudflare tunnel | public link: 40 s full result |
 | 11-14 | GPS marker: photo EXIF GPS, compass bearing, landslide position, image report with map + EXIF, robust saving | 12 new headless checks; EXIF round-trip exact to 1e-6° |
+| 11-14 | UX audit against 20 UX laws + 20 machine-made signs (§10.4) | AA failures 5 → 0; controls < 44 px → 0; 11 new checks; 2 latent bugs fixed |
 
 ---
 
@@ -1121,6 +1205,7 @@ kept within 85–95 %).
 | Landslide position error | σ_d typed 5 %, model depth 30 %; GPS default 10 m; Earth R 6,371,008.8 m | guide.py |
 | Late GPS fix attached | ≤ 3 min after the photo; silent refresh maximumAge 20 s | guide.py |
 | Image report | 1,080 px wide, photo ≤ 920 px high, JPEG q 0.9, map 470 × 350, zoom ≤ 18, tiles 5 s | guide.py |
+| UI tokens | spacing 4/8/12/16/24/32 px; tap ≥ 44–48 px; text ≥ 4.5 : 1 (AA); accent #17695a light / #5fd1a8 dark | ui.py |
 
 ## Appendix B: file map
 
