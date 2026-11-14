@@ -89,27 +89,30 @@ UI_ICONS = {
 }
 
 CSS = """
-/* "Contour": the app as a topographic field instrument. Survey paper (cool lichen grey, not cream), spruce-slate ink,
-   the logo's moss teal, and survey flagging-tape orange kept for hazards only. Headings and numbers in the DIN family
-   (road-sign and map lettering, built to be read at a glance) from the phone's own fonts, body in the system face
-   (Devanagari included). Information sits on open paper divided by contour lines; only things you act on or must
-   stop for get a container. Every text colour is >= 4.5:1 (measured in-page). */
-:root{--teal-950:#082f2a;--teal-800:#0e4d45;--teal-600:#17695a;--teal-400:#4fa587;--sage-300:#8fc9a9;--sage-100:#e4f1e9;
---amber:#e8a400;--orange:#a63d12;--ruby:#b8381f;
---bg:#e9ede6;--surface:#f6f7f2;--surface-2:#eef1ea;--ink:#15242a;--ink-2:#3a4c50;--mute:#53625f;--line:#c9d3cb;--contour:#a9bcb1;
---brand:#17695a;--on-brand:#ffffff;--link:#135c4f;--warn:#a63d12;--warn-bg:#fbefe6;--warn-line:#efc3a6;--tape:#ff6a1a;--tape-ink:#15242a;
---caution:#7f5600;--dup:#3a62c4;--focus:#e8a400;--edge:#73857f;--info:#1e6edc;
---g-ground:#17695a;--g-signal:#d9622b;--g-track:#a9cfbd;--tint-signal:rgba(255,106,26,.1);--tint-ground:rgba(23,105,90,.09);
---lift:0 1px 0 rgba(21,36,42,.07);--shadow:0 10px 30px -12px rgba(21,36,42,.35);--r:12px;
---f-sign:"DIN Alternate","DIN Next","Bahnschrift","sans-serif-condensed","Roboto Condensed","Arial Narrow",ui-sans-serif,system-ui,sans-serif;
+/* "Field Atlas at dawn". The app is a geological field atlas: a painted ridge landscape at the top (dawn in light mode,
+   moonlight in dark mode) whose foreground fog becomes the page; panels are atlas plates with an engraved inner rule;
+   open sections are separated by lithology symbols (sand, shale, limestone, conglomerate) so scrolling reads as
+   descending through strata. Display serif for names and titles (a field guide's specimen labels), system sans for
+   reading. Flagging-tape orange is kept for hazards only; every text colour >= 4.5:1, every control edge >= 3:1. */
+:root{--teal-950:#082f2a;--teal-800:#0e4d45;--teal-600:#155e51;--teal-400:#4fa587;--sage-300:#8fc9a9;--sage-100:#e4f1e9;
+--amber:#e8a400;--orange:#a3401a;--ruby:#b8381f;
+--bg:#e7ebe8;--surface:#fbfaf6;--surface-2:#f1f2ee;--ink:#1b272c;--ink-2:#3d4c52;--mute:#53636a;--line:#cfd6d2;--contour:#a6b5b0;--frame:#bcc6c1;
+--brand:#1a6a5b;--on-brand:#ffffff;--link:#155e51;--warn:#a3401a;--warn-bg:#fbeee6;--warn-line:#edc4ac;--tape:#ff6a1a;--tape-ink:#1b272c;
+--caution:#7c5400;--dup:#3a62c4;--focus:#e8a400;--edge:#6f817c;--info:#1e6edc;
+--g-ground:#1a6a5b;--g-signal:#c8562a;--g-track:#a9cfbd;--tint-signal:rgba(200,86,42,.1);--tint-ground:rgba(26,106,91,.09);
+--sky1:#a6bccd;--sky2:#dde3e3;--sky3:#f3d6b6;--sun:#f6bf86;--r0:#c4ced7;--r1:#9dadbb;--r2:#728899;--r3:#4b6476;--scar:#c8693a;--mist:#ffffff;--star:transparent;
+--lift:0 1px 1px rgba(27,39,44,.05),0 12px 30px -18px rgba(27,39,44,.45);--shadow:0 18px 40px -16px rgba(27,39,44,.45);--r:6px;
+--f-disp:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,"Noto Serif",Georgia,"Noto Serif Devanagari","Nirmala UI",serif;
+--f-sign:var(--f-disp);
 --f-body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Nirmala UI",sans-serif;
 --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--tap:48px;
 color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1a1b;--surface:#152325;--surface-2:#1a2a2c;--ink:#e3ece8;--ink-2:#b7c7c2;--mute:#8fa19d;
---line:#2b3e40;--contour:#335152;--brand:#5fd1a8;--on-brand:#06261f;--link:#86dcbb;--teal-600:#86dcbb;--warn:#ffa071;--orange:#ffa071;
---warn-bg:#2a1c15;--warn-line:#5c3624;--tape:#ff7a33;--caution:#f2c25a;--dup:#9db8ff;--focus:#f2c25a;--edge:#728b86;--info:#7fb0ff;
---g-ground:#5fd1a8;--g-signal:#ffa071;--g-track:#2f6555;--tint-signal:rgba(255,122,51,.12);--tint-ground:rgba(95,209,168,.1);
---lift:0 1px 0 rgba(0,0,0,.35);--shadow:0 10px 30px -12px rgba(0,0,0,.7);color-scheme:dark}}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1420;--surface:#141d2b;--surface-2:#1a2434;--ink:#e5ebf1;--ink-2:#b9c5d0;--mute:#8f9eac;
+--line:#26334a;--contour:#3a4b66;--frame:#30405a;--brand:#6fd3b0;--on-brand:#06261f;--link:#8bdcc0;--teal-600:#8bdcc0;--warn:#ffa27a;--orange:#ffa27a;
+--warn-bg:#2a1b17;--warn-line:#5a3326;--tape:#ff7a33;--caution:#f2c25a;--dup:#9db8ff;--focus:#f2c25a;--edge:#70839c;--info:#7fb0ff;
+--g-ground:#6fd3b0;--g-signal:#ffa27a;--g-track:#2c5a52;--tint-signal:rgba(255,162,122,.12);--tint-ground:rgba(111,211,176,.1);
+--sky1:#08101d;--sky2:#101b30;--sky3:#1d2b46;--sun:#dfe7f2;--r0:#25344d;--r1:#1d2a40;--r2:#172235;--r3:#111a2a;--scar:#b4643e;--mist:#9fb3cc;--star:#dfe7f2;
+--lift:0 1px 1px rgba(0,0,0,.3),0 14px 32px -18px rgba(0,0,0,.85);--shadow:0 18px 40px -16px rgba(0,0,0,.8);color-scheme:dark}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;min-height:100vh;overflow-x:clip;color:var(--ink);background:var(--bg);font:16px/1.55 var(--f-body)}
@@ -118,103 +121,120 @@ svg{display:block}
 a{color:var(--link);text-underline-offset:2px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
-/* the map sheet edge behind the header: static contour lines of a slope, drawn once from a fixed seed */
-.topo{position:absolute;left:50%;width:100vw;transform:translateX(-50%);top:0;height:170px;z-index:0;pointer-events:none;color:var(--contour);opacity:.55;
--webkit-mask-image:linear-gradient(#000 35%,transparent);mask-image:linear-gradient(#000 35%,transparent)}
-.topo svg{width:100%;height:100%}
-header{position:relative;z-index:1;display:flex;align-items:center;gap:var(--s2);margin:var(--s1) 0 var(--s4)}
-header .logo svg{width:38px;height:38px}
-.brand{min-width:0;flex:1}
-.brand b{display:block;font:600 1.22rem/1.15 var(--f-sign);letter-spacing:.01em}
-.brand span{display:block;font-size:.82rem;color:var(--mute);margin-top:2px}
-/* open section on the paper: a contour line above it instead of a box */
-.card{position:relative;z-index:1;margin-top:var(--s5);padding:var(--s5) 2px 0;background:none;border:0;border-radius:0;box-shadow:none}
-.card::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--line)}
-.card::after{content:"";position:absolute;left:0;top:-1px;width:32px;height:3px;background:var(--ink)}
-/* containers only where you act (capture, save) or must stop (safety, errors, photo problems) */
-.card.panel,#repsec,#askcard,.card.result,.card.safety,.card.bad,.card.qband{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--lift);padding:var(--s4)}
-.card.panel::before,#repsec::before,#askcard::before,.card.result::before,.card.qband::before,.card.bad::before{display:none}
+/* the landscape: sky, sun or moon, five ridges in atmospheric perspective, a slide scar, drifting mist; the nearest
+   band is the page colour, so the painting dissolves into the page */
+.hero{position:absolute;left:50%;width:100vw;transform:translateX(-50%);top:0;height:310px;z-index:0;overflow:hidden;pointer-events:none}
+.hero svg{width:100%;height:100%}
+.hero .mist{animation:drift 38s ease-in-out infinite alternate}.hero .mist.b{animation-duration:52s;animation-direction:alternate-reverse}
+.hero .tw{animation:tw 4.5s ease-in-out infinite}.hero .tw:nth-child(3n){animation-delay:-1.7s}.hero .tw:nth-child(4n){animation-delay:-3.1s}
+@keyframes drift{from{transform:translateX(-60px)}to{transform:translateX(60px)}}
+@keyframes tw{50%{opacity:.25}}
+header{position:relative;z-index:1;display:flex;align-items:flex-start;gap:var(--s3);min-height:206px;margin:0;padding-top:var(--s2)}
+header .logo{padding:6px;border-radius:50%;background:var(--surface);box-shadow:var(--lift)}
+header .logo svg{width:34px;height:34px}
+.brand{min-width:0;flex:1;padding-top:2px}
+.brand b{display:block;font:600 1.7rem/1.05 var(--f-disp);letter-spacing:-.01em;color:var(--ink)}
+.brand span{display:block;font-size:.86rem;color:var(--ink-2);margin-top:6px;white-space:nowrap}
+/* Devanagari has tall matras above the headline: give display lines room in Hindi */
+:lang(hi) .brand b,:lang(hi) .title,:lang(hi) h2{line-height:1.3}
+/* open sections: text on the page, divided by a band of lithology symbols; the symbol changes down the page */
+.card{position:relative;z-index:1;margin-top:var(--s5);padding:30px 2px 0;background:none;border:0;border-radius:0;box-shadow:none}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:12px;background:var(--contour);
+-webkit-mask:var(--lith) repeat-x 0 0/24px 12px;mask:var(--lith) repeat-x 0 0/24px 12px}
+.card::after{content:"";position:absolute;left:0;right:0;top:15px;height:1px;background:var(--line)}
+.card{--lith:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Ccircle cx='4' cy='4' r='1.3'/%3E%3Ccircle cx='16' cy='8' r='1.3'/%3E%3Ccircle cx='11' cy='10.5' r='.9'/%3E%3Ccircle cx='21' cy='2.5' r='.9'/%3E%3C/svg%3E")}
+#out>.card:nth-of-type(4n+2),#history>.card{--lith:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Cpath d='M1 3h8M14 3h8M7 9h8M19 9h5M0 9h2' stroke='%23000' stroke-width='1.3'/%3E%3C/svg%3E")}
+#out>.card:nth-of-type(4n+3){--lith:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Cpath d='M0 1h24M0 6.5h24M0 11.5h24M6 1v5.5M18 6.5v5' stroke='%23000' stroke-width='1.1' fill='none'/%3E%3C/svg%3E")}
+#out>.card:nth-of-type(4n){--lith:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Ccircle cx='5' cy='6' r='3.2' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3Ccircle cx='16' cy='3.5' r='2' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3Ccircle cx='19' cy='9.5' r='1.4' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3C/svg%3E")}
+/* plates: blocks you act on or must stop for; paper with an engraved inner rule */
+.card.panel,#repsec,#askcard,.card.result,.card.safety,.card.bad,.card.qband{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+box-shadow:inset 0 0 0 5px var(--surface),inset 0 0 0 6px var(--frame),var(--lift);padding:var(--s5) var(--s5) var(--s5)}
+.card.panel::before,#repsec::before,#askcard::before,.card.result::before,.card.qband::before,.card.bad::before,
 .card.panel::after,#repsec::after,#askcard::after,.card.result::after,.card.qband::after,.card.bad::after,.card.safety::after{display:none}
-.kicker{font:600 1rem/1.3 var(--f-sign);color:var(--ink);letter-spacing:.01em;margin:0 0 var(--s2)}
-.card.result .kicker{font:650 .9rem/1.3 var(--f-body);color:var(--ink-2);margin-bottom:var(--s1)}
-h2{font:600 1.3rem/1.2 var(--f-sign);margin:0 0 var(--s3);letter-spacing:.005em}
-.tips{display:grid;gap:var(--s2);margin:0 0 var(--s4);padding:0;list-style:none;counter-reset:tp}
-.tips li{display:grid;grid-template-columns:26px 1fr;gap:var(--s2);align-items:start;color:var(--ink-2);font-size:.96rem;counter-increment:tp}
-.tips li::before{content:counter(tp);display:grid;place-items:center;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--contour);color:var(--link);font:600 .9rem/1 var(--f-sign)}
+.card.panel{margin-top:0}
+.kicker{font:650 .8rem/1.3 var(--f-body);color:var(--ink-2);letter-spacing:.02em;margin:0 0 var(--s2)}
+#out>.card:not(.result):not(.safety)>.kicker:first-child,#history .kicker{font:600 1.3rem/1.2 var(--f-disp);letter-spacing:0;color:var(--ink);margin-bottom:var(--s3)}
+#out>.card>.kicker:first-child:has(+h2){font:650 .8rem/1.3 var(--f-body);letter-spacing:.02em;color:var(--ink-2);margin-bottom:var(--s2)}
+h2{font:600 1.42rem/1.2 var(--f-disp);margin:0 0 var(--s3);letter-spacing:-.005em}
+.tips{display:grid;gap:var(--s3);margin:0 0 var(--s5);padding:0;list-style:none;counter-reset:tp}
+.tips li{display:grid;grid-template-columns:28px 1fr;gap:var(--s3);align-items:baseline;color:var(--ink-2);font-size:.98rem;counter-increment:tp}
+.tips li::before{content:counter(tp);font:600 1.35rem/1 var(--f-disp);color:var(--link);text-align:right}
 .tips .ico{display:none}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
-.btn{position:relative;display:flex;align-items:center;justify-content:center;gap:var(--s2);min-height:54px;padding:var(--s3) var(--s4);border-radius:8px;border:0;
-font-weight:650;font-size:1rem;line-height:1.2;font-family:inherit;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .15s ease,transform .08s ease}
-.btn.primary{color:var(--on-brand);background:var(--brand);box-shadow:0 1px 0 rgba(0,0,0,.12),inset 0 -2px 0 rgba(0,0,0,.14)}
-.btn.primary:hover{background:#0f574a}.btn:active{transform:translateY(1px)}
-@media (prefers-color-scheme:dark){.btn.primary:hover{background:#7fdcb9}}
-.btn.ghost{color:var(--link);background:transparent;border:1.5px solid var(--edge)}
-.btn.ghost:hover{border-color:var(--link);background:var(--tint-ground)}
+.btn{position:relative;display:flex;align-items:center;justify-content:center;gap:var(--s2);min-height:54px;padding:var(--s3) var(--s5);border-radius:999px;border:0;
+font-weight:650;font-size:1rem;line-height:1.2;font-family:inherit;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .15s ease,transform .08s ease,box-shadow .15s ease}
+.btn.primary{color:var(--on-brand);background:var(--brand);box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 8px 18px -10px var(--brand)}
+.btn.primary:hover{background:#125446}.btn:active{transform:translateY(1px)}
+@media (prefers-color-scheme:dark){.btn.primary:hover{background:#8be0c2}}
+.btn.ghost{color:var(--link);background:var(--surface);border:1.5px solid var(--edge)}
+.btn.ghost:hover{background:var(--tint-ground)}
 .btn.text{background:none;color:var(--link);min-height:var(--tap);text-decoration:underline;text-underline-offset:3px}
 .btn[disabled]{opacity:.6;cursor:progress}
 .btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .btn:focus-within{outline:3px solid var(--focus);outline-offset:2px}
 .span2{grid-column:1/-1}
-figure{position:relative;z-index:1;margin:var(--s4) 0 0;display:none}
-figure img{width:100%;max-height:62vh;object-fit:cover;border-radius:var(--r);display:block;box-shadow:var(--lift)}
-.chip{position:absolute;left:var(--s3);top:var(--s3);display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;border-radius:999px;
-font-size:.84rem;font-weight:650;color:#fff;background:rgba(13,26,27,.86)}
+/* the photo is mounted like a print in the atlas */
+figure{position:relative;z-index:1;margin:var(--s5) 0 0;display:none}
+figure img{width:100%;max-height:62vh;object-fit:cover;display:block;border:7px solid var(--surface);border-radius:var(--r);box-shadow:var(--lift)}
+.chip{position:absolute;left:var(--s4);top:var(--s4);display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;border-radius:999px;
+font-size:.84rem;font-weight:650;color:#fff;background:rgba(13,20,32,.84)}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--sage-300)}
-.chip.signal .dot{background:var(--amber)}.chip.bad .dot{background:#ff8a6b}.chip.signal .dot,.chip.bad .dot{width:11px;height:10px;border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.chip.signal .dot{background:var(--amber)}.chip.bad .dot{background:#ff8a6b}
+.chip.signal .dot,.chip.bad .dot{width:11px;height:10px;border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%)}
 .spin{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;opacity:.8;animation:sp .8s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
-/* the answer: the type glyph stands on its summit; confidence = how many contour rings are inked, foot to top */
-.result{padding:var(--s4)}
+/* the answer as a specimen label: the type stands on its summit; confidence inks the contour rings from the foot up */
+.result{padding:var(--s5)}
 .rhead{display:grid;grid-template-columns:auto 1fr;gap:var(--s4);align-items:center}
-.summit{position:relative;width:112px;height:112px;flex:none;color:var(--brand)}
+.summit{position:relative;width:116px;height:116px;flex:none;color:var(--brand)}
 .summit.signal{color:var(--caution)}.summit.bad{color:var(--ruby)}
 .summit svg.rings{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .rings path{fill:none;stroke:var(--line);stroke-width:1.1}
-.rings path.on{stroke:currentColor;stroke-width:1.7;stroke-dasharray:1;stroke-dashoffset:0;animation:climb .7s cubic-bezier(.3,.7,.2,1) both;animation-delay:calc(var(--i)*70ms)}
+.rings path.on{stroke:currentColor;stroke-width:1.7;stroke-dasharray:1;stroke-dashoffset:0;animation:climb .8s cubic-bezier(.3,.7,.2,1) both;animation-delay:calc(var(--i)*80ms)}
 .rings path.on.idx{stroke-width:2.6}
 @keyframes climb{from{stroke-dashoffset:1}}
 .summit .glyph{position:absolute;left:50%;top:47%;transform:translate(-50%,-50%);width:46%;height:46%;border-radius:50%;display:grid;place-items:center;background:none}
 .summit .glyph svg{width:78%;height:78%}
 .glyph{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--tint-ground)}
 .glyph svg{width:48px;height:48px}
-.title{font:600 1.75rem/1.08 var(--f-sign);letter-spacing:0;margin:2px 0 var(--s1);text-wrap:balance}
-.hungr{font-size:.88rem;color:var(--mute)}
-.meter{margin-top:var(--s4)}
-.meter .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.94rem;color:var(--ink-2)}.meter .cband{color:var(--ink)}
-.meter .val{font:600 1.7rem/1 var(--f-sign);color:var(--ink);font-variant-numeric:tabular-nums}
+.title{font:600 2.05rem/1.04 var(--f-disp);letter-spacing:-.015em;margin:4px 0 var(--s1);text-wrap:balance}
+.hungr{font-size:.9rem;color:var(--mute)}
+.meter{margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--line)}
+.meter .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.95rem;color:var(--ink-2)}.meter .cband{color:var(--ink)}
+.meter .val{font:600 2.1rem/1 var(--f-disp);color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
 .track{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:var(--s2)}
 .fill{height:100%;border-radius:99px;background:var(--brand)}
 .fill.signal{background:var(--caution)}
 .result.lowq{border:2px dashed var(--ruby)}.result.lowq .fill{background:var(--ruby)}
-.note{margin:var(--s3) 0 0;padding:var(--s3);border-radius:8px;background:var(--surface-2);color:var(--ink-2);font-size:.94rem;border-left:3px solid var(--caution)}
+.note{margin:var(--s3) 0 0;padding:var(--s3) var(--s4);border-radius:4px;background:var(--surface-2);color:var(--ink-2);font-size:.95rem;border-left:3px solid var(--caution)}
 .probs{display:grid;gap:var(--s3);margin-top:var(--s1)}
-.prob{display:grid;grid-template-columns:28px 1fr 52px;gap:var(--s2);align-items:center}
+.prob{display:grid;grid-template-columns:28px 1fr 56px;gap:var(--s3);align-items:center}
 .prob svg{width:28px;height:28px}
-.prob .nm{font-size:.94rem;color:var(--ink-2);display:flex;flex-direction:column;gap:6px}
-.prob .tr{height:4px;border-radius:99px;background:var(--line);overflow:hidden}
+.prob .nm{font-size:.96rem;color:var(--ink-2);display:flex;flex-direction:column;gap:6px}
+.prob .tr{height:3px;border-radius:99px;background:var(--line);overflow:hidden}
 .prob .fl{height:100%;border-radius:99px;background:var(--g-track)}
 .prob.top .fl{background:var(--brand)}.prob.top .nm{color:var(--ink);font-weight:650}
-.prob .pc{text-align:right;font:500 1.02rem/1 var(--f-sign);font-variant-numeric:tabular-nums;color:var(--mute)}
+.prob .pc{text-align:right;font:500 1.15rem/1 var(--f-disp);font-variant-numeric:lining-nums tabular-nums;color:var(--mute)}
 .prob.top .pc{color:var(--ink);font-weight:600}
-details.more{margin-top:var(--s2)}details.more>summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;color:var(--link);font-weight:600;font-size:.94rem}
+details.more{margin-top:var(--s2)}details.more>summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;color:var(--link);font-weight:600;font-size:.95rem}
 .list{list-style:none;padding:0;margin:0;display:grid;gap:var(--s1)}
-.list li{display:flex;gap:var(--s2);align-items:flex-start;font-size:.96rem;color:var(--ink-2)}
+.list li{display:flex;gap:var(--s2);align-items:flex-start;font-size:.97rem;color:var(--ink-2)}
 .list .ico{color:var(--link);margin-top:1px}
-/* safety wears survey hazard tape: the one block on the page built to interrupt */
-.card.safety{background:var(--warn-bg);border-color:var(--warn-line);padding-top:calc(var(--s4) + 10px);overflow:hidden}
+/* safety wears survey flagging tape: the one block built to interrupt */
+.card.safety{background:var(--warn-bg);border-color:var(--warn-line);box-shadow:var(--lift);padding-top:calc(var(--s5) + 10px);overflow:hidden}
 .card.safety::before{display:block;height:10px;mask:none;-webkit-mask:none;border-radius:0;
 background:repeating-linear-gradient(-45deg,var(--tape) 0 12px,var(--tape-ink) 12px 24px)}
 .safety h2{display:flex;gap:var(--s2);align-items:center;color:var(--warn);margin-bottom:var(--s2)}.safety .ico{color:var(--warn)}
-.safety p{margin:0;color:var(--ink);font-size:1rem}
+.safety p{margin:0;color:var(--ink);font-size:1.02rem}
 .card.bad{background:var(--warn-bg);border-color:var(--warn-line)}
 ol.steps{margin:var(--s2) 0 0;padding-left:1.2rem;color:var(--ink-2)}ol.steps li{margin:var(--s1) 0}
 .skel{height:14px;border-radius:8px;background:var(--line);margin:10px 0;animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.5}}
-.foot{position:relative;margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--line);font-size:.84rem;color:var(--mute);text-align:left;line-height:1.6}
-.meta{display:block;margin-top:var(--s5);font-size:.84rem;color:var(--mute);text-align:left}
+.foot{position:relative;margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--line);font-size:.86rem;color:var(--mute);text-align:left;line-height:1.6}
+.meta{display:block;margin-top:var(--s5);font-size:.86rem;color:var(--mute);text-align:left}
 .u-m0{margin:0!important}.u-t1{margin:4px 0 0!important}.u-t2{margin:8px 0 0!important}.u-t3{margin:12px 0 0!important}.u-t4{margin:16px 0 0!important}
 .u-b2{margin:0 0 8px!important}.u-b3{margin:0 0 12px!important}.u-tb{margin:4px 0 12px!important}.u-sub{margin:-4px 0 12px!important}.u-blk{display:block!important}
-@media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.5rem}.summit{width:96px;height:96px}}
+@media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.7rem}.summit{width:96px;height:96px}.brand b{font-size:1.45rem}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 """
 
@@ -240,13 +260,28 @@ function summit(seed,conf,cls){let s=7;for(const ch of seed)s=(Math.imul(s,31)+c
    d+=(j?'L':'M')+(64+r*Math.cos(t)).toFixed(1)+' '+(64-i*1.1+r*Math.sin(t)*.9).toFixed(1)}
   p+=`<path pathLength="1" d="${d}Z" class="${i<on?'on':''}${i%5===0?' idx':''}" style="--i:${i}"/>`}
  return `<div class="summit ${cls}"><svg class="rings" viewBox="0 0 128 128" aria-hidden="true">${p}</svg><div class="glyph">${G[seed]}</div></div>`}
-// map-sheet edge behind the header: contours of a hillside with a slide hollow above and its deposit lobe below
-(function(){const el=document.getElementById('topo');if(!el)return;let p='';
- for(let k=0;k<11;k++){const y0=8+k*15;let d='';
-  for(let x=0;x<=400;x+=8){const lobe=22*Math.exp(-(((x-275)/62)**2))*(k-4)/6;
-   d+=(x?'L':'M')+x+' '+(y0+7*Math.sin(x/61+k*.42)+3*Math.sin(x/19+k*1.3)+lobe).toFixed(1)}
-  p+=`<path d="${d}" fill="none" stroke="currentColor" stroke-width="${k%5===2?1.6:.9}" vector-effect="non-scaling-stroke"/>`}
- el.innerHTML=`<svg viewBox="0 0 400 170" preserveAspectRatio="none">${p}</svg>`})();
+// the landscape behind the header: drawn once from a fixed seed (same view every visit), colours from CSS tokens so it
+// is dawn in light mode and moonlight in dark mode; the far ridges drift slower than the near ones while scrolling
+(function(){const el=document.getElementById('hero');if(!el)return;let s=20140;const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296;
+ const W=1200,H=310,ridge=(base,amp,rough,ph)=>{const pts=[];for(let x=-20;x<=W+20;x+=12){const t=x/W;
+   const y=base-amp*(.6*Math.sin(x/150+ph)+.3*Math.sin(x/61+ph*2.1)+.12*Math.sin(x/23+ph*3.7))-rough*(rnd()-.5);pts.push([x,y])}return pts};
+ const pathOf=pts=>'M'+pts.map(p=>p[0]+' '+p[1].toFixed(1)).join('L')+`L${W+20} ${H}L-20 ${H}Z`;
+ const yAt=(pts,x)=>{for(let i=1;i<pts.length;i++)if(pts[i][0]>=x){const a=pts[i-1],b=pts[i],f=(x-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*f}return pts[pts.length-1][1]};
+ const L=[ridge(176,36,3,.4),ridge(204,30,4,1.9),ridge(232,26,5,3.1),ridge(258,22,6,4.4),ridge(298,5,2,5.6)];
+ let stars='';for(let i=0;i<46;i++){const x=rnd()*W,y=rnd()*150,r=rnd()<.15?1.4:.8;stars+=`<circle class="${i%5?'':'tw'}" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r}" fill="var(--star)"/>`}
+ // the slide on the darkest ridge: a bowl-shaped scarp and its debris fan, the subject of the app
+ const sx=655,top=yAt(L[3],sx),scar=`M${sx-46} ${top+6}Q${sx} ${top-12} ${sx+44} ${top+8}Q${sx+30} ${top+34} ${sx+52} ${top+62}L${sx-70} ${top+62}Q${sx-38} ${top+34} ${sx-46} ${top+6}Z`;
+ const g=(k,inner)=>`<g class="lay" data-k="${k}">${inner}</g>`;
+ el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" style="stop-color:var(--sky1)"/><stop offset=".4" style="stop-color:var(--sky2)"/><stop offset=".64" style="stop-color:var(--sky3)"/></linearGradient><radialGradient id="hmist"><stop offset="0" style="stop-color:var(--mist);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--mist);stop-opacity:0"/></radialGradient></defs>
+  <rect width="${W}" height="${H}" fill="url(#hsky)"/>${stars}
+  ${g(.42,`<circle cx="548" cy="168" r="30" fill="var(--sun)" opacity=".95"/><path d="${pathOf(L[0])}" fill="var(--r0)"/>`)}
+  ${g(.32,`<path d="${pathOf(L[1])}" fill="var(--r1)"/><ellipse class="mist" cx="560" cy="${yAt(L[1],560)+16}" rx="300" ry="22" fill="url(#hmist)"/>`)}
+  ${g(.22,`<path d="${pathOf(L[2])}" fill="var(--r2)"/><ellipse class="mist b" cx="700" cy="${yAt(L[2],700)+18}" rx="260" ry="18" fill="url(#hmist)"/>`)}
+  ${g(.12,`<path d="${pathOf(L[3])}" fill="var(--r3)"/><path d="${scar}" fill="var(--scar)" opacity=".85"/>`)}
+  ${g(0,`<path d="${pathOf(L[4])}" fill="var(--bg)"/>`)}</svg>`;
+ const lays=[...el.querySelectorAll('.lay')];if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;let tick=0;
+ addEventListener('scroll',()=>{if(tick)return;tick=requestAnimationFrame(()=>{tick=0;const y=Math.min(scrollY,420);lays.forEach(l=>l.style.transform=`translateY(${(y*l.dataset.k).toFixed(1)}px)`)})},{passive:true})})();
 function probs(r){const top=r.ranked[0][0],one=([c,p])=>`<div class="prob ${c===top?'top':''}">${G[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(p*100).toFixed(1)}%"></div></div></div><div class="pc">${pct(p)}</div></div>`;
  const rest=r.ranked.slice(3);
  return r.ranked.slice(0,3).map(one).join('')+(rest.length?`<details class="more"><summary>Show all ${r.ranked.length} types</summary><div class="probs">${rest.map(one).join('')}</div></details>`:'')}
@@ -316,11 +351,11 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="48x48" href="favicon.ico">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="theme-color" content="#e9ede6" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f1a1b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#a6bccd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08101d" media="(prefers-color-scheme: dark)">
 <style>__CSS____GCSS____PCSS__.drow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.92rem}.drow b{text-align:right;font-weight:600}.drow small{opacity:.65;font-weight:400}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--edge);font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
 </style></head><body>__DEFS__<main>
-<div class="topo" id="topo" aria-hidden="true"></div>
+<div class="hero" id="hero" aria-hidden="true"></div>
 <header><div class="logo">__LOGO__</div><div class="brand"><b>Landslide Type Check</b><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
 <div id="netbar" class="netbar" role="status" hidden>You are offline. Photos cannot be analysed until the connection is back.</div>
 <section class="card panel"><ol class="journey" id="journey" aria-label="Progress"></ol><div class="seg" id="mode" role="group" aria-label="Capture mode"></div><ul class="shots" id="shots"></ul><h2 id="capH">Photograph the slope from below</h2>

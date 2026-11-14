@@ -785,7 +785,7 @@ async function reportImage(r,mt,photo,blob,tiles){
     as a last resort, ends in an ellipsis (the web page report keeps the full text). */
  const W=1600,M=44,G=36,N=D.names,d=r.dimensions,L=locOf(mt,r),T=s=>tr(s),miss=[],when=new Date(mt.t||Date.now()).toLocaleString();
  const cv=document.createElement('canvas');cv.width=W;cv.height=4000;const x=cv.getContext('2d');if(!x)throw new Error('no canvas');
- const F=(sz,wt=400)=>`${wt} ${sz}px ${wt>=600?'"DIN Alternate",Bahnschrift,':''}system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Nirmala UI",sans-serif`,
+ const F=(sz,wt=400)=>`${wt} ${sz}px ${wt>=600?'"Palatino Linotype","Book Antiqua",Palatino,"Noto Serif",Georgia,':''}system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans","Noto Sans Devanagari","Nirmala UI",sans-serif`,
   ink='#15242a',ink2='#3a4c50',line='#c9d3cb',teal='#17695a';
  // one line, never wrapped: shrink to 72 % of the size, then cut with an ellipsis; align 'l' | 'r'
  const one=(s,X,Y,maxW,sz,wt=400,col=ink,al='l')=>{s=String(s??'');let z=sz;x.font=F(z,wt);

@@ -1163,6 +1163,33 @@ engineer in glare and under stress, and the office reviewer judging credibility.
 - **Guide tests:** 52/52 in English and in Hindi.
 - **Photo-set suite:** complete in both languages, 0 script errors.
 
+### 10.8 Visual identity: "Field Atlas at dawn"
+
+The Bauhaus pass (§10.7) fixed function: edges, shapes, contrast. It did not give the app a character. This pass
+redraws the whole surface as a **plate from a geological field atlas**. The functional rules of §10.7 stay as they
+are: edge colour, ISO shapes, 44 px targets and the amber/red hazard code.
+
+| Element | Design | Why |
+|---|---|---|
+| Header | a landscape drawn in inline SVG behind the title: four ridges in aerial perspective, mist between them, and a small landslide scar with its debris fan on the nearest ridge. The scene is dawn in light mode and moonlight with stars in dark mode | the first thing on screen is the subject itself, a slope seen from below, which is the view the app asks the engineer to photograph |
+| Motion | ridges move at different speeds when the page scrolls (parallax 0–0.42); mist drifts over 38–52 s and stars twinkle; all of it is off under `prefers-reduced-motion` | one quiet depth cue; nothing moves on its own near the controls |
+| Type | headings in a book serif (Iowan Old Style, Palatino, Noto Serif / Noto Serif Devanagari, then Georgia); body stays sans | atlas plates and survey reports use serif titles; numbers such as 87 % read like a printed figure |
+| Panels where you act (capture, result, save, ask, safety) | atlas plates: paper surface with an engraved inner rule 5 px inside the edge | a framed plate says "this is the instrument"; the open text between plates stays unframed |
+| Section dividers | a 12 px band of lithology symbols as in a geological column: sand dots, shale dashes, limestone bricks and conglomerate pebbles, changing down the page | the divider carries the subject's own drawing convention instead of an arbitrary line |
+| Colours | light: mist grey-green ground `#e7ebe8`, paper `#fbfaf6`, ink `#1b272c`, forest teal `#1a6a5b`; dark: night blue `#0d1420` with a paler teal | the palette of a misty hill slope; teal = vegetation and "done", warm colours kept only for hazard |
+| Buttons | fully rounded pills | a different shape from the plates, so controls and containers separate at a glance |
+| Hindi | Devanagari display lines get line-height 1.3 | matras above the line need room; at 1.05 the two title lines touched |
+
+The landscape is drawn from a fixed seed, so it looks the same on every visit. It uses only CSS colour tokens and
+no image files, so the page still works offline and the scene follows the theme without a second drawing.
+
+**Measured after the change:**
+- **Text contrast:** 0 text elements below AA, light and dark, in 4 result states (67–82 elements per state).
+- **Control edges:** 0 of 10–11 controls below 3 : 1, light and dark.
+- **Tap targets:** 0 controls under 44 px in all three modes.
+- **Guide tests:** 52/52 in English and in Hindi, 0 script errors.
+- **Photo-set suite:** complete in both languages, 0 script errors.
+
 ---
 
 ## 11. Deployment
@@ -1236,6 +1263,7 @@ engineer in glare and under stress, and the office reviewer judging credibility.
 | 35 | "Contour" visual identity: survey paper, DIN numerals, flagging-tape hazard, summit confidence gauge (§10.5) | generic card UI | a field engineer reads map conventions at a glance; one saturated warm colour = danger |
 | 36 | "Most likely type" + Model confidence band (High / Moderate / Low) | "Landslide type" + bare % | a model output is a hypothesis to verify; a band word gives the meaning of the number |
 | 37 | Functional Bauhaus as the design scheme; ISO 3864 colour + shape for status; control edges ≥ 3 : 1 (§10.7) | neumorphism, decorative styles | fluency and credibility for the office reader; edges and shapes that survive glare and colour-vision deficiency on site |
+| 38 | "Field Atlas at dawn" identity: SVG ridge landscape header, serif headings, atlas plates, lithology dividers (§10.8) | flat Bauhaus surface only | the subject and its drawing conventions give the app a character; the functional rules of §10.7 stay |
 
 ---
 
@@ -1260,6 +1288,7 @@ engineer in glare and under stress, and the office reviewer judging credibility.
 | 11-14 | GPS marker: photo EXIF GPS, compass bearing, landslide position, image report with map + EXIF, robust saving | 12 new headless checks; EXIF round-trip exact to 1e-6° |
 | 11-14 | "Contour" redesign and engineer-facing wording (§10.5) | AA 0 failures light + dark in 4 result states; controls < 44 px: 0; 51/51 tests en + hi |
 | 11-14 | UX audit against 20 UX laws + 20 machine-made signs (§10.4) | AA failures 5 → 0; controls < 44 px → 0; 11 new checks; 2 latent bugs fixed |
+| 11-14 | "Field Atlas at dawn" visual identity (§10.8) | AA 0 failures light + dark in 4 states; edges < 3 : 1: 0; controls < 44 px: 0; 52/52 tests en + hi |
 
 ---
 
