@@ -1190,6 +1190,46 @@ no image files, so the page still works offline and the scene follows the theme 
 - **Guide tests:** 52/52 in English and in Hindi, 0 script errors.
 - **Photo-set suite:** complete in both languages, 0 script errors.
 
+### 10.9 The atlas scheme carried into every layer
+
+§10.8 set the identity at the top of the page. This pass carries the same scheme, a printed geological field atlas,
+into every layer: material, motion, controls, data, type and secondary screens. Each element borrows a real atlas or
+survey convention instead of a generic web pattern.
+
+| Layer | Element | Atlas convention it borrows | What it does for the reader |
+|---|---|---|---|
+| Material | paper grain on the page, the plates and the sheets (inline SVG noise, 4–10 % alpha) | printed paper | the screen reads as a document, not as glass |
+| Material | the plate's inner rule is an outline 7 px inside, with 8 px blocks where it turns at the corners | map neatline with corner blocks | marks the panels you act on |
+| Landscape | ridges fade into valley haze, the sun or moon has a glow, the moon has craters, pine silhouettes on the two near ridges | aerial perspective in survey sketches | depth and scale from shapes alone |
+| Landscape | the slide is built from a centreline: a crown arc, a chute that narrows, a fan that widens and thins downslope, with debris stipple. It sits on the highest point of the near crest, so it shows above the panel on phone and desktop | a field sketch of a debris slide | the subject of the app is in the first view |
+| Motion | the ridges assemble from far to near on load, the sun rises, then the header and the first plate settle in (about 1.7 s, once) | — | one orchestrated moment; everything else moves only in answer to an action |
+| Motion | the result reveal: contour rings climb, the type name settles, the glyph pops, the confidence ruler and the type bars grow | — | shows that a new answer arrived |
+| Steps | the walked trail is a solid line in the brand colour, the trail ahead is dotted, the current station breathes slowly | trail symbols on a topographic map | where you are and what is left, without reading |
+| Mode switch | one engraved thumb slides between Single photo, Site survey and Overlapping set | — | the choice is a physical position |
+| Buttons | a flat fill with a lit top edge and a pressed lower edge (inset shadows, no gradient); a springy press; hover lifts by 1 px; the icon nudges | — | tactile feedback in glare, where colour change alone is hard to see |
+| Disclosures | a chevron that turns when opened; the opened content unfolds | — | shows that more is hidden, and where it went |
+| Confidence | a ruler graduated in tenths, with the "uncertain below" threshold (60 %) as an upright mark; the reading is brand teal, amber when uncertain, red for a bad photo | an instrument scale | shows the distance to the threshold without extra words |
+| Size table | label, dot leader, figure; the 90 % range in italics | an atlas index | the eye travels from name to value |
+| Type | italic serif for the field-guide labels ("Most likely type"), the Hungr citation, the step numerals, the colophon and the input hints; old-style figures in running text, lining tabular figures in data | book and citation conventions | labels, citations and data are distinct voices |
+| History | thumbnails mounted like prints, with a paper margin and a hairline frame; type names and percentages in serif; poor-photo tags as amber or red outlines with the ISO triangle; ruled rows | specimen register | a field record, not a list of files |
+| Sheets | grain paper with a handle; they rise on a spring over a blurred, dimmed page; subsection titles and list numerals in serif | — | the sheet is a separate page laid on top |
+| Small parts | survey-tape stripes moving on the progress bar; a light sweep on the loading skeleton; a toast with a brand edge that springs up; the tour dots stretch on the current card; ticks pop when a sign is checked; brand-coloured caret, selection, accent and scrollbar | — | the same material and motion language everywhere |
+
+Constraints kept: system fonts only and no network requests, so the page still works offline. All motion is off
+under `prefers-reduced-motion`. Text contrast ≥ AA, control edges ≥ 3 : 1, targets ≥ 44 px. The "flat primary
+button" check from the §10.4 audit still holds, because the depth comes from inset shadows on a flat fill.
+
+**A browser detail found on the way:** the walked trail first used a custom property set by a `:has()` selector.
+Chromium did not restyle the `::after` element when the step changed: the parent reported 90 %, the line stayed at
+10 %. The step function now sets `--walk` itself.
+
+**Measured after the change:**
+- **Text contrast:** 0 text elements below AA, light and dark, in 4 result states.
+- **Control edges:** 0 controls below 3 : 1.
+- **Tap targets:** 0 controls under 44 px in all three modes.
+- **Guide tests:** 52/52 in English and in Hindi. One English run first showed a timing flake in the history check; two reruns passed 52/52.
+- **Photo-set suite:** complete in both languages, 0 script errors.
+
 ---
 
 ## 11. Deployment
@@ -1264,6 +1304,7 @@ no image files, so the page still works offline and the scene follows the theme 
 | 36 | "Most likely type" + Model confidence band (High / Moderate / Low) | "Landslide type" + bare % | a model output is a hypothesis to verify; a band word gives the meaning of the number |
 | 37 | Functional Bauhaus as the design scheme; ISO 3864 colour + shape for status; control edges ≥ 3 : 1 (§10.7) | neumorphism, decorative styles | fluency and credibility for the office reader; edges and shapes that survive glare and colour-vision deficiency on site |
 | 38 | "Field Atlas at dawn" identity: SVG ridge landscape header, serif headings, atlas plates, lithology dividers (§10.8) | flat Bauhaus surface only | the subject and its drawing conventions give the app a character; the functional rules of §10.7 stay |
+| 39 | Atlas conventions in every layer: grain paper, neatline corners, trail steps, graduated confidence ruler with threshold mark, dot-leader size index, mounted history prints (§10.9) | identity only in the header | each element borrows a real atlas or survey convention, so the whole page speaks one visual language |
 
 ---
 
@@ -1289,6 +1330,7 @@ no image files, so the page still works offline and the scene follows the theme 
 | 11-14 | "Contour" redesign and engineer-facing wording (§10.5) | AA 0 failures light + dark in 4 result states; controls < 44 px: 0; 51/51 tests en + hi |
 | 11-14 | UX audit against 20 UX laws + 20 machine-made signs (§10.4) | AA failures 5 → 0; controls < 44 px → 0; 11 new checks; 2 latent bugs fixed |
 | 11-14 | "Field Atlas at dawn" visual identity (§10.8) | AA 0 failures light + dark in 4 states; edges < 3 : 1: 0; controls < 44 px: 0; 52/52 tests en + hi |
+| 11-14 | Atlas scheme carried into every layer (§10.9) | AA 0 failures light + dark in 4 states; edges < 3 : 1: 0; controls < 44 px: 0; 52/52 tests en + hi |
 
 ---
 

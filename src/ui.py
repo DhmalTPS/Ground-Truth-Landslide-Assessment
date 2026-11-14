@@ -100,7 +100,7 @@ CSS = """
 --brand:#1a6a5b;--on-brand:#ffffff;--link:#155e51;--warn:#a3401a;--warn-bg:#fbeee6;--warn-line:#edc4ac;--tape:#ff6a1a;--tape-ink:#1b272c;
 --caution:#7c5400;--dup:#3a62c4;--focus:#e8a400;--edge:#6f817c;--info:#1e6edc;
 --g-ground:#1a6a5b;--g-signal:#c8562a;--g-track:#a9cfbd;--tint-signal:rgba(200,86,42,.1);--tint-ground:rgba(26,106,91,.09);
---sky1:#a6bccd;--sky2:#dde3e3;--sky3:#f3d6b6;--sun:#f6bf86;--r0:#c4ced7;--r1:#9dadbb;--r2:#728899;--r3:#4b6476;--scar:#c8693a;--mist:#ffffff;--star:transparent;
+--sky1:#a6bccd;--sky2:#dde3e3;--sky3:#f3d6b6;--sun:#f6bf86;--r0:#c4ced7;--r1:#9dadbb;--r2:#728899;--r3:#4b6476;--scar:#c9a27f;--mist:#ffffff;--star:transparent;--scar-ink:#6e4026;--crater:transparent;--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");--neat:linear-gradient(var(--frame),var(--frame));--ease-out:cubic-bezier(.16,.84,.24,1);--spring:cubic-bezier(.3,1.45,.5,1);
 --lift:0 1px 1px rgba(27,39,44,.05),0 12px 30px -18px rgba(27,39,44,.45);--shadow:0 18px 40px -16px rgba(27,39,44,.45);--r:6px;
 --f-disp:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,"Noto Serif",Georgia,"Noto Serif Devanagari","Nirmala UI",serif;
 --f-sign:var(--f-disp);
@@ -111,30 +111,40 @@ color-scheme:light}
 --line:#26334a;--contour:#3a4b66;--frame:#30405a;--brand:#6fd3b0;--on-brand:#06261f;--link:#8bdcc0;--teal-600:#8bdcc0;--warn:#ffa27a;--orange:#ffa27a;
 --warn-bg:#2a1b17;--warn-line:#5a3326;--tape:#ff7a33;--caution:#f2c25a;--dup:#9db8ff;--focus:#f2c25a;--edge:#70839c;--info:#7fb0ff;
 --g-ground:#6fd3b0;--g-signal:#ffa27a;--g-track:#2c5a52;--tint-signal:rgba(255,162,122,.12);--tint-ground:rgba(111,211,176,.1);
---sky1:#08101d;--sky2:#101b30;--sky3:#1d2b46;--sun:#dfe7f2;--r0:#25344d;--r1:#1d2a40;--r2:#172235;--r3:#111a2a;--scar:#b4643e;--mist:#9fb3cc;--star:#dfe7f2;
+--sky1:#08101d;--sky2:#101b30;--sky3:#1d2b46;--sun:#dfe7f2;--r0:#25344d;--r1:#1d2a40;--r2:#172235;--r3:#111a2a;--scar:#7d5a48;--mist:#9fb3cc;--star:#dfe7f2;--scar-ink:#3a1a10;--crater:rgba(120,138,166,.32);--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 --lift:0 1px 1px rgba(0,0,0,.3),0 14px 32px -18px rgba(0,0,0,.85);--shadow:0 18px 40px -16px rgba(0,0,0,.8);color-scheme:dark}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;overflow-x:clip;color:var(--ink);background:var(--bg);font:16px/1.55 var(--f-body)}
+body{margin:0;min-height:100vh;overflow-x:clip;color:var(--ink);background:var(--grain),var(--bg);background-color:var(--bg);font:16px/1.55 var(--f-body);font-feature-settings:"kern","liga";text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;caret-color:var(--brand);accent-color:var(--brand)}
+html{scrollbar-color:var(--contour) transparent}::selection{background:var(--sage-300);color:var(--teal-950)}
+p,li,dd{text-wrap:pretty}h2,.title,.brand b{text-wrap:balance}
 main{position:relative;max-width:620px;margin:0 auto;padding:var(--s4) var(--s4) var(--s6)}
 svg{display:block}
 a{color:var(--link);text-underline-offset:2px}
-:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+:focus-visible{outline:2.5px solid var(--focus);outline-offset:3px}
 .ico{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
 /* the landscape: sky, sun or moon, five ridges in atmospheric perspective, a slide scar, drifting mist; the nearest
    band is the page colour, so the painting dissolves into the page */
-.hero{position:absolute;left:50%;width:100vw;transform:translateX(-50%);top:0;height:310px;z-index:0;overflow:hidden;pointer-events:none}
+.hero{position:absolute;left:50%;width:100vw;transform:translateX(-50%);top:0;height:var(--hero-h);z-index:0;overflow:hidden;pointer-events:none}
+:root{--hero-h:clamp(310px,26vw,420px)}
+@media (min-width:700px){header{min-height:calc(var(--hero-h) - 60px)!important}}
+.hero .lay{animation:rise 1.7s var(--ease-out) both;animation-delay:calc(var(--d)*120ms)}
+.hero .sun{animation:rise 2.6s var(--ease-out) both .15s}
+@keyframes rise{from{translate:0 30px;opacity:0}}
+header>*{animation:settle .9s var(--ease-out) both .55s}header>.brand{animation-delay:.45s}
+@keyframes settle{from{translate:0 8px;opacity:0}}
+.card.panel{animation:settle 1s var(--ease-out) both .3s}
 .hero svg{width:100%;height:100%}
 .hero .mist{animation:drift 38s ease-in-out infinite alternate}.hero .mist.b{animation-duration:52s;animation-direction:alternate-reverse}
 .hero .tw{animation:tw 4.5s ease-in-out infinite}.hero .tw:nth-child(3n){animation-delay:-1.7s}.hero .tw:nth-child(4n){animation-delay:-3.1s}
 @keyframes drift{from{transform:translateX(-60px)}to{transform:translateX(60px)}}
 @keyframes tw{50%{opacity:.25}}
-header{position:relative;z-index:1;display:flex;align-items:flex-start;gap:var(--s3);min-height:206px;margin:0;padding-top:var(--s2)}
+header{position:relative;z-index:1;display:flex;align-items:flex-start;gap:var(--s3);min-height:calc(var(--hero-h) - 84px);margin:0;padding-top:var(--s2)}
 header .logo{padding:6px;border-radius:50%;background:var(--surface);box-shadow:var(--lift)}
 header .logo svg{width:34px;height:34px}
 .brand{min-width:0;flex:1;padding-top:2px}
-.brand b{display:block;font:600 1.7rem/1.05 var(--f-disp);letter-spacing:-.01em;color:var(--ink)}
-.brand span{display:block;font-size:.86rem;color:var(--ink-2);margin-top:6px;white-space:nowrap}
+.brand b{display:block;font:600 clamp(1.7rem,1.1rem + 1.5vw,2.6rem)/1.05 var(--f-disp);letter-spacing:-.012em;color:var(--ink)}
+.brand span{display:block;font:italic 400 .95rem/1.3 var(--f-disp);color:var(--ink-2);margin-top:6px;white-space:nowrap}
 /* Devanagari has tall matras above the headline: give display lines room in Hindi */
 :lang(hi) .brand b,:lang(hi) .title,:lang(hi) h2{line-height:1.3}
 /* open sections: text on the page, divided by a band of lithology symbols; the symbol changes down the page */
@@ -147,8 +157,10 @@ header .logo svg{width:34px;height:34px}
 #out>.card:nth-of-type(4n+3){--lith:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Cpath d='M0 1h24M0 6.5h24M0 11.5h24M6 1v5.5M18 6.5v5' stroke='%23000' stroke-width='1.1' fill='none'/%3E%3C/svg%3E")}
 #out>.card:nth-of-type(4n){--lith:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Ccircle cx='5' cy='6' r='3.2' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3Ccircle cx='16' cy='3.5' r='2' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3Ccircle cx='19' cy='9.5' r='1.4' fill='none' stroke='%23000' stroke-width='1.1'/%3E%3C/svg%3E")}
 /* plates: blocks you act on or must stop for; paper with an engraved inner rule */
-.card.panel,#repsec,#askcard,.card.result,.card.safety,.card.bad,.card.qband{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
-box-shadow:inset 0 0 0 5px var(--surface),inset 0 0 0 6px var(--frame),var(--lift);padding:var(--s5) var(--s5) var(--s5)}
+.card.panel,#repsec,#askcard,.card.result,.card.safety,.card.bad,.card.qband{background:var(--grain),var(--surface);background-color:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+outline:1px solid var(--frame);outline-offset:-7px;box-shadow:var(--lift);padding:var(--s5) var(--s5) var(--s5)}
+.card.panel,#repsec,#askcard,.card.result{background:var(--neat) 3px 3px/8px 8px no-repeat,var(--neat) calc(100% - 3px) 3px/8px 8px no-repeat,var(--neat) 3px calc(100% - 3px)/8px 8px no-repeat,var(--neat) calc(100% - 3px) calc(100% - 3px)/8px 8px no-repeat,var(--grain),var(--surface);background-color:var(--surface)}
+.card.qband{outline:0}
 .card.panel::before,#repsec::before,#askcard::before,.card.result::before,.card.qband::before,.card.bad::before,
 .card.panel::after,#repsec::after,#askcard::after,.card.result::after,.card.qband::after,.card.bad::after,.card.safety::after{display:none}
 .card.panel{margin-top:0}
@@ -158,16 +170,19 @@ box-shadow:inset 0 0 0 5px var(--surface),inset 0 0 0 6px var(--frame),var(--lif
 h2{font:600 1.42rem/1.2 var(--f-disp);margin:0 0 var(--s3);letter-spacing:-.005em}
 .tips{display:grid;gap:var(--s3);margin:0 0 var(--s5);padding:0;list-style:none;counter-reset:tp}
 .tips li{display:grid;grid-template-columns:28px 1fr;gap:var(--s3);align-items:baseline;color:var(--ink-2);font-size:.98rem;counter-increment:tp}
-.tips li::before{content:counter(tp);font:600 1.35rem/1 var(--f-disp);color:var(--link);text-align:right}
+.tips li::before{content:counter(tp);font:italic 500 1.6rem/1 var(--f-disp);color:var(--link);text-align:right}
+.tips li,.hist small,.foot{font-variant-numeric:oldstyle-nums proportional-nums}
 .tips .ico{display:none}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
 .btn{position:relative;display:flex;align-items:center;justify-content:center;gap:var(--s2);min-height:54px;padding:var(--s3) var(--s5);border-radius:999px;border:0;
 font-weight:650;font-size:1rem;line-height:1.2;font-family:inherit;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .15s ease,transform .08s ease,box-shadow .15s ease}
-.btn.primary{color:var(--on-brand);background:var(--brand);box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 8px 18px -10px var(--brand)}
-.btn.primary:hover{background:#125446}.btn:active{transform:translateY(1px)}
-@media (prefers-color-scheme:dark){.btn.primary:hover{background:#8be0c2}}
+.btn.primary{color:var(--on-brand);background:var(--brand);box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 -3px 0 rgba(0,0,0,.14) inset,0 10px 22px -12px var(--brand),0 2px 4px -2px rgba(0,0,0,.25)}
+.btn{transition:background-color .2s ease,transform .35s var(--spring),box-shadow .25s ease,border-color .2s ease,filter .2s ease}
+.btn.primary:hover{filter:brightness(.93);transform:translateY(-1px)}.btn:active{transform:scale(.975);transition-duration:.08s}
+.btn .ico{transition:transform .35s var(--spring)}.btn:hover .ico{transform:translateY(-1.5px)}
+@media (prefers-color-scheme:dark){.btn.primary:hover{filter:brightness(1.08)}}
 .btn.ghost{color:var(--link);background:var(--surface);border:1.5px solid var(--edge)}
-.btn.ghost:hover{background:var(--tint-ground)}
+.btn.ghost:hover{background:var(--tint-ground);border-color:var(--link)}
 .btn.text{background:none;color:var(--link);min-height:var(--tap);text-decoration:underline;text-underline-offset:3px}
 .btn[disabled]{opacity:.6;cursor:progress}
 .btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
@@ -198,11 +213,22 @@ font-size:.84rem;font-weight:650;color:#fff;background:rgba(13,20,32,.84)}
 .glyph{width:64px;height:64px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--tint-ground)}
 .glyph svg{width:48px;height:48px}
 .title{font:600 2.05rem/1.04 var(--f-disp);letter-spacing:-.015em;margin:4px 0 var(--s1);text-wrap:balance}
+.result .rhead>div:last-child{animation:settle .8s var(--ease-out) both .15s}.summit .glyph{animation:pop .7s var(--spring) both .45s}
+@keyframes pop{from{scale:.6;opacity:0}}
 .hungr{font-size:.9rem;color:var(--mute)}
+.result .kicker{font:italic 400 1.02rem/1.2 var(--f-disp);letter-spacing:0;color:var(--ink-2);margin-bottom:2px}
+.result p.hungr.u-t2{font:italic 400 .98rem/1.45 var(--f-disp);color:var(--ink-2)}
 .meter{margin-top:var(--s4);padding-top:var(--s3);border-top:1px solid var(--line)}
 .meter .row{display:flex;justify-content:space-between;align-items:baseline;font-size:.95rem;color:var(--ink-2)}.meter .cband{color:var(--ink)}
 .meter .val{font:600 2.1rem/1 var(--f-disp);color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
 .track{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:var(--s2)}
+.cscale{position:relative;height:16px;margin-top:var(--s2);color:var(--brand);background:repeating-linear-gradient(90deg,var(--contour) 0 1px,transparent 1px 100%) 0 100%/10% 4px repeat-x}
+.cscale.signal{color:var(--caution)}.cscale.bad{color:var(--ruby)}
+.cscale::before{content:"";position:absolute;left:0;right:0;top:5px;height:4px;border-radius:2px;background:var(--line)}
+.cscale i{position:absolute;left:0;top:5px;height:4px;border-radius:2px;width:calc(var(--v)*100%);background:currentColor;transform-origin:left;animation:grow 1.1s var(--ease-out) both .2s}
+.cscale::after{content:"";position:absolute;top:0;left:calc(var(--c)*100%);width:2px;height:16px;margin-left:-1px;border-radius:1px;background:var(--ink-2)}
+@keyframes grow{from{transform:scaleX(0)}}
+.prob .fl{transform-origin:left;animation:grow 1s var(--ease-out) both .3s}
 .fill{height:100%;border-radius:99px;background:var(--brand)}
 .fill.signal{background:var(--caution)}
 .result.lowq{border:2px dashed var(--ruby)}.result.lowq .fill{background:var(--ruby)}
@@ -216,6 +242,10 @@ font-size:.84rem;font-weight:650;color:#fff;background:rgba(13,20,32,.84)}
 .prob.top .fl{background:var(--brand)}.prob.top .nm{color:var(--ink);font-weight:650}
 .prob .pc{text-align:right;font:500 1.15rem/1 var(--f-disp);font-variant-numeric:lining-nums tabular-nums;color:var(--mute)}
 .prob.top .pc{color:var(--ink);font-weight:600}
+summary{list-style:none}summary::-webkit-details-marker{display:none}
+details>summary::after{content:"";flex:none;width:7px;height:7px;margin:0 0 3px 12px;border:solid currentColor;border-width:0 1.7px 1.7px 0;transform:rotate(45deg);transition:transform .35s var(--spring),margin .35s var(--spring)}
+details[open]>summary::after{transform:rotate(225deg);margin-bottom:-3px}
+details[open]>:not(summary){animation:unfold .4s var(--ease-out) both}@keyframes unfold{from{opacity:0;translate:0 -6px}}
 details.more{margin-top:var(--s2)}details.more>summary{min-height:var(--tap);display:flex;align-items:center;cursor:pointer;color:var(--link);font-weight:600;font-size:.95rem}
 .list{list-style:none;padding:0;margin:0;display:grid;gap:var(--s1)}
 .list li{display:flex;gap:var(--s2);align-items:flex-start;font-size:.97rem;color:var(--ink-2)}
@@ -223,17 +253,22 @@ details.more{margin-top:var(--s2)}details.more>summary{min-height:var(--tap);dis
 /* safety wears survey flagging tape: the one block built to interrupt */
 .card.safety{background:var(--warn-bg);border-color:var(--warn-line);box-shadow:var(--lift);padding-top:calc(var(--s5) + 10px);overflow:hidden}
 .card.safety::before{display:block;height:10px;mask:none;-webkit-mask:none;border-radius:0;
-background:repeating-linear-gradient(-45deg,var(--tape) 0 12px,var(--tape-ink) 12px 24px)}
+background:linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,0) 45%,rgba(0,0,0,.14)),repeating-linear-gradient(-45deg,var(--tape) 0 12px,var(--tape-ink) 12px 24px)}
 .safety h2{display:flex;gap:var(--s2);align-items:center;color:var(--warn);margin-bottom:var(--s2)}.safety .ico{color:var(--warn)}
 .safety p{margin:0;color:var(--ink);font-size:1.02rem}
 .card.bad{background:var(--warn-bg);border-color:var(--warn-line)}
 ol.steps{margin:var(--s2) 0 0;padding-left:1.2rem;color:var(--ink-2)}ol.steps li{margin:var(--s1) 0}
-.skel{height:14px;border-radius:8px;background:var(--line);margin:10px 0;animation:pulse 1.4s ease-in-out infinite}
+.skel{height:14px;border-radius:8px;margin:10px 0;background:linear-gradient(90deg,var(--line) 0 35%,var(--surface-2) 50%,var(--line) 65% 100%) 0 0/300% 100%;animation:sheen 1.6s ease-in-out infinite}
+@keyframes sheen{from{background-position:100% 0}to{background-position:0 0}}
 @keyframes pulse{50%{opacity:.5}}
 .foot{position:relative;margin-top:var(--s6);padding-top:var(--s4);border-top:1px solid var(--line);font-size:.86rem;color:var(--mute);text-align:left;line-height:1.6}
 .meta{display:block;margin-top:var(--s5);font-size:.86rem;color:var(--mute);text-align:left}
 .u-m0{margin:0!important}.u-t1{margin:4px 0 0!important}.u-t2{margin:8px 0 0!important}.u-t3{margin:12px 0 0!important}.u-t4{margin:16px 0 0!important}
 .u-b2{margin:0 0 8px!important}.u-b3{margin:0 0 12px!important}.u-tb{margin:4px 0 12px!important}.u-sub{margin:-4px 0 12px!important}.u-blk{display:block!important}
+input::placeholder,textarea::placeholder{font-family:var(--f-disp);font-style:italic}
+input:not([type=checkbox]):not([type=radio]):focus-visible,textarea:focus-visible,select:focus-visible{outline:0;border-color:var(--brand)!important;box-shadow:0 0 0 4px var(--tint-ground),0 0 0 1px var(--brand)}
+/* the colophon: provenance set like the last line of an atlas plate */
+.foot{font:italic 400 .95rem/1.6 var(--f-disp);color:var(--ink-2)}
 @media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.7rem}.summit{width:96px;height:96px}.brand b{font-size:1.45rem}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 """
@@ -261,25 +296,42 @@ function summit(seed,conf,cls){let s=7;for(const ch of seed)s=(Math.imul(s,31)+c
   p+=`<path pathLength="1" d="${d}Z" class="${i<on?'on':''}${i%5===0?' idx':''}" style="--i:${i}"/>`}
  return `<div class="summit ${cls}"><svg class="rings" viewBox="0 0 128 128" aria-hidden="true">${p}</svg><div class="glyph">${G[seed]}</div></div>`}
 // the landscape behind the header: drawn once from a fixed seed (same view every visit), colours from CSS tokens so it
-// is dawn in light mode and moonlight in dark mode; the far ridges drift slower than the near ones while scrolling
+// is dawn in light mode and moonlight in dark mode. Ridges fade into valley haze (aerial perspective), a pine line on the
+// near ridge gives scale, and the slide on the darkest ridge is engraved: hatched scarp, stippled debris fan.
+// The layers assemble once on load; while scrolling the far ridges drift slower than the near ones.
 (function(){const el=document.getElementById('hero');if(!el)return;let s=20140;const rnd=()=>(s=(Math.imul(s,1664525)+1013904223)>>>0)/4294967296;
- const W=1200,H=310,ridge=(base,amp,rough,ph)=>{const pts=[];for(let x=-20;x<=W+20;x+=12){const t=x/W;
+ const W=1200,H=310,ridge=(base,amp,rough,ph)=>{const pts=[];for(let x=-20;x<=W+20;x+=12){
    const y=base-amp*(.6*Math.sin(x/150+ph)+.3*Math.sin(x/61+ph*2.1)+.12*Math.sin(x/23+ph*3.7))-rough*(rnd()-.5);pts.push([x,y])}return pts};
  const pathOf=pts=>'M'+pts.map(p=>p[0]+' '+p[1].toFixed(1)).join('L')+`L${W+20} ${H}L-20 ${H}Z`;
  const yAt=(pts,x)=>{for(let i=1;i<pts.length;i++)if(pts[i][0]>=x){const a=pts[i-1],b=pts[i],f=(x-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*f}return pts[pts.length-1][1]};
- const L=[ridge(176,36,3,.4),ridge(204,30,4,1.9),ridge(232,26,5,3.1),ridge(258,22,6,4.4),ridge(298,5,2,5.6)];
- let stars='';for(let i=0;i<46;i++){const x=rnd()*W,y=rnd()*150,r=rnd()<.15?1.4:.8;stars+=`<circle class="${i%5?'':'tw'}" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r}" fill="var(--star)"/>`}
- // the slide on the darkest ridge: a bowl-shaped scarp and its debris fan, the subject of the app
- const sx=655,top=yAt(L[3],sx),scar=`M${sx-46} ${top+6}Q${sx} ${top-12} ${sx+44} ${top+8}Q${sx+30} ${top+34} ${sx+52} ${top+62}L${sx-70} ${top+62}Q${sx-38} ${top+34} ${sx-46} ${top+6}Z`;
- const g=(k,inner)=>`<g class="lay" data-k="${k}">${inner}</g>`;
+ const L=[ridge(150,34,3,.4),ridge(174,28,4,1.9),ridge(198,24,5,3.1),ridge(222,18,6,4.4),ridge(300,5,2,5.6)];
+ let stars='';for(let i=0;i<54;i++){const x=rnd()*W,y=rnd()*150,r=rnd()<.15?1.4:.8;stars+=`<circle class="${i%5?'':'tw'}" cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r}" fill="var(--star)"/>`}
+ // pines along a crest: small conifer silhouettes in clusters, none on the slide itself
+ const pines=(pts,x0,x1,hmin,hmax,dens,skip)=>{let o='';for(let x=x0;x<x1;x+=5+rnd()*5){if(rnd()>dens||(x>skip[0]&&x<skip[1]))continue;
+   const y=yAt(pts,x)+1.5,h=hmin+rnd()*(hmax-hmin);o+=`M${(x-h*.28).toFixed(1)} ${y.toFixed(1)}L${x.toFixed(1)} ${(y-h).toFixed(1)}L${(x+h*.28).toFixed(1)} ${y.toFixed(1)}Z`}return o};
+ let sx=600;for(let x=560;x<=740;x+=4)if(yAt(L[3],x)<yAt(L[3],sx))sx=x;const top=yAt(L[3],sx)+4,lp=[],rp=[],N=14;
+ // debris slide seen from across the valley: a crown arc, a chute that narrows, a fan that widens and thins downslope
+ for(let i=0;i<=N;i++){const t=i/N,cx=sx+7*t*t,y=top+3+64*t,w=t<.42?10-5.5*(t/.42):4.5+12*Math.pow((t-.42)/.58,1.3);
+   lp.push([cx-w-(rnd()-.5)*2.2,y]);rp.push([cx+w+(rnd()-.5)*2.2,y])}
+ const P2=q=>q[0].toFixed(1)+' '+q[1].toFixed(1),end=sx+7;
+ const scar='M'+P2(lp[0])+'Q'+sx+' '+(top-5)+' '+P2(rp[0])+rp.slice(1).map(q=>'L'+P2(q)).join('')+'Q'+end+' '+(top+74)+' '+P2(lp[N])+lp.slice(0,N).reverse().map(q=>'L'+P2(q)).join('')+'Z';
+ const crown='M'+P2(lp[0])+'Q'+sx+' '+(top-5)+' '+P2(rp[0]);
+ let deb='';for(let i=0;i<22;i++){const t=.62+rnd()*.38,u=rnd()-.5,k=Math.round(t*N),w=rp[k][0]-lp[k][0];deb+=`<circle cx="${(lp[k][0]+w*(u+.5)).toFixed(1)}" cy="${(top+3+64*t).toFixed(1)}" r="${(.45+rnd()*.7).toFixed(2)}"/>`}
+ const g=(k,d,inner)=>`<g class="lay" style="--d:${d}" data-k="${k}">${inner}</g>`;
+ const grad=(id,a,b)=>`<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset=".15" style="stop-color:var(${a})"/><stop offset="1" style="stop-color:var(${b})"/></linearGradient>`;
  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice"><defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1">
-  <stop offset="0" style="stop-color:var(--sky1)"/><stop offset=".4" style="stop-color:var(--sky2)"/><stop offset=".64" style="stop-color:var(--sky3)"/></linearGradient><radialGradient id="hmist"><stop offset="0" style="stop-color:var(--mist);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--mist);stop-opacity:0"/></radialGradient></defs>
+  <stop offset="0" style="stop-color:var(--sky1)"/><stop offset=".4" style="stop-color:var(--sky2)"/><stop offset=".64" style="stop-color:var(--sky3)"/></linearGradient>
+  <radialGradient id="hmist"><stop offset="0" style="stop-color:var(--mist);stop-opacity:.55"/><stop offset="1" style="stop-color:var(--mist);stop-opacity:0"/></radialGradient>
+  <radialGradient id="hhalo"><stop offset=".25" style="stop-color:var(--sun);stop-opacity:.55"/><stop offset=".55" style="stop-color:var(--sun);stop-opacity:.16"/><stop offset="1" style="stop-color:var(--sun);stop-opacity:0"/></radialGradient>
+  ${grad('hr0','--r0','--sky3')}${grad('hr1','--r1','--r0')}${grad('hr2','--r2','--r1')}${grad('hr3','--r3','--r2')}
+  <linearGradient id="hscar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--scar)"/><stop offset=".5" style="stop-color:var(--scar);stop-opacity:.75"/><stop offset="1" style="stop-color:var(--scar);stop-opacity:.15"/></linearGradient></defs>
   <rect width="${W}" height="${H}" fill="url(#hsky)"/>${stars}
-  ${g(.42,`<circle cx="548" cy="168" r="30" fill="var(--sun)" opacity=".95"/><path d="${pathOf(L[0])}" fill="var(--r0)"/>`)}
-  ${g(.32,`<path d="${pathOf(L[1])}" fill="var(--r1)"/><ellipse class="mist" cx="560" cy="${yAt(L[1],560)+16}" rx="300" ry="22" fill="url(#hmist)"/>`)}
-  ${g(.22,`<path d="${pathOf(L[2])}" fill="var(--r2)"/><ellipse class="mist b" cx="700" cy="${yAt(L[2],700)+18}" rx="260" ry="18" fill="url(#hmist)"/>`)}
-  ${g(.12,`<path d="${pathOf(L[3])}" fill="var(--r3)"/><path d="${scar}" fill="var(--scar)" opacity=".85"/>`)}
-  ${g(0,`<path d="${pathOf(L[4])}" fill="var(--bg)"/>`)}</svg>`;
+  ${g(.42,0,`<g class="sun"><circle cx="548" cy="132" r="120" fill="url(#hhalo)"/><circle cx="548" cy="132" r="30" fill="var(--sun)"/><circle cx="539" cy="124" r="6" fill="var(--crater)"/><circle cx="558" cy="140" r="4" fill="var(--crater)"/><circle cx="556" cy="121" r="2.5" fill="var(--crater)"/></g><path d="${pathOf(L[0])}" fill="url(#hr0)"/>`)}
+  ${g(.32,1,`<path d="${pathOf(L[1])}" fill="url(#hr1)"/><ellipse class="mist" cx="560" cy="${yAt(L[1],560)+16}" rx="300" ry="22" fill="url(#hmist)"/>`)}
+  ${g(.22,2,`<path d="${pathOf(L[2])}" fill="url(#hr2)"/><path d="${pines(L[2],-20,W+20,4,7,.35,[-1,-1])}" fill="var(--r2)"/><ellipse class="mist b" cx="700" cy="${yAt(L[2],700)+18}" rx="260" ry="18" fill="url(#hmist)"/>`)}
+  ${g(.12,3,`<path d="${pathOf(L[3])}" fill="url(#hr3)"/><path d="${pines(L[3],-20,W+20,7,13,.6,[sx-80,sx+66])}" fill="var(--r3)"/>
+   <path d="${scar}" fill="url(#hscar)"/><path d="${crown}" fill="none" style="stroke:var(--scar-ink)" stroke-width="1.6" stroke-linecap="round"/><g fill="var(--scar-ink)" opacity=".7">${deb}</g>`)}
+  ${g(0,4,`<path d="${pathOf(L[4])}" fill="var(--bg)"/>`)}</svg>`;
  const lays=[...el.querySelectorAll('.lay')];if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;let tick=0;
  addEventListener('scroll',()=>{if(tick)return;tick=requestAnimationFrame(()=>{tick=0;const y=Math.min(scrollY,420);lays.forEach(l=>l.style.transform=`translateY(${(y*l.dataset.k).toFixed(1)}px)`)})},{passive:true})})();
 function probs(r){const top=r.ranked[0][0],one=([c,p])=>`<div class="prob ${c===top?'top':''}">${G[c]}<div class="nm">${esc(D.names[c])}<div class="tr"><div class="fl" style="width:${(p*100).toFixed(1)}%"></div></div></div><div class="pc">${pct(p)}</div></div>`;
@@ -322,6 +374,7 @@ function render(r){
     <div class="kicker">${kicker}</div><div class="title">${esc(fam||i.title)}</div></div></div>
     ${fam?'':`<p class="hungr u-t2"><span>Hungr et al. 2014</span>: ${esc(i.hungr)}</p>`}
     <div class="meter"><div class="row"><span><span>Model confidence</span>${fam?' <span>(family)</span>':''}: <b class="cband">${conf>=.8?'High':conf>=D.conf?'Moderate':'Low'}</b></span><span class="val">${pct(conf)}</span></div>
+    <div class="cscale${bp?' bad':sig?' signal':''}" style="--v:${conf};--c:${D.conf}" aria-hidden="true"><i></i></div>
     <p class="hungr u-t1">Answers below ${pct(D.conf)} are marked uncertain.</p></div>${note}</section>
    <section class="card safety"><h2>${ico('alert')}Safety</h2><p>${esc(i.safety)}</p></section>
    <section class="card"><div class="kicker">All types</div><div class="probs u-t3">${probs(r)}</div></section>
@@ -353,7 +406,9 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#a6bccd" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#08101d" media="(prefers-color-scheme: dark)">
-<style>__CSS____GCSS____PCSS__.drow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.92rem}.drow b{text-align:right;font-weight:600}.drow small{opacity:.65;font-weight:400}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--edge);font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
+<style>__CSS____GCSS____PCSS__.drow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 0;font-size:.92rem}
+.drow>span{display:flex;align-items:baseline;flex:1;min-width:0;gap:8px}
+.drow>span::after{content:"";flex:1;min-width:14px;border-bottom:2px dotted var(--contour);translate:0 -4px}.drow b{text-align:right;font-weight:600;font-variant-numeric:lining-nums tabular-nums}.drow small{opacity:.75;font-weight:400;font-style:italic}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--edge);transition:border-color .2s ease,box-shadow .25s ease;font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
 </style></head><body>__DEFS__<main>
 <div class="hero" id="hero" aria-hidden="true"></div>
 <header><div class="logo">__LOGO__</div><div class="brand"><b>Landslide Type Check</b><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
