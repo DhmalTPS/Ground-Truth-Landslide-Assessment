@@ -271,7 +271,7 @@ TEXT = {
 
 CSS = """
 .pit .px::after{content:"";position:absolute;inset:-6px}
-.psteps input{min-height:44px;padding:6px 8px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:inherit;font:inherit}
+.psteps input{min-height:44px;padding:6px 8px;border-radius:10px;border:1.5px solid var(--edge);background:var(--surface);color:inherit;font:inherit}
 #pano[hidden],.pgide[hidden],.tips[hidden],.psteps[hidden]{display:none}
 .pgide{margin:0 0 12px}.pgide .pk{margin-bottom:10px}
 .pil{max-height:170px}.pil .cone{fill:var(--teal-400);fill-opacity:.16;stroke:var(--teal-400);stroke-width:1.2}

@@ -1119,6 +1119,50 @@ After these fixes:
 - **Guide tests:** 52/52 checks in English and in Hindi (the earlier run of 51 plus the new 9 CLASH check).
 - **Photo-set suite:** complete in both languages, 0 script errors.
 
+
+### 10.7 Design scheme: functional Bauhaus on the Contour base
+
+**Choice.** Nineteen named graphic-design schemes were compared for this app's two readers (§10.5): the site
+engineer in glare and under stress, and the office reviewer judging credibility.
+
+| Role | Scheme | Why |
+|---|---|---|
+| Base | **Bauhaus**, used as a working system rather than a poster style | best fit for both readers |
+| Diagrams only | **Isometric** | engineers read technical drawings fluently |
+| One instrument cue | **Skeuomorphism**, a light touch | the summit gauge |
+| Rejected | Neumorphism | control edges around 1.1–1.5 : 1, it disappears in sunlight, and pressed versus unpressed is ambiguous |
+| Rejected | Glitch | it imitates malfunction |
+| Rejected | Memphis, Vaporwave, Psychedelic | they signal "not serious" |
+| Rejected | De Stijl | it uses red, yellow and blue as decoration, which breaks the safety colour code |
+
+**Why Bauhaus, in terms of perception:**
+- **Fluency:** a grid, plain shapes and no ornament keep extraneous load low. Information that is easy to process is also judged more true and more trustworthy (Reber, Schwarz and Winkielman, 2004).
+- **Credibility:** in Fogg's 2003 Stanford study, "design look" was the most-cited factor in whether people trusted a site.
+- **Safety colours:** its primary palette maps onto the ISO 3864 safety colours engineers already know from site signs: red for danger, yellow or amber for warning, blue for information, green for safe.
+- **Lineage:** the DIN typeface (DIN 1451, 1931) comes from the same functionalist tradition.
+
+**What changed.**
+
+| Element | Before | After | Reason |
+|---|---|---|---|
+| Section dividers | wavy contour line | 1 px hairline plus a 32 × 3 px ink bar at the left edge | one structural mark; the waves stay only in the header art and the gauge |
+| Control edges (ghost buttons, inputs, small buttons, round icon buttons, mode switch, checklists, selects) | 1.3–2.1 : 1 | ≥ 3 : 1, from a new `--edge` token, in light and dark | WCAG 1.4.11 non-text contrast: users must see what can be tapped, in glare |
+| Selected capture mode | lighter fill plus a soft shadow | outlined with the edge colour, bold label | pressed versus not pressed is unambiguous |
+| Status shapes | coloured dots | triangle = caution or failure (photo chip, photo-quality marker); circle = fine or information; the camera location is a blue circle | ISO meaning without relying on colour, which helps the about 8 % of men with colour-vision deficiency |
+| Caution note ("Not confident…") | grey side bar | amber side bar | same caution colour everywhere |
+| Corner radius | 12 to 18 px | buttons 8, panels 12, chips fully round | crisper geometry; the radius still follows the hierarchy |
+| Panel shadow | soft drop shadow | 1 px edge only | flat holds up better in sunlight; depth is kept for modal sheets |
+| Model line and footer | centred | left-aligned, footer above a hairline | asymmetric grid; provenance reads like a document footer |
+| Tour card "Stand below, see it all" | flat side view | isometric site diagram: observer in front, slope block behind, dashed sight lines to scarp and toe, a 20–80 m dimension line | spatial instructions read faster as a technical drawing |
+| Image report section titles | title and full rule | title, full rule and a short ink bar | the same mark as the page |
+
+**Measured after the change:**
+- **Text contrast:** 0 text elements below AA, light and dark, in 4 result states.
+- **Control edges:** 0 controls below 3 : 1 out of 10–11 per result page, light and dark. This scan is new. Computed from the colour values, the previous borders were 1.3–1.9 : 1 in light mode and 1.4–2.1 : 1 in dark mode. The new edge colour is 3.3–3.6 : 1 in light mode and 4.4–4.9 : 1 in dark mode.
+- **Tap targets:** 0 controls under 44 px in all three modes.
+- **Guide tests:** 52/52 in English and in Hindi.
+- **Photo-set suite:** complete in both languages, 0 script errors.
+
 ---
 
 ## 11. Deployment
@@ -1191,6 +1235,7 @@ After these fixes:
 | 34 | Liberal distance input (units, commas, Devanagari digits) | strict number box | phones type "40 m" or "130 ft"; the box rejected them silently |
 | 35 | "Contour" visual identity: survey paper, DIN numerals, flagging-tape hazard, summit confidence gauge (§10.5) | generic card UI | a field engineer reads map conventions at a glance; one saturated warm colour = danger |
 | 36 | "Most likely type" + Model confidence band (High / Moderate / Low) | "Landslide type" + bare % | a model output is a hypothesis to verify; a band word gives the meaning of the number |
+| 37 | Functional Bauhaus as the design scheme; ISO 3864 colour + shape for status; control edges ≥ 3 : 1 (§10.7) | neumorphism, decorative styles | fluency and credibility for the office reader; edges and shapes that survive glare and colour-vision deficiency on site |
 
 ---
 
