@@ -237,6 +237,16 @@ def make_handler(pred, vlm, save, max_saved=2000, token=None, dim=None):
             if not self._authorized():
                 return self._send(403, "add ?t=<token> to the address", "text/plain")
             if urlparse(self.path).path in ("/", "/index.html"):
+                # phones only allow the in-page live camera on a secure page: send other devices that opened the
+                # plain http address to the https one (this laptop's own browser treats localhost as secure)
+                if (Handler.https_port and not isinstance(self.connection, ssl.SSLSocket)
+                        and not self.client_address[0].startswith("127.") and self.client_address[0] != "::1"):
+                    host = (self.headers.get("Host") or lan_ip()).rsplit(":", 1)[0]
+                    self.send_response(307)
+                    self.send_header("Location", f"https://{host}:{Handler.https_port}{self.path}")
+                    self.send_header("Content-Length", "0")
+                    self.end_headers()
+                    return
                 self._send(200, page, "text/html; charset=utf-8")
             else:
                 self._send(404, "not found", "text/plain")
@@ -480,6 +490,7 @@ def make_handler(pred, vlm, save, max_saved=2000, token=None, dim=None):
             print(f"{datetime.now():%H:%M:%S} {r['status']:10s} {r['label']} {r['confidence']:.0%} ({r['ms']} ms, {stage})")
             self._json(200, r)
 
+    Handler.https_port = None
     return Handler
 
 
@@ -519,32 +530,48 @@ def main():
     ap.add_argument("--no-save", action="store_true", help="do not keep uploaded photos")
     ap.add_argument("--max-saved", type=int, default=2000, help="stop saving uploads after this many")
     ap.add_argument("--token", help="require ?t=TOKEN in the address (recommended on shared networks)")
-    ap.add_argument("--https", action="store_true",
-                    help="serve over https so phones allow the live camera guide (self-signed certificate made "
-                         "with openssl in .cache/tls; the phone shows a one-time warning to accept)")
+    ap.add_argument("--https", action="store_true", help="(now the default) kept so old commands still work")
+    ap.add_argument("--https-port", type=int, default=8443,
+                    help="https port, served by default next to http so phones get the in-page live camera guide "
+                         "(self-signed certificate made with openssl in .cache/tls; the phone shows a one-time "
+                         "warning to accept)")
+    ap.add_argument("--no-https", action="store_true", help="plain http only (phones then use the phone camera app)")
     ap.add_argument("--cert", nargs=2, metavar=("CERT", "KEY"), help="use your own certificate (e.g. from mkcert)")
     args = ap.parse_args()
 
     pred = Predictor(args.model)
     vlm = VLM() if args.vlm else None
     dim = None if args.no_dims else Dimensioner()
-    server = ThreadingHTTPServer((args.host, args.port),
-                                 make_handler(pred, vlm, not args.no_save, args.max_saved, args.token, dim))
-    scheme = "http"
-    if args.https or args.cert:
-        cert, key = args.cert or self_signed_cert(lan_ip())
-        ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-        ctx.load_cert_chain(cert, key)
-        server.socket = ctx.wrap_socket(server.socket, server_side=True)
-        scheme = "https"
+    handler = make_handler(pred, vlm, not args.no_save, args.max_saved, args.token, dim)
+    server = ThreadingHTTPServer((args.host, args.port), handler)
+    secure = None
+    if not args.no_https:   # fail-soft: without openssl or with the port taken the app still runs on http
+        try:
+            cert, key = args.cert or self_signed_cert(lan_ip())
+            ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            ctx.load_cert_chain(cert, key)
+            secure = ThreadingHTTPServer((args.host, args.https_port), handler)
+            secure.socket = ctx.wrap_socket(secure.socket, server_side=True)
+            handler.https_port = args.https_port
+            threading.Thread(target=secure.serve_forever, daemon=True).start()
+        except (OSError, ssl.SSLError, subprocess.CalledProcessError) as e:
+            secure = None
+            print(f"  https not available ({e}); phones will use the phone camera app instead of the live guide")
     q = f"/?t={args.token}" if args.token else ""
+    phone = f"https://{lan_ip()}:{args.https_port}{q}" if secure else f"http://{lan_ip()}:{args.port}{q}"
     print(f"Landslide app ready (model: {pred.model_name}, confident >= {pred.confident_min}).\n"
-          f"  on this laptop: {scheme}://localhost:{args.port}{q}\n"
-          f"  on a phone (same Wi-Fi/hotspot): {scheme}://{lan_ip()}:{args.port}{q}\n"
-          + ("" if scheme == "https" else "  (the live camera guide on phones needs --https; otherwise the phone camera app is used)\n")
+          f"  on this laptop: http://localhost:{args.port}{q}\n"
+          f"  on a phone (same Wi-Fi/hotspot): {phone}\n"
+          + ("  (first visit: the phone warns about the self-signed certificate - tap Advanced > Proceed once;\n"
+             "   plain http links redirect here, and the in-page live camera guide then works)\n" if secure else
+             "  (the live camera guide on phones needs https; otherwise the phone camera app is used)\n")
           + ("  uploads are NOT saved\n" if args.no_save else f"  uploads saved to {UPLOADS} (max {args.max_saved})\n")
           + "  (if the phone cannot connect, allow Python through Windows Firewall for private networks)")
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    finally:
+        if secure:
+            secure.shutdown()
 
 
 if __name__ == "__main__":

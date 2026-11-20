@@ -213,6 +213,8 @@ TEXT = {
     "tilt_same": ["Aim as high as photo 1 ({a}°, now {b}°).", "फ़ोटो 1 जितना ऊपर रखें ({a}°, अभी {b}°)।"],
     "pill_ov": ["Overlap {p} %", "ओवरलैप {p} %"], "pill_ovq": ["Overlap ?", "ओवरलैप ?"], "pill_n": ["{n} taken", "{n} ली गईं"],
     "pill_tilt": ["Same tilt", "समान झुकाव"],
+    "walk_n": ["about {n} steps (~{m} m)", "लगभग {n} कदम (~{m} मी)"],
+    "steps_s": ["~{n} steps", "~{n} कदम"],
     "pill_nm": ["{n} of {m} taken", "{m} में से {n} ली गईं"],
     "pill_face": ["Same facing", "समान दिशा"],
     "face_same": ["Face the same way as photo 1 (turned {x}°). Step sideways, do not turn.", "फ़ोटो 1 की दिशा में ही रखें ({x}° घूमे)। बगल में कदम लें, घूमें नहीं।"],
@@ -340,6 +342,8 @@ CSS = """
 .ptarget.r span{left:auto;right:6px}
 .pmeter{position:absolute;left:12%;right:12%;bottom:calc(150px + env(safe-area-inset-bottom));height:12px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden;pointer-events:none}
 .pmeter .z{position:absolute;top:0;bottom:0;background:rgba(95,209,168,.35);border-left:2px solid #5fd1a8;border-right:2px solid #5fd1a8}
+.pov{position:absolute;right:10px;top:38%;padding:2px 10px;border-radius:99px;background:rgba(0,0,0,.6);font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.3;pointer-events:none;color:#ffc862}
+.pov.ok{color:#5fd1a8}.pov.lost{color:#ff745e}
 .pmeter .v{position:absolute;top:2px;bottom:2px;width:4px;margin-left:-2px;border-radius:2px;background:#fff;transition:left .3s}
 .pstrip{position:absolute;left:0;right:0;bottom:calc(104px + env(safe-area-inset-bottom));display:flex;gap:6px;justify-content:center;pointer-events:none}
 .pstrip img{width:44px;height:33px;object-fit:cover;border-radius:5px;border:1.5px solid #fff;opacity:.9}
@@ -521,9 +525,9 @@ function apply(){const on=want;$('.pgide').hidden=!on;$('#pano').hidden=!on;g.ga
 
 /* ---------- live camera: ghost of the last photo, target line, overlap meter ---------- */
 let ghost=null,tgt=null,meter=null,strip=null,flash=null,last=null;
-function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelectorAll('.pghost,.ptarget,.pmeter,.pstrip,.pflash,.pdone,.pdir,.pauto').forEach(e=>e.remove());last=null;if(!on){ghost=null;render();return}
+function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelectorAll('.pghost,.ptarget,.pmeter,.pov,.pstrip,.pflash,.pdone,.pdir,.pauto').forEach(e=>e.remove());last=null;if(!on){ghost=null;render();return}
  vf.querySelector('video').insertAdjacentHTML('afterend','<div class="pghost"><img alt=""></div>');
- vf.insertAdjacentHTML('beforeend',`<div class="ptarget"><span>${esc(L('target'))}</span></div><div class="pmeter"><div class="z"></div><div class="v"></div></div><div class="pstrip"></div><div class="pflash"></div>`);
+ vf.insertAdjacentHTML('beforeend',`<div class="ptarget"><span>${esc(L('target'))}</span></div><div class="pmeter"><div class="z"></div><div class="v"></div></div><b class="pov" aria-hidden="true"></b><div class="pstrip"></div><div class="pflash"></div>`);
  vf.querySelector('.vfb').insertAdjacentHTML('beforeend',`<button type="button" class="pdir" aria-label="${esc(L('dir'))}"></button><button type="button" class="pdone"></button><button type="button" class="pauto" aria-pressed="false"></button>`);
  const au=vf.querySelector('.pauto'),drawAuto=()=>{au.textContent=L(S.auto?'auto_on':'auto_off');au.setAttribute('aria-pressed',!!S.auto);au.classList.toggle('on',!!S.auto)};
  au.onclick=()=>{S.auto=!S.auto;g.store.set('pauto',S.auto);drawAuto();if(S.auto)g.say(L('auto_hint'))};drawAuto();live.sh=[];live.t=0;live.dx=null;
@@ -535,14 +539,16 @@ function box(){const v=g.vid,bw=v.clientWidth,bh=v.clientHeight,vw=v.videoWidth|
 function layout(est){if(!ghost)return;const n=S.items.length,prev=S.items[n-1],vf=g.vf,dir=S.dir||1;
  vf.querySelector('.pdone').textContent=L('done',{n});vf.querySelector('.pdone').hidden=!n;vf.querySelector('.pdir').textContent=dir<0?'←':'→';vf.querySelector('.pdir').hidden=!n;
  strip.innerHTML=S.items.slice(-6).map(i=>`<img src="${i.thumb}" alt="">`).join('');
- tgt.hidden=meter.hidden=!n;if(!n){ghost.hidden=true;return}
+ tgt.hidden=meter.hidden=!n;if(!n){ghost.hidden=true;const pv=vf.querySelector('.pov');if(pv)pv.hidden=true;return}
  const b=box(),B=P.bands[S.kind],mid=(B.ideal[0]+B.ideal[1])/2;ghost.hidden=false;if(ghost.dataset.id!=String(prev.id)){ghost.src=prev.thumb;ghost.dataset.id=prev.id}
  ghost.style.width=b.dw+'px';ghost.style.height=b.dh+'px';ghost.style.left=(b.bw-b.dw)/2+'px';ghost.style.top=(b.bh-b.dh)/2+'px';
  // where the last photo's trailing edge should sit when the overlap is ideal
  const ex=dir>0?mid:1-mid;tgt.style.left=((b.bw-b.dw)/2+ex*b.dw)+'px';tgt.classList.toggle('r',dir<0);
  const e=est&&!est.orient&&est.score>.3?est:null,dx=e?e.dx:dir*(1-mid),dy=e?e.dy:0;
  ghost.style.transform=`translate(${-dx*b.dw}px,${-dy*b.dh}px)`;ghost.classList.toggle('lost',!e);
- meter.querySelector('.v').style.left=(e?Math.min(1,Math.max(0,e.ov)):0)*100+'%';meter.querySelector('.v').style.opacity=e?1:.3}
+ meter.querySelector('.v').style.left=(e?Math.min(1,Math.max(0,e.ov)):0)*100+'%';meter.querySelector('.v').style.opacity=e?1:.3;
+ // the live overlap with the last photo as a big number, green inside the ideal band
+ const pv=vf.querySelector('.pov');if(pv){pv.hidden=false;pv.textContent=e?pct(e.ov)+' %':'? %';pv.className='pov '+(e?(e.ov>=B.ideal[0]&&e.ov<=B.ideal[1]+.08?'ok':'warn'):'lost')}}
 const live={sh:[],t:0,dx:null,at:0,busy:false,fastN:0};
 // auto sweep (feature 3, live): fire the shutter when the overlap with the last photo is in the ideal band, the
 // frame is sharp (Laplacian variance >= 0.6 x median of recent frames) and the camera is not moving too fast
@@ -559,6 +565,11 @@ function compass(vid,prev){const h=g.head?g.head():null;if(!h||prev.head==null)r
  const d=((h.deg-prev.head+540)%360)-180;if(!S.dir&&Math.abs(d)>6)S.dir=Math.sign(d);const a=Math.round(d*(S.dir||1));
  const lo=Math.round((1-B.ideal[1])*fov),hi=Math.round((1-B.ideal[0])*fov);
  return {a:Math.max(0,a),b:tg,ok:a>=lo&&a<=hi,more:a<lo,x:Math.max(1,Math.abs(a<lo?tg-a:a-tg))}}
+// walk-along: how far to step to reach the middle of the ideal overlap band. The view is 2*D*tan(fov/2) wide at the
+// typed distance D, so the walk needed is (overlap now - ideal) x that width; ~0.75 m per normal step. Null without D.
+function walkSteps(vid,ov){const D=g.dist?g.dist():null;if(!D)return null;const B=P.bands.walk,mid=(B.ideal[0]+B.ideal[1])/2;
+ const fov=((vid.videoWidth||1)>=(vid.videoHeight||1)?69:50)*Math.PI/180,m=Math.abs(ov-mid)*2*D*Math.tan(fov/2);
+ return m<.3?null:{n:Math.max(1,Math.round(m/.75)),m:m<10?m.toFixed(1):Math.round(m)}}
 function tick(vid,t){const n=S.items.length,first=S.items[0],turn=S.kind==='turn',dir=S.dir||1,dw=L(dir<0?'left':'right'),back=L(dir<0?'right':'left');
  const R=dir<0?'←':'→',K=dir<0?'→':'←';
  // out.arrow[key]: the big on-screen arrow (and degrees when the compass knows them) for that instruction
@@ -569,11 +580,11 @@ function tick(vid,t){const n=S.items.length,first=S.items[0],turn=S.kind==='turn
  const cq=turn?compass(vid,S.items[n-1]):null;if(cq)out.pills.push(`<span class="${cq.ok?'ok':'warn'}">${esc(L('pill_turned',{a:cq.a,b:cq.b}))}</span>`);
  if(!e||e.orient||e.score<.3){out.pills.unshift(`<span class="warn">${esc(L('pill_ovq'))}</span>`);
   // no visual match (bare slope, fog, fast turn): the compass still says how far to turn
-  if(cq){if(cq.ok)out.good=L('c_on');else{out.bad.push(['Overlap',cq.more?L('c_more',{d:dw,x:cq.x}):L('c_back',{d:back,x:cq.x})]);out.arrow.Overlap=[cq.more?R:K,cq.x]}}
+  if(cq){if(cq.ok)out.good=L('c_on');else{out.bad.push(['Overlap',cq.more?L('c_more',{d:dw,x:cq.x}):L('c_back',{d:back,x:cq.x})]);out.arrow.Overlap=[cq.more?R:K,cq.x+'°']}}
   else{out.bad.push(['Overlap',turn?L('lost_turn',{k:n,d:back}):L('lost_walk',{k:n})]);out.arrow.Overlap=[K]}}
- else{const B=P.bands[S.kind],p=pct(e.ov),ok=e.ov>=B.ideal[0]&&e.ov<=B.ideal[1]+.08;out.pills.unshift(`<span class="${ok?'ok':'warn'}">${esc(L('pill_ov',{p}))}</span>`);
-  if(e.ov>B.ideal[1]+.08){out.bad.push(['Overlap',turn?L('more_turn',{d:dw,p}):L('more_walk',{p})]);out.arrow.Overlap=[R,cq&&!cq.ok&&cq.more?cq.x:null]}
-  else if(e.ov<B.ideal[0]){out.bad.push(['Overlap',turn?L('less_turn',{d:back,p}):L('less_walk',{p})]);out.arrow.Overlap=[K,cq&&!cq.ok&&!cq.more?cq.x:null]}
+ else{const B=P.bands[S.kind],p=pct(e.ov),ok=e.ov>=B.ideal[0]&&e.ov<=B.ideal[1]+.08,ws=turn?null:walkSteps(vid,e.ov);out.pills.unshift(`<span class="${ok?'ok':'warn'}">${esc(L('pill_ov',{p}))}</span>`);
+  if(e.ov>B.ideal[1]+.08){out.bad.push(['Overlap',turn?L('more_turn',{d:dw,p}):L('more_walk',{p})+(ws?' '+L('walk_n',ws):'')]);out.arrow.Overlap=[R,cq&&!cq.ok&&cq.more?cq.x+'°':ws?L('steps_s',{n:ws.n}):null]}
+  else if(e.ov<B.ideal[0]){out.bad.push(['Overlap',turn?L('less_turn',{d:back,p}):L('less_walk',{p})+(ws?' '+L('walk_n',ws):'')]);out.arrow.Overlap=[K,cq&&!cq.ok&&!cq.more?cq.x+'°':ws?L('steps_s',{n:ws.n}):null]}
   else out.good=L('good_ov',{p})}
  // pan speed: change of the estimated shift between ticks (fraction of the width per second)
  const now=Date.now(),shv=sharp(vid);live.sh.push(shv);if(live.sh.length>8)live.sh.shift();let fast=false;
@@ -583,7 +594,7 @@ function tick(vid,t){const n=S.items.length,first=S.items[0],turn=S.kind==='turn
  // walk-along sets need parallel views (the walked baseline assumes the camera keeps facing the slope): warn when the
  // compass says the facing drifted from photo 1 by more than the usual phone compass error (~15 deg)
  const hd=!turn&&first.head!=null&&g.head?g.head():null;
- if(hd&&!(hd.acc>20)){const sd=((hd.deg-first.head+540)%360)-180,d=Math.abs(sd);if(d>15){out.arrow['Same facing']=[sd>0?'←':'→',Math.round(d)];out.pills.push(`<span class="warn">${esc(L('pill_face'))}</span>`);out.bad.push(['Same facing',L('face_same',{x:Math.round(d)})])}}
+ if(hd&&!(hd.acc>20)){const sd=((hd.deg-first.head+540)%360)-180,d=Math.abs(sd);if(d>15){out.arrow['Same facing']=[sd>0?'←':'→',Math.round(d)+'°'];out.pills.push(`<span class="warn">${esc(L('pill_face'))}</span>`);out.bad.push(['Same facing',L('face_same',{x:Math.round(d)})])}}
  if(first&&first.elev!=null&&t&&Math.abs(t.elev-first.elev)>6){out.pills.push(`<span class="warn">${esc(L('pill_tilt'))}</span>`);out.bad.push(['Same tilt',L('tilt_same',{a:Math.round(first.elev),b:Math.round(t.elev)})])}
  return out}
 async function shot(blob,t,vid){flash.classList.add('on');setTimeout(()=>flash.classList.remove('on'),60);g.buzz([20,40,20]);
@@ -674,7 +685,7 @@ A.pano={show(on){want=on;if(ready)apply()},init(){g=A._g;D=A.D;P=D.pano;esc=A.es
   A.onPicks=(f,c)=>g.mode()==='pano'?onPicks(f,c):false},
  label(){return L('label_turn',{k:S.items.length+1})},hint(){return S.items.length?(S.kind==='turn'?L('next_turn',{d:L((S.dir||1)<0?'left':'right')}):L('next_walk')):L(S.kind==='turn'?'hint_first_turn':'hint_first_walk')},
  finder,tick,shot,gx(){return `${S.kind}:${S.items.length}:${S.rep?S.rep.verdict:'-'}:${S.items.filter(i=>i.src==='cam').length}`},
- _S:S,_zip:saveZip,_compass:compass,_match:match,_sig:sig,_add:add,_check:check,_join:join,_pick:pickKeys,_sharp:sharp,_video:fromVideo,_steps:steps};
+ _S:S,_zip:saveZip,_walkSteps:walkSteps,_compass:compass,_match:match,_sig:sig,_add:add,_check:check,_join:join,_pick:pickKeys,_sharp:sharp,_video:fromVideo,_steps:steps};
 })();
 """
 

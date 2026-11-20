@@ -355,7 +355,7 @@ $('#helpBtn').onclick=help;
 const camIn=$('#cam'),galIn=$('#gal');
 function autoGps(){if(store.get('gpsAsked',0)||!navigator.geolocation||!window.isSecureContext)return;store.set('gpsAsked',1);
  navigator.geolocation.getCurrentPosition(setGps,()=>{},{enableHighAccuracy:true,timeout:20000,maximumAge:60000})}
-function openCamera(){autoGps();if(LIVE)openFinder();else camIn.click()}
+function openCamera(){autoGps();if(LIVE)openFinder();else{toast(camErr(null));camIn.click()}}
 camIn.addEventListener('click',()=>autoGps());
 camIn.parentElement.addEventListener('click',e=>{if(e.target===camIn)return;   // the input's own click (label activation or programmatic) passes through
  if(!sess.get('safe')){e.preventDefault();safety(openCamera);return}
@@ -464,7 +464,7 @@ function liveShow(m,t,px){const c=judge(m,t).filter(x=>x[0]!=='Resolution'&&!(mo
  const msg=ready||!hit?(px&&px.good)||'Good. Take the photo.':hit[1];vf.querySelector('.vfmsg').textContent=msg;
  // big arrow for the top instruction: up/down from framing and aim, left/right (with degrees from the compass) from the set guide
  const k=ready?'':top,va=vf.querySelector('.vfarrow'),pa=px&&px.arrow&&px.arrow[k],ch=pa?pa[0]:k==='Framing'||(k==='Aim'&&t&&t.elev>60)?'\u2193':k==='Aim'?'\u2191':'';
- va.className='vfarrow'+(ch==='\u2190'?' h l':ch==='\u2192'?' h':'');va.innerHTML=ch?esc(ch)+(pa&&pa[1]?`<small>${pa[1]}\u00b0</small>`:''):'';
+ va.className='vfarrow'+(ch==='\u2190'?' h l':ch==='\u2192'?' h':'');va.innerHTML=ch?esc(ch)+(pa&&pa[1]?`<small>${esc(String(pa[1]))}</small>`:''):'';
  const sh=vf.querySelector('.shutter');sh.classList.toggle('ready',ready&&q===0);sh.classList.toggle('poor',q>=2);
  sh.setAttribute('aria-label',tr('Take photo')+', '+tr('Photo quality')+': '+tr(QL[q]));
  vf.querySelector('.vfr').textContent=ready&&q===0?'Ready':q===1?'OK to shoot':q>=2?'Can still shoot':'';
@@ -1028,7 +1028,7 @@ function runSet(r,blob,g,label){lastBlob=blob;lastPGps=null;lastHead=null;lastSr
  curMeta=meta();curMeta.set=label||'';cur=r;job=r.job||null;const fig=$('#fig');$('#prev').src=URL.createObjectURL(blob);fig.style.display='block';
  if(r.ms)store.set('etaT',ema('etaT',r.ms,4000));photoQ={level:0,issues:[]};withQ(r);A.render(r);afterType(r);sizes(r)}
 A._g={say,buzz,toast,tr,store,sess,step,safety,openFinder,closeFinder,openCamera,ICO,LIVE,prog,post,busy,cancelled,params,gx,runSet,fail,RX,out,vf,vid,
- ori:()=>ori,head:()=>head&&Date.now()-head.t<3000?head:null,mode:()=>mode,shoot:()=>shoot(),setMode:m=>{mode=m;store.set('mode',m);drawMode()},abort:()=>xhr&&xhr.abort(),camIn,galIn,ema};
+ ori:()=>ori,dist:()=>distM(),head:()=>head&&Date.now()-head.t<3000?head:null,mode:()=>mode,shoot:()=>shoot(),setMode:m=>{mode=m;store.set('mode',m);drawMode()},abort:()=>xhr&&xhr.abort(),camIn,galIn,ema};
 A.pano&&A.pano.init();
 const demo=new URLSearchParams(location.search).get('demo');   // demo pages show the guidance too (nothing saved)
 if(demo&&D.samples[demo]&&out.firstElementChild){cur=D.samples[demo];afterType(cur,true);if(cur.dimensions)afterDims(cur,true)}
