@@ -270,28 +270,8 @@ input:not([type=checkbox]):not([type=radio]):focus-visible,textarea:focus-visibl
 /* the colophon: provenance set like the last line of an atlas plate */
 .foot{font:italic 400 .95rem/1.6 var(--f-disp);color:var(--ink-2)}
 @media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.7rem}.summit{width:96px;height:96px}.brand b{font-size:1.45rem}}
-/* wide screens (laptop, desktop, tablet landscape): two columns - capture on the left, results on the right */
-.intro,.desk{display:none}
 .dropzone{position:fixed;inset:12px;z-index:70;display:none;place-items:center;border:3px dashed var(--brand);border-radius:18px;background:color-mix(in srgb,var(--bg) 82%,transparent);font:600 1.3rem/1.3 var(--f-disp);color:var(--ink);pointer-events:none}
 body.dragging .dropzone{display:grid}
-@media (min-width:1000px){
-main{max-width:1240px;padding:var(--s4) var(--s6) var(--s6)}
-.layout{display:grid;grid-template-columns:minmax(380px,460px) minmax(0,1fr);column-gap:clamp(32px,4vw,64px);align-items:start}
-.colA>.card.panel{margin-top:var(--s5)}
-.colA{position:sticky;top:0;max-height:100vh;overflow:auto;scrollbar-width:thin;padding:0 6px var(--s4) 2px;margin:0 -6px 0 -2px}
-.colB{min-width:0}
-.colB:not(:has(#out>*)):not(:has(#fig[style*=block])):not(:has(#history>*)) .intro{display:block}
-.intro{position:relative;z-index:1;margin-top:var(--s5);padding:30px 0 0}
-.intro h2{font:600 clamp(1.5rem,2.2vw,1.9rem)/1.2 var(--f-disp);margin:0 0 var(--s4);max-width:28ch}
-.steps{list-style:none;margin:0;padding:0;display:grid;counter-reset:st}
-.steps li{counter-increment:st;display:grid;grid-template-columns:40px 1fr;column-gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--line)}
-.steps li::before{content:counter(st);grid-row:1/3;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:600 1rem var(--f-disp);color:var(--on-brand);background:var(--brand)}
-.steps b{font-weight:650}.steps span{color:var(--ink-2);font-size:.95rem}
-.intro .hungr{margin-top:var(--s4)}
-.foot{grid-column:1/-1}
-}
-@media (min-width:1000px) and (hover:hover) and (pointer:fine){.mob{display:none}.desk{display:inline}#camNat{display:none}#camNat~label{grid-column:1/-1}}
-@media (min-width:1600px){main{max-width:1400px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 """
 
@@ -399,7 +379,7 @@ function render(r){
     <div class="cscale${bp?' bad':sig?' signal':''}" style="--v:${conf};--c:${D.conf}" aria-hidden="true"><i></i></div>
     <p class="hungr u-t1">Answers below ${pct(D.conf)} are marked uncertain.</p></div>${note}</section>
    <section class="card safety"><h2>${ico('alert')}Safety</h2><p>${esc(i.safety)}</p></section>
-   <section class="card"><div class="kicker">All types</div><div class="probs u-t3">${probs(r)}</div></section>
+   <section class="card" id="typescard"><div class="kicker">All types</div><div class="probs u-t3">${probs(r)}</div></section>
    <section class="card" id="checkcard"><div class="kicker">Check on site</div><h2>${esc(i.title)}</h2><ul class="list">${i.check.map(t=>`<li>${ico('check')}<span>${esc(t)}</span></li>`).join('')}</ul></section>`;
  }
  if(r.vlm){h+=`<section class="card"><div class="kicker">Second opinion from Qwen2.5-VL (zero-shot)</div><h2 style="display:flex;gap:8px;align-items:center">${ico('spark')}${esc(n[r.vlm.label]||r.vlm.label)}, ${pct(r.vlm.confidence)}</h2><p class="hungr u-m0">${esc(r.vlm.description)}</p></section>`;}
@@ -409,7 +389,7 @@ function render(r){
 function loading(){setChip('','Analysing…',true);
  out.innerHTML='<section class="card result" aria-busy="true"><div class="kicker">Analysing photo</div><div class="skel" style="width:60%;height:22px"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:40%"></div></section>';}
 function fail(msg){setChip('bad','Error');
- out.innerHTML=`<section class="card bad" role="alert"><div class="kicker">Something went wrong</div><h2>${esc(msg)}</h2><p class="hungr u-m0">Check the connection to the laptop running the app, then try again.</p></section>`;}
+ out.innerHTML=`<section class="card bad" role="alert"><div class="kicker">Something went wrong</div><h2>${esc(msg)}</h2><p class="hungr u-m0">${/image|photo|jpe?g|png|megapixel|read|format|large|file/i.test(msg)?'Choose another photo: a JPEG or PNG of the slope, under 40 megapixels.':'Check the connection to the computer running the app, then try again.'}</p></section>`;}
 // photo pick -> the guidance layer (src/guide.py) runs the photo check, upload, progress and next steps
 function go(e){const fs=[...e.target.files];if(!fs.length)return;e.target.value='';const cam=e.target.id==='cam';
  if(App.onPicks&&App.onPicks(fs,cam))return;App.onPick(fs[0],cam)}
@@ -424,9 +404,178 @@ document.getElementById('cam').onchange=go;document.getElementById('gal').onchan
  addEventListener('drop',e=>{if(e.defaultPrevented||!files(e))return;e.preventDefault();dn=0;B.classList.remove('dragging');take([...e.dataTransfer.files])});
  addEventListener('paste',e=>{if(/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName))return;const fs=[...(e.clipboardData?.files||[])];if(fs.some(img)){e.preventDefault();take(fs)}})}
 window.App={D,esc,render,fail,setChip,shrink,dims,onPick:null};
+// ---- desktop work area (>= 1100 px): the set tools move from the phone panel into the stage, state classes drive the
+// layout, keyboard shortcuts. Nodes are moved, not copied, so every listener and id keeps working.
+document.addEventListener('DOMContentLoaded',()=>{const $=q=>document.querySelector(q),B=document.body,stage=$('#stage'),plate=$('#plate');if(!stage)return;
+ const wide=matchMedia('(min-width:1100px)'),fine=matchMedia('(hover:hover) and (pointer:fine)'),g=()=>window.App&&App._g;
+ const parts=['#shots','#pano','.pgide'].map(q=>{const n=$(q);if(!n)return null;const m=document.createComment(q);n.before(m);return {q,n,m}}).filter(Boolean);
+ function place(){if(wide.matches){const top=parts.filter(p=>p.q!=='.pgide').map(p=>p.n);stage.prepend(...top);parts.filter(p=>p.q==='.pgide').forEach(p=>stage.append(p.n))}
+  else parts.forEach(p=>p.m.after(p.n))}
+ const cam=$('#camBtn'),gal=$('#gal')?.closest('label');
+ function prim(){const d=wide.matches&&fine.matches;   // with a mouse the upload is the main way in, the live camera second
+  if(cam){cam.classList.toggle('primary',!d);cam.classList.toggle('ghost',d)}if(gal){gal.classList.toggle('primary',d);gal.classList.toggle('ghost',!d)}}
+ function state(){const o=$('#out'),f=$('#fig'),res=!!(o&&o.firstElementChild)||!!(f&&f.style.display==='block');B.classList.toggle('has-res',res);
+  const m=(g()&&g().mode&&g().mode())||'single';['single','survey','pano'].forEach(k=>B.classList.toggle('m-'+k,m===k));
+  const pf=$('#plateFor');if(pf){const t=m==='survey'?(($('#capH')||{}).textContent||''):'';if(pf.textContent!==t)pf.textContent=t}}
+ place();prim();state();
+ wide.addEventListener('change',()=>{place();prim()});fine.addEventListener('change',prim);
+ const mo=new MutationObserver(state);
+ [['#out',{childList:true}],['#fig',{attributes:true,attributeFilter:['style']}],['#mode',{childList:true,subtree:true,attributes:true}],['#capH',{childList:true,characterData:true,subtree:true}]]
+  .forEach(([q,o])=>{const n=$(q);if(n)mo.observe(n,o)});
+ plate.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&b.dataset.a==='cam'){$('#camBtn').click();return}$('#gal').click()});
+ plate.addEventListener('keydown',e=>{if(e.target===plate&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('#gal').click()}});
+ addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;const t=document.activeElement,vf=$('#vf');
+  if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))return;
+  if(document.querySelector('.modal:not([hidden])')||(vf&&!vf.hidden))return;
+  const k=e.key.toLowerCase();if(k==='u'){e.preventDefault();$('#gal').click()}else if(k==='c'){e.preventDefault();$('#camBtn').click()}else if(k==='?'){e.preventDefault();$('#helpBtn').click()}});
+ const hud=$('#vf .vfhud');if(hud&&!hud.querySelector('.vfkeys'))hud.insertAdjacentHTML('beforeend','<p class="vfkeys"><kbd>Space</kbd> take the photo &nbsp; <kbd>Esc</kbd> close</p>');
+ if(cam)cam.title='Live camera with guidance (C)';if(gal)gal.title='Choose a photo from this device (U)';
+});
 const demo=new URLSearchParams(location.search).get('demo');
 if(demo){const S=D.samples[demo]||D.samples.ok;   // sample result, no photo (presentations, UI checks)
  if(demo==='error')fail('could not read the image (use a JPEG or PNG photo under 40 megapixels)');else render(S);}
+"""
+
+DESK_CSS = """
+/* ===== desktop and laptop (>= 1100 CSS px, e.g. 1920x1080 at 150 % Windows scaling = 1280 px): a work area, not a phone
+   column. Left rail = set-up (mode, how to shoot, distance, notes); right = the work: a drop stage before a result,
+   then photo + verdict side by side and the evidence cards in columns. ===== */
+.stage,.frameart,.vfkeys{display:none}
+.vfkeys kbd{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.25)}
+kbd{font:600 .78em/1 var(--f-body);padding:3px 6px;border-radius:5px;border:1px solid var(--edge);border-bottom-width:2px;background:var(--surface-2);color:var(--ink)}
+@media (min-width:1100px){
+:root{--hero-h:270px}
+main{max-width:1680px;padding:0 clamp(20px,2.4vw,44px) var(--s6)}
+header{min-height:0!important;align-items:center;padding:18px 0 26px}
+.brand b{font-size:clamp(1.6rem,1.1rem + .9vw,2.1rem)}
+.layout{display:grid;grid-template-columns:clamp(320px,23vw,390px) minmax(0,1fr);column-gap:clamp(24px,2.2vw,40px);align-items:start}
+.colA{position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--contour) transparent;z-index:2}
+.colA>.card.panel{margin:0}
+.panel #journey{display:none}
+.panel .tips{gap:var(--s2);margin-bottom:var(--s4)}.panel .tips li{font-size:.92rem}
+#capH{font-size:1.2rem}
+body:not(.has-res) .panel .btns{display:none}
+body.has-res .panel .tips,body.has-res .panel #capH{display:none}
+.colB{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:clamp(18px,1.8vw,28px);row-gap:26px;align-items:start;grid-auto-flow:row;min-width:0}
+#out{display:contents}
+.colB>*,#out>*{grid-column:1/-1;margin:0!important;min-width:0}
+#history{order:30}#history:empty{display:none}
+/* the stage: drop target and the set tools */
+.stage{display:grid;gap:22px;position:relative;z-index:1}
+.dropplate{display:grid;justify-items:center;align-content:center;gap:12px;min-height:clamp(340px,calc(100vh - 260px),560px);padding:36px 28px;text-align:center;cursor:pointer;
+ border:2px dashed var(--contour);border-radius:14px;background:var(--grain),var(--surface);background-color:var(--surface);box-shadow:var(--lift);transition:border-color .2s ease,background-color .2s ease}
+.dropplate:hover,body.dragging .dropplate{border-color:var(--brand);background-color:color-mix(in srgb,var(--brand) 6%,var(--surface))}
+.dropplate:focus-visible{outline:2.5px solid var(--focus);outline-offset:4px}
+.frameart{display:block;width:min(400px,70%);height:auto;margin-bottom:6px}
+.fa-hill{fill:var(--surface-2);stroke:var(--contour);stroke-width:1.5}.fa-scar{fill:var(--scar);opacity:.85}.fa-crown{fill:none;stroke:var(--scar-ink);stroke-width:2;stroke-linecap:round}
+.fa-frame{fill:none;stroke:var(--brand);stroke-width:2.5;stroke-dasharray:9 6}.fa-level{stroke:var(--mute);stroke-width:1.5;stroke-dasharray:2 5}
+.frameart text{font:600 11px var(--f-body);fill:var(--ink-2)}
+.dropplate h2{font:600 clamp(1.5rem,1rem + 1vw,2rem)/1.2 var(--f-disp);margin:0}
+.pm-set,body.m-pano .pm-one{display:none}body.m-pano .pm-set{display:inline}
+.pfor{margin:0;color:var(--ink-2);font-size:1rem;max-width:60ch}.pfor:empty{display:none}
+.pbtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}.pbtns .btn{min-width:200px}
+.pkeys{margin:6px 0 0;color:var(--mute);font-size:.85rem}
+body.has-res .dropplate,body.has-res .stage .pgide{display:none}
+body.has-res.m-single .stage{display:none}
+/* survey: the four shots as a row of slots */
+.stage #shots{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:0}
+.stage #shots:empty{display:none}
+.stage #shots li{background:var(--surface);border-color:var(--line);align-content:start;min-height:96px}
+.stage #shots li.cur{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface))}
+/* overlapping set: tray first, then the how-to beside its diagram */
+.stage #pano:not([hidden]){padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.stage .pgide:not([hidden]){display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);column-gap:32px;align-items:start;padding:20px 24px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.stage .pgide>*{grid-column:2}.stage .pgide>.pk,.stage .pgide>.pintro{grid-column:1/-1}.stage .pgide>.pdiag{grid-column:1;grid-row:3/span 6}
+.stage .pgide .pdiag svg{max-width:100%}
+/* result: photo and verdict side by side, the evidence in columns */
+#fig{grid-column:1/span 7;grid-row:span 4;align-self:stretch;max-height:max(480px,calc(100vh - 40px));position:sticky;top:14px}
+#fig img{height:100%;max-height:none;object-fit:contain;background:#05080d}
+#out>.qband .btns{max-width:460px}
+#out>.qband{order:-1;position:relative;z-index:1;background:color-mix(in srgb,var(--qc,#d2452b) 12%,var(--surface))}
+#out>.card.result{grid-column:span 5;order:1}
+#out>#repsec{grid-column:span 5;order:2}
+#out>#askcard,#out>#nextcard{grid-column:span 5;order:3}
+#out>.safety{order:4}
+#out>#ovcard{order:1}
+#out>#dimcard{grid-column:span 6;order:6}#out>#checkcard{grid-column:span 6;order:7}#out>#typescard{grid-column:span 6;order:8}
+#out>.meta{order:20}
+.colB:not(:has(#fig[style*="block"])) #out>.card.result{grid-column:span 7}
+.colB:not(:has(#fig[style*="block"])) #out>#askcard,.colB:not(:has(#fig[style*="block"])) #out>#nextcard{grid-column:span 6}
+#out>.card:not(.result):not(.safety):not(.bad):not(.qband){padding-top:24px}
+#out>.card.result .title{font-size:clamp(1.55rem,.9rem + 1.1vw,2.2rem)}#out>.card.result .summit{width:92px;height:92px}
+/* the mode switch is a vertical list in the rail (three labels do not fit side by side in 320 px) */
+#mode{grid-auto-flow:row;grid-auto-rows:1fr}
+#mode button{text-align:left;padding:8px 14px}
+#mode::before{width:auto;right:4px;height:calc((100% - 16px)/3);bottom:auto;translate:0 0}
+#mode:has(button:nth-child(2)[aria-pressed=true])::before{translate:0 calc(100% + 4px)}
+#mode:has(button:nth-child(3)[aria-pressed=true])::before{translate:0 calc(200% + 8px)}
+.drow{font-size:.9rem}
+/* history: a grid of thumbnails */
+#history .hist{grid-template-columns:repeat(auto-fill,minmax(300px,1fr));column-gap:24px}
+/* modals are dialogs, not bottom sheets */
+.sheet::before{display:none}
+#mHelp{overflow:auto;place-items:start center;padding:4vh 0}
+#mHelp .sheet{width:min(940px,94vw);max-height:none;overflow:visible;columns:2 360px;column-gap:44px}
+#mHelp .sheet>.row:first-child{column-span:all;margin-bottom:6px}
+#mHelp .sheet h3{break-after:avoid}#mHelp .sheet ol,#mHelp .sheet ul,#mHelp .sheet dl{break-inside:avoid-column}
+#mHelp .sheet b{display:inline}
+}
+@media (min-width:1600px){#out>#dimcard,#out>#checkcard,#out>#typescard{grid-column:span 4}}
+@media (min-width:1100px){#out:not(:has(#dimcard))>#checkcard,#out:not(:has(#dimcard))>#typescard{grid-column:span 6}}
+@media (min-width:1100px){body.m-pano .frameart{display:none}body.m-pano .dropplate{min-height:220px}
+.stage #pano .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.stage #pano .row .btn{min-width:180px}
+.stage .pgide .pdiag{max-width:520px}}
+/* live viewfinder on a wide screen: the video at its real shape on the left, the guidance in a side panel */
+@media (min-width:1100px) and (min-aspect-ratio:4/3){
+.vf{--side:min(380px,30vw)}
+.vf video{width:calc(100% - var(--side));object-fit:contain}
+.vf .pghost{right:var(--side)}
+.vf .vfg{inset:120px calc(var(--side) + 4%) 130px 4%}
+.vf .ptarget{top:120px;bottom:130px}
+.vf .vfarrow,.vf .lvl{left:calc((100% - var(--side))/2)}
+.vfhud{display:grid;grid-template-columns:minmax(0,1fr) var(--side);grid-template-rows:auto auto auto 1fr auto;z-index:1}
+.vfhud::after{content:"";position:absolute;top:0;right:0;bottom:0;width:var(--side);background:rgba(8,12,18,.92);border-left:1px solid rgba(255,255,255,.08);z-index:-1}
+.vfhud>.vft{grid-column:1/-1;grid-row:1}
+.vfhud>.vfd{grid-column:2;grid-row:2;align-self:start;max-width:none;margin:8px 18px 12px 18px;-webkit-line-clamp:unset;display:block;text-align:left;font-size:.9rem;background:rgba(255,255,255,.06)}
+.vfhud>.pills{grid-column:2;grid-row:3;justify-content:flex-start;padding:0 18px}
+.vfhud>.vfdock{grid-column:2;grid-row:4;margin:12px 0 0;align-self:start;align-items:stretch;padding:0 18px}
+.vfhud .vfmsg{max-width:none;text-align:left}
+.vfhud>.vfb{grid-column:1;grid-row:5}
+.vfhud>.vfkeys{display:block;grid-column:2;grid-row:5;align-self:end;margin:0;padding:0 18px 22px;color:#a9b6c4;font-size:.85rem}
+}
+@media (min-width:1100px) and (max-width:1399px){#fig{grid-column:1/span 6}#out>.card.result,#out>#repsec,#out>#askcard,#out>#nextcard{grid-column:span 6}}
+@media (min-width:1100px) and (max-height:760px){:root{--hero-h:150px}header{padding:12px 0 18px}.brand span{display:none}}
+/* mouse and keyboard: denser controls, hover states, the camera-app option hidden (a file picker on a computer) */
+@media (hover:hover) and (pointer:fine){
+.mob{display:none}.desk{display:inline}
+.btn:hover{filter:brightness(1.06)}.btn.ghost:hover{border-color:var(--brand)}
+.hist li[data-id]:hover,.stage #shots li:hover{background:var(--tint-ground)}
+}
+@media (hover:hover) and (pointer:fine){#camNat{display:none}#camNat~label{grid-column:1/-1}}
+@media (min-width:1100px) and (hover:hover) and (pointer:fine){
+#camNat~label{order:-1}
+.btn{min-height:44px;padding:10px 20px;font-size:.95rem}
+.seg button{min-height:38px}
+.iconbtn{min-width:40px;height:40px}
+.vf video{object-fit:contain}
+}
+/* Windows high-contrast themes: keep every control and region outlined */
+@media (forced-colors:active){
+.btn,.iconbtn,.seg,.card.result,.panel,#repsec,#askcard,.dropplate,.sheet,.vfd,.vfmsg{border:1px solid CanvasText}
+#mode::before{background:Highlight;forced-color-adjust:none}.hero{display:none}
+}
+/* printing the result (Ctrl+P): the answer and its evidence on white paper */
+@media print{
+:root{--bg:#fff;--surface:#fff;--surface-2:#f4f4f4;--ink:#000;--ink-2:#222;--mute:#444;--line:#bbb;--contour:#999;--grain:none;color-scheme:light}
+body{background:#fff}
+*,*::before,*::after{animation:none!important;transition:none!important}
+#fig{position:relative!important;top:auto!important;height:auto!important;max-height:none!important}#fig img{height:auto!important}
+header{min-height:0!important;padding:0 0 12px}
+.hero,header button,.colA,.stage,.dropzone,#netbar,#nextcard,#askcard,#history,.btns,.btn,.minibtn,#repsec,.toast,.modal,.vf{display:none!important}
+main{max-width:none;padding:0}.layout,.colB{display:block}#out{display:block}
+.card{break-inside:avoid;box-shadow:none!important}#fig{display:block!important;max-width:70%}#fig img{max-height:none;box-shadow:none;border:1px solid #999}
+a{color:#000}
+}
 """
 
 PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
@@ -442,7 +591,7 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <style>__CSS____GCSS____PCSS__.drow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 0;font-size:.92rem}
 .drow>span{display:flex;align-items:baseline;flex:1;min-width:0;gap:8px}
 .drow>span::after{content:"";flex:1;min-width:14px;border-bottom:2px dotted var(--contour);translate:0 -4px}.drow b{text-align:right;font-weight:600;font-variant-numeric:lining-nums tabular-nums}.drow small{opacity:.75;font-weight:400;font-style:italic}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--edge);transition:border-color .2s ease,box-shadow .25s ease;font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
-</style></head><body>__DEFS__<main>
+__DCSS__</style></head><body>__DEFS__<main>
 <div class="hero" id="hero" aria-hidden="true"></div>
 <header><div class="logo">__LOGO__</div><div class="brand"><b>Landslide Type Check</b><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
 <div id="netbar" class="netbar" role="status" hidden>You are offline. Photos cannot be analysed until the connection is back.</div>
@@ -460,14 +609,17 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <label class="dist"><span class="dl">Distance to the slope (optional)</span>
 <input id="dist" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 40" aria-describedby="disthint"><span class="hint" id="disthint">Makes the sizes more accurate. 40, 40 m or 130 ft all work.</span></label></section>
 </div><div class="colB">
-<aside class="intro" aria-label="How it works"><div class="kicker">How it works</div>
-<h2>From one slope photo to landslide type and size</h2>
-<ol class="steps">
-<li><b>Take or upload a photo</b><span>Use the guided camera, upload a photo, or drag one onto this page.</span></li>
-<li><b>The photo is checked first</b><span>Sharpness, light, haze and framing are checked before anything is classified.</span></li>
-<li><b>Read the result</b><span>Landslide type after Hungr 2014 with its confidence, the estimated size with a 90 % range, and what to check on site.</span></li>
-</ol>
-<p class="hungr">For the live camera guide in the field, open this same page on a phone.</p></aside>
+<div class="stage" id="stage">
+<div class="dropplate" id="plate" role="button" tabindex="0" aria-labelledby="plateH" aria-describedby="plateFor">
+<svg class="frameart" viewBox="0 0 360 170" aria-hidden="true"><path class="fa-hill" d="M0 150 C60 120 90 70 150 52 C200 38 230 60 270 90 C300 112 330 128 360 132 V170 H0Z"/>
+<path class="fa-scar" d="M168 50 C180 46 198 47 206 54 L222 118 C206 132 176 134 160 124 Z"/><path class="fa-crown" d="M166 52 C182 44 200 45 208 54"/>
+<rect class="fa-frame" x="112" y="26" width="150" height="124" rx="4"/><path class="fa-level" d="M100 160 H274"/>
+<text x="268" y="40">top: scarp</text><text x="268" y="146">bottom: toe</text></svg>
+<h2 id="plateH"><span class="pm-one">Drop a photo of the slope here</span><span class="pm-set">Drop the overlapping photos here</span></h2>
+<p class="pfor" id="plateFor"></p>
+<div class="pbtns"><button type="button" class="btn primary" data-a="up">__I_image__<span class="pm-one">Choose a photo</span><span class="pm-set">Choose photos</span></button><button type="button" class="btn ghost" data-a="cam">__I_camera__Guided camera</button></div>
+<p class="pkeys"><kbd>Ctrl</kbd> + <kbd>V</kbd> pastes a copied photo. Shortcuts: <kbd>U</kbd> upload, <kbd>C</kbd> camera, <kbd>?</kbd> help.</p>
+</div></div>
 <figure id="fig"><img id="prev" alt="Your photo"><div id="chip" class="chip"></div></figure>
 <div id="out"></div>
 <div id="history"></div>
@@ -513,4 +665,5 @@ def build_page(logo_svg, info, names, tips, confident_min):
         page = page.replace(f"__I_{k}__", v.replace("<svg", '<svg class="ico"'))
     # JSON inside <script>: escape "</" so no string can close the script element
     page = page.replace("__GCSS__", guide.CSS).replace("__GJS__", guide.JS).replace("__PCSS__", pano.CSS).replace("__PJS__", pano.JS)
+    page = page.replace("__DCSS__", DESK_CSS)
     return page.replace("__JS__", JS.replace("__DATA__", json.dumps(data).replace("</", "<\\/")))

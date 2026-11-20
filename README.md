@@ -123,9 +123,15 @@ the window stays open. `cloudflared.exe` is a general tool and lives outside the
 
 ## User guidance in the app
 
-One page works on phones and on laptops/desktops. On screens 1000 px or wider it uses two columns: capture on the left,
-results on the right (with a "How it works" panel until there is a result). With a mouse it shows "Upload a photo"
-instead of the phone-only "Phone camera" option, and a photo can be dragged onto the page or pasted (Ctrl+V).
+One page works on phones and on laptops/desktops. At 1100 CSS px and wider (a 1920x1080 laptop at 150 % Windows
+scaling is 1280 px) it becomes a work area: a left rail for set-up (mode, how to shoot, distance, notes) and, before a
+result, a large drop zone with a framing sketch (click, drag a photo in, or Ctrl+V); survey shots show as four slots
+and the overlapping-set tray and how-to sit in the work area. A result shows the photo in a viewer beside the verdict
+and Save/Share, the safety strip under them, then dimensions, site checks and all types in columns; history is a grid.
+With a mouse, upload is the main button and the phone-only camera-app option is hidden; keys: U upload, C camera,
+? help, Space shoots and Esc closes in the viewfinder. The live viewfinder letterboxes the webcam and puts the
+guidance in a side panel. Help is a two-column dialog; Ctrl+P prints the result on white; Windows high-contrast
+themes keep every control outlined.
 The page is sent gzipped (~110 KB instead of ~400 KB). Behind a hosting proxy (Hugging Face, Render, a tunnel) the
 app does not redirect to its own https port, and `--port` defaults to `$PORT` when the host sets it; the Space
 Dockerfile runs with `--no-https` because the host already serves https.

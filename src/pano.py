@@ -542,7 +542,7 @@ function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelecto
  vf.querySelector('.pdone').onclick=()=>{g.closeFinder();$('#pano .tray')?.scrollIntoView({behavior:'smooth',block:'nearest'})};
  vf.querySelector('.pdir').onclick=()=>{S.dir=(S.dir||1)*-1;layout()};
  const B=P.bands[S.kind];const z=meter.querySelector('.z');z.style.left=B.ideal[0]*100+'%';z.style.width=(B.ideal[1]-B.ideal[0])*100+'%';layout()}
-function box(){const v=g.vid,bw=v.clientWidth,bh=v.clientHeight,vw=v.videoWidth||bw,vh=v.videoHeight||bh,s=Math.max(bw/vw,bh/vh);return {bw,bh,dw:vw*s,dh:vh*s}}
+function box(){const v=g.vid,bw=v.clientWidth,bh=v.clientHeight,vw=v.videoWidth||bw,vh=v.videoHeight||bh,fit=getComputedStyle(v).objectFit==='contain'?Math.min:Math.max,s=fit(bw/vw,bh/vh);return {bw,bh,dw:vw*s,dh:vh*s}}   // cover on phones, letterboxed (contain) on desktop
 function layout(est){if(!ghost)return;const n=S.items.length,prev=S.items[n-1],vf=g.vf,dir=S.dir||1;
  vf.querySelector('.pdone').textContent=L('done',{n});vf.querySelector('.pdone').hidden=!n;vf.querySelector('.pdir').textContent=dir<0?'←':'→';vf.querySelector('.pdir').hidden=!n;
  strip.innerHTML=S.items.slice(-6).map(i=>`<img src="${i.thumb}" alt="">`).join('');
