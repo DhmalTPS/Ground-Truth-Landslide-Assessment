@@ -143,7 +143,7 @@ CSS = """
 .pace input{width:76px;min-height:44px;padding:8px;border-radius:9px;border:1px solid var(--edge);font:inherit;background:transparent;color:inherit}
 .locl{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);font-size:.9rem;line-height:1.45}.locl a{color:var(--link);word-break:break-all}.locl small{opacity:.7}.lpin{flex:none;width:14px;height:14px;margin-top:3px;border-radius:50%;background:var(--info);box-shadow:0 0 0 4px rgba(30,110,220,.18)}
 .minibtn{min-height:44px;border:1.5px solid var(--edge);background:var(--surface);color:var(--link);border-radius:8px;padding:8px 14px;font-weight:650;font-size:.9rem;font-family:inherit;cursor:pointer}.minibtn:hover{border-color:var(--link)}
-.minibtn.pri{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.minibtn.pri{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}.minibtn[disabled]{background:var(--surface-2)!important;color:var(--mute)!important;border-color:var(--line)!important;cursor:not-allowed}
 .fieldmsg.okmsg{color:var(--link)}.qband.qlite{margin:var(--s3) 0 0;padding:var(--s2) 0 0;border:0;border-top:1px solid var(--line);border-radius:0;background:none}.qband.qlite p{display:none}
 .done-line{margin:0 0 var(--s2);display:flex;flex-wrap:wrap;gap:6px;align-items:baseline}.done-line b{color:var(--link)}
 .fieldmsg{font-size:.84rem;color:var(--warn);margin-top:4px;min-height:1em}
@@ -173,8 +173,8 @@ CSS = """
 .acts{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:10px}
 .acts li{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;font-size:.94rem;color:var(--ink-2);padding:10px 0;border-bottom:1px solid var(--line)}.acts li:last-child{border-bottom:0}.acts li:not(:first-child) .minibtn.pri{background:var(--surface);color:var(--link);border-color:var(--edge)}
 .acts li b{color:var(--ink)}
-.tick{cursor:pointer;border-radius:10px;padding:10px 6px;margin:0 -6px;min-height:44px}.tick:hover{background:var(--surface-2)}.tick[aria-checked=true] .ico{color:var(--on-brand);background:var(--brand);border-radius:50%;animation:pop .45s var(--spring) both}
-.tick[aria-checked=false] .ico{opacity:.45}.tally{margin-top:12px;font-size:.88rem;color:var(--ink-2)}
+.tick{cursor:pointer;border-radius:10px;padding:10px 6px;margin:0 -6px;min-height:44px;display:flex;gap:var(--s2);align-items:flex-start;width:calc(100% + 12px);text-align:left;font:inherit;color:inherit;background:none;border:0}.tick:hover{background:var(--surface-2)}.tick[aria-checked=true] .ico{color:var(--on-brand);background:var(--brand);border-radius:50%;animation:pop .45s var(--spring) both}
+.tick .ico{box-sizing:border-box;border-radius:50%}.tick[aria-checked=false] .ico{color:transparent;border:1.5px solid var(--edge)}.tally{margin-top:12px;font-size:.88rem;color:var(--ink-2)}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}.cmp div{padding:10px;border-radius:12px;border:1px solid var(--line);text-align:center;font-size:.85rem}
 .cmp b{display:block;font-size:1.3rem}.cmp .lead{border-color:var(--teal-400);background:var(--tint-ground)}
 .gloss dt{font-weight:650;color:var(--ink);margin-top:8px;font-size:.9rem}.gloss dd{margin:2px 0 0;color:var(--ink-2);font-size:.88rem}
@@ -193,7 +193,7 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .vfg{position:absolute;inset:7% 5% 20%;pointer-events:none}
 .vfg i{position:absolute;background:rgba(255,255,255,.28)}.vfg .h1,.vfg .h2{left:0;right:0;height:1px}.vfg .h1{top:33.3%}.vfg .h2{top:66.6%}
 .vfg .v1,.vfg .v2{top:0;bottom:0;width:1px}.vfg .v1{left:33.3%}.vfg .v2{left:66.6%}
-.band{position:absolute;left:0;right:0;border:2px dashed rgba(255,200,98,.85);border-radius:12px;font-size:.75rem;font-weight:650;padding:4px 8px;color:#ffd58a;text-shadow:0 1px 2px #000}
+.band{position:absolute;left:0;right:0;border:2px dashed rgba(255,200,98,.85);border-radius:12px;padding:6px 8px}.band>span{display:inline-block;background:rgba(0,0,0,.62);color:#ffe2a8;font-size:.9rem;font-weight:650;line-height:1.3;padding:2px 8px;border-radius:6px}
 .vfg .top{top:0;height:18%}.vfg .bot{bottom:0;height:18%;display:flex;align-items:flex-end}
 .vfg[data-frame=top] .bot,.vfg[data-frame=bottom] .top{display:none}.vfg[data-frame=top] .top{height:70%}.vfg[data-frame=bottom] .bot{height:70%}
 .lvl{position:absolute;left:50%;top:50%;width:46%;height:0;border-top:2px solid #ff745e;transform:translate(-50%,-50%);transition:transform .15s linear,border-color .2s}
@@ -308,7 +308,7 @@ document.body.insertAdjacentHTML('beforeend',`<div class="modal" id="mTour" hidd
 <div class="modal" id="mSafe" hidden role="dialog" aria-modal="true" aria-labelledby="safeT"><div class="sheet"></div></div>
 <div class="modal" id="mHelp" hidden role="dialog" aria-modal="true" aria-labelledby="helpT"><div class="sheet"></div></div>
 <div class="vf" id="vf" hidden role="dialog" aria-modal="true" aria-label="Camera with framing guide"><video playsinline muted autoplay></video>
-<div class="vfg" data-frame="full"><i class="h1"></i><i class="h2"></i><i class="v1"></i><i class="v2"></i><div class="band top">Top of the slope (scarp)</div><div class="band bot">Bottom (toe / deposit)</div></div>
+<div class="vfg" data-frame="full"><i class="h1"></i><i class="h2"></i><i class="v1"></i><i class="v2"></i><div class="band top"><span>Top of the slope (scarp)</span></div><div class="band bot"><span>Bottom (toe / deposit)</span></div></div>
 <div class="lvl" aria-hidden="true"></div><div class="vfarrow" aria-hidden="true"></div>
 <div class="vfhud"><div class="vft"><button type="button" data-a="close" aria-label="Close camera">&#10005;</button><span class="vfs"></span><button type="button" data-a="voice" aria-label="Voice guidance"></button></div>
 <button type="button" class="vfd" data-a="task" aria-expanded="false"></button><div class="pills" aria-hidden="true"></div>
@@ -682,7 +682,7 @@ function sizes(r){if(!job){finish(r);return}if(r.status!=='bad_photo'){measure()
  const slot=document.createElement('section');slot.className='card';slot.id='dimslot';
  slot.innerHTML=`<div class="kicker">Estimated dimensions</div><p class="hungr u-tb">Sizes from a photo that failed the photo check are not reliable, so they are not measured automatically.</p><button type="button" class="minibtn" id="dany">Estimate sizes anyway</button>`;
  const m=out.querySelector('.meta');m?out.insertBefore(slot,m):out.appendChild(slot);$('#dany').onclick=()=>measure();finish(r)}
-function findDims(){return $('#dimcard')||[...out.querySelectorAll('.card')].find(c=>/^Estimated dimensions|^अनुमानित आयाम/.test((c.querySelector('.kicker')?.textContent||'').trim())&&c.id!=='dimslot')}
+function findDims(){return $('#dimcard')||[...out.querySelectorAll('.card')].find(c=>/^Estimated (size|dimensions)|^अनुमानित (आकार|आयाम)/.test((c.querySelector('.kicker')?.textContent||'').trim())&&c.id!=='dimslot')}
 function placeDims(r){const w=document.createElement('div');w.innerHTML=A.dims(r.dimensions);const c=w.firstElementChild;c.id='dimcard';
  if(qLevel(r)>=2&&r.dimensions.available)c.insertAdjacentHTML('afterbegin',`<p class="note u-b3"><b>${esc(tr('Photo quality'))}: ${esc(tr(QL[qLevel(r)]))}.</b> <span>The 90% ranges were checked on usable photos; with this photo the real error can be larger than shown.</span></p>`);const s=$('#dimslot')||$('#dimcard');s?s.replaceWith(c):out.appendChild(c);typeChip(r)}
 function fail(msg,net){A.fail(msg);const c=out.firstElementChild;
@@ -701,6 +701,8 @@ function afterType(r,replay){step(4);const N=D.names,top=r.ranked[0][0],sec=r.ra
  if(r.status==='bad_photo')addAct('Retake from below with the whole slope in view.','Retake','retake');
  else if(r.status==='uncertain')addAct(r.family?`Answer the questions or tick the signs below to tell <b>${esc(N[top])}</b> from <b>${esc(N[sec])}</b>.`:'Not sure. Answer the questions below, or take a second photo from another spot.','Another photo','retake');
  if(r.status==='bad_photo'||r.status==='uncertain'||close)ask(r,replay);
+ {const ak=$('#askcard'),sp=$('#nextcard .acts li:last-child>span');   // no questions on screen: do not point to them
+  if(r.status==='uncertain'&&!r.family&&(!ak||ak.hidden)&&sp)sp.textContent='Not sure. Take a second photo from another spot, and mark the signs you can see on site below.'}
  ticks(r);reportBar();
  if(!replay){buzz(r.status==='ok'?40:[40,80,40]);say(r.status==='bad_photo'?tr('Very poor photo. Best guess')+' '+tr(N[r.label])+'. '+tr('Please retake the photo.'):(r.status==='uncertain'?tr('Uncertain. Most likely')+' ':'')+tr(N[r.label])+', '+Math.round(r.confidence*100)+' %.')}}
 function afterDims(r,replay){const d=r.dimensions;if(!d)return;locLine();const c=findDims();if(c)c.id='dimcard';
@@ -746,10 +748,12 @@ function ask(r,replay){let p={};r.ranked.forEach(([c,v])=>p[c]=Math.max(v,1e-4))
    ans.push({q:q.t,a:y==='1'?'yes':y==='0'?'no':'not sure',prev:p});asked.push(q.id);if(y!=='-')p=upd(p,q,y==='1');r.fieldRanked=Object.entries(p).sort((a,b)=>b[1]-a[1]);draw();buzz(15);
    if(cur&&cur.__id)finish(cur)})};
  draw()}
-function tickList(ul,cb,saved){const lis=[...ul.querySelectorAll('li')];lis.forEach((li,i)=>{li.classList.add('tick');li.setAttribute('role','checkbox');li.setAttribute('aria-checked',saved&&saved[i]?'true':'false');li.tabIndex=0;
-  const tg=()=>{li.setAttribute('aria-checked',li.getAttribute('aria-checked')==='true'?'false':'true');cb()};li.onclick=tg;li.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();tg()}}});return lis}
+function tickList(ul,cb,saved){   // each sign is a real checkbox button inside its list item
+ return [...ul.querySelectorAll(':scope>li')].map((li,i)=>{const b=document.createElement('button');b.type='button';b.className='tick';b.setAttribute('role','checkbox');
+  b.setAttribute('aria-checked',saved&&saved[i]?'true':'false');b.append(...li.childNodes);li.append(b);
+  b.onclick=()=>{b.setAttribute('aria-checked',b.getAttribute('aria-checked')==='true'?'false':'true');cb()};return b})}
 function ticks(r){const card=$('#checkcard');if(!card)return;const N=D.names,top=r.ranked[0][0],sec=r.ranked[1][0],cmp=r.status==='uncertain'&&sec!=='no_landslide'&&D.info[sec];
- card.querySelector('h2').insertAdjacentHTML('afterend','<p class="hungr u-sub">Tap each sign you can see on site.</p>');
+ card.querySelector('h2').insertAdjacentHTML('afterend','<p class="hungr u-sub">Mark each sign you can see on site.</p>');
  if(cmp)card.insertAdjacentHTML('beforeend',`<h2 class="u-t4">${esc(D.info[sec].title)} (second choice)</h2><ul class="list" id="ck2">${D.info[sec].check.map(t=>`<li>${ICO('check')}<span>${esc(t)}</span></li>`).join('')}</ul>`);
  card.insertAdjacentHTML('beforeend','<div class="tally" id="tally" aria-live="polite"></div>');
  const ul1=card.querySelector('ul.list'),ul2=$('#ck2'),sv=r.signs||{};let l1=[],l2=[];
@@ -816,7 +820,7 @@ function locHTML(L){if(!L)return '<p>No location recorded.</p>';const c=L.cam;
  return h+'</table>'}
 // in the result view: where this photo was taken, with a one-tap fix when there is none
 function locLine(){const el=$('#locline');if(!el)return;const L=cur?locOf(curMeta,cur):null;
- if(!L){el.innerHTML=`<span class="lpin"></span><div><span>No location for this photo.</span> <button type="button" class="minibtn" data-a="gps">Add my location</button></div>`;el.querySelector('[data-a=gps]').onclick=askGps;return}
+ if(!L){el.innerHTML=`<span class="lpin off"></span><div><span>No location for this photo.</span> <button type="button" class="minibtn" data-a="gps">Add my location</button></div>`;el.querySelector('[data-a=gps]').onclick=askGps;return}
  const c=L.cam;el.innerHTML=`<span class="lpin"></span><div><b>Location</b> <a href="${osm(c)}" target="_blank" rel="noopener">${ll(c)}</a>${pm(c.acc)} <small>(${c.src==='photo'?'photo GPS':'phone GPS'})</small>`+
   (L.tgt?`<br><span>Landslide about</span> <a href="${osm(L.tgt)}" target="_blank" rel="noopener">${ll(L.tgt)}</a>${pm(L.tgt.acc)}`:'')+'</div>'}
 

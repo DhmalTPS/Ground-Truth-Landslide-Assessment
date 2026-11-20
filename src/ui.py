@@ -98,7 +98,7 @@ CSS = """
 --amber:#e8a400;--orange:#a3401a;--ruby:#b8381f;
 --bg:#e7ebe8;--surface:#fbfaf6;--surface-2:#f1f2ee;--ink:#1b272c;--ink-2:#3d4c52;--mute:#53636a;--line:#cfd6d2;--contour:#a6b5b0;--frame:#bcc6c1;
 --brand:#1a6a5b;--on-brand:#ffffff;--link:#155e51;--warn:#a3401a;--warn-bg:#fbeee6;--warn-line:#edc4ac;--tape:#ff6a1a;--tape-ink:#1b272c;
---caution:#7c5400;--dup:#3a62c4;--focus:#e8a400;--edge:#6f817c;--info:#1e6edc;
+--caution:#7c5400;--dup:#3a62c4;--focus:#0b57d0;--edge:#6f817c;--info:#1e6edc;
 --g-ground:#1a6a5b;--g-signal:#c8562a;--g-track:#a9cfbd;--tint-signal:rgba(200,86,42,.1);--tint-ground:rgba(26,106,91,.09);
 --sky1:#a6bccd;--sky2:#dde3e3;--sky3:#f3d6b6;--sun:#f6bf86;--r0:#c4ced7;--r1:#9dadbb;--r2:#728899;--r3:#4b6476;--scar:#c9a27f;--mist:#ffffff;--star:transparent;--scar-ink:#6e4026;--crater:transparent;--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");--neat:linear-gradient(var(--frame),var(--frame));--ease-out:cubic-bezier(.16,.84,.24,1);--spring:cubic-bezier(.3,1.45,.5,1);
 --lift:0 1px 1px rgba(27,39,44,.05),0 12px 30px -18px rgba(27,39,44,.45);--shadow:0 18px 40px -16px rgba(27,39,44,.45);--r:6px;
@@ -109,7 +109,7 @@ CSS = """
 color-scheme:light}
 @media (prefers-color-scheme:dark){:root{--bg:#0d1420;--surface:#141d2b;--surface-2:#1a2434;--ink:#e5ebf1;--ink-2:#b9c5d0;--mute:#8f9eac;
 --line:#26334a;--contour:#3a4b66;--frame:#30405a;--brand:#6fd3b0;--on-brand:#06261f;--link:#8bdcc0;--teal-600:#8bdcc0;--warn:#ffa27a;--orange:#ffa27a;
---warn-bg:#2a1b17;--warn-line:#5a3326;--tape:#ff7a33;--caution:#f2c25a;--dup:#9db8ff;--focus:#f2c25a;--edge:#70839c;--info:#7fb0ff;
+--warn-bg:#2a1b17;--ruby:#ff7a5c;--warn-line:#5a3326;--tape:#ff7a33;--caution:#f2c25a;--dup:#9db8ff;--focus:#9db8ff;--edge:#70839c;--info:#7fb0ff;
 --g-ground:#6fd3b0;--g-signal:#ffa27a;--g-track:#2c5a52;--tint-signal:rgba(255,162,122,.12);--tint-ground:rgba(111,211,176,.1);
 --sky1:#08101d;--sky2:#101b30;--sky3:#1d2b46;--sun:#dfe7f2;--r0:#25344d;--r1:#1d2a40;--r2:#172235;--r3:#111a2a;--scar:#7d5a48;--mist:#9fb3cc;--star:#dfe7f2;--scar-ink:#3a1a10;--crater:rgba(120,138,166,.32);--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .035 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
 --lift:0 1px 1px rgba(0,0,0,.3),0 14px 32px -18px rgba(0,0,0,.85);--shadow:0 18px 40px -16px rgba(0,0,0,.8);color-scheme:dark}}
@@ -142,7 +142,7 @@ header>*{animation:settle .9s var(--ease-out) both .55s}header>.brand{animation-
 header{position:relative;z-index:1;display:flex;align-items:flex-start;gap:var(--s3);min-height:calc(var(--hero-h) - 84px);margin:0;padding-top:var(--s2)}
 header .logo{padding:6px;border-radius:50%;background:var(--surface);box-shadow:var(--lift)}
 header .logo svg{width:34px;height:34px}
-.brand{min-width:0;flex:1;padding-top:2px}
+.brand{min-width:0;flex:1;padding-top:2px}.brand h1{margin:0;font:inherit}
 .brand b{display:block;font:600 clamp(1.7rem,1.1rem + 1.5vw,2.6rem)/1.05 var(--f-disp);letter-spacing:-.012em;color:var(--ink)}
 .brand span{display:block;font:italic 400 .95rem/1.3 var(--f-disp);color:var(--ink-2);margin-top:6px;white-space:nowrap}
 /* Devanagari has tall matras above the headline: give display lines room in Hindi */
@@ -184,7 +184,7 @@ font-weight:650;font-size:1rem;line-height:1.2;font-family:inherit;cursor:pointe
 .btn.ghost{color:var(--link);background:var(--surface);border:1.5px solid var(--edge)}
 .btn.ghost:hover{background:var(--tint-ground);border-color:var(--link)}
 .btn.text{background:none;color:var(--link);min-height:var(--tap);text-decoration:underline;text-underline-offset:3px}
-.btn[disabled]{opacity:.6;cursor:progress}
+.btn[disabled],.btn[aria-disabled=true]{background:var(--surface-2)!important;color:var(--mute)!important;border-color:var(--line)!important;box-shadow:none!important;filter:none!important;cursor:not-allowed}.btn[aria-busy=true]{cursor:progress}
 .btn input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .btn:focus-within{outline:3px solid var(--focus);outline-offset:2px}
 .span2{grid-column:1/-1}
@@ -272,6 +272,35 @@ input:not([type=checkbox]):not([type=radio]):focus-visible,textarea:focus-visibl
 @media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.7rem}.summit{width:96px;height:96px}.brand b{font-size:1.45rem}}
 .dropzone{position:fixed;inset:12px;z-index:70;display:none;place-items:center;border:3px dashed var(--brand);border-radius:18px;background:color-mix(in srgb,var(--bg) 82%,transparent);font:600 1.3rem/1.3 var(--f-disp);color:var(--ink);pointer-events:none}
 body.dragging .dropzone{display:grid}
+
+/* ===== audit pass: shared fixes for every screen size ===== */
+.desk{display:none}
+.btns{grid-template-columns:repeat(2,minmax(0,1fr))}.btns .btn{min-width:0;padding-inline:var(--s3);text-align:center}
+.title{overflow-wrap:break-word}
+@media (max-width:520px){.card.result .title{font-size:1.75rem}.card.result.unsure .title{font-size:1.55rem}}
+.drow small{opacity:1;font-style:normal;color:var(--ink-2);font-size:.82rem;font-weight:500}
+.dtrust{display:inline-block;vertical-align:middle;margin-left:8px;padding:2px 10px;border-radius:99px;font:600 .78rem/1.5 var(--f-body);letter-spacing:0;border:1px solid var(--edge);color:var(--ink-2)}
+.dtrust.t-high{border-color:var(--brand);color:var(--brand)}.dtrust.t-low{border-color:var(--caution);color:var(--caution)}
+.card.result.unsure .title{font-size:clamp(1.45rem,1rem + 1.2vw,1.8rem)}
+.card.result.unsure{box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--caution) 70%,transparent),var(--lift)}
+.card.bad .note,.card.result.lowq .note{border-left-color:var(--ruby)}
+#out:has(.card.result.lowq,.card.result.unsure) #repsec .btn.primary{background:var(--surface);color:var(--link);border:1.5px solid var(--edge);box-shadow:none}
+.lpin.off{background:var(--mute)!important;box-shadow:none!important}
+.dots i{background:var(--edge)}
+.dropplate{border-color:var(--edge)}
+.seg button[aria-pressed=true],#mode::before{background:var(--tint-ground);box-shadow:inset 0 0 0 2px var(--brand)}
+#mode button[aria-pressed=true]{color:var(--ink)}
+input::placeholder{font-family:var(--f-body)!important;font-style:normal!important;color:var(--mute)}
+:lang(hi) .kicker,:lang(hi) .brand span,:lang(hi) .result .kicker,:lang(hi) .foot,:lang(hi) .hungr,:lang(hi) i,:lang(hi) em{font-style:normal}
+:lang(hi) body{line-height:1.65}
+.seg button{text-wrap:balance}
+/* phone and tablet: after a result the capture panel shrinks to its controls, so the answer starts near the top */
+@media (max-width:1099px){body.has-res .panel .tips,body.has-res .panel #capH,body.has-res .panel .dist .hint{display:none}
+ body.has-res .panel .dist{margin-top:var(--s3)}
+ /* overlapping set: heading, buttons and tray first, the long how-to after them */
+ body.m-pano .panel{display:flex;flex-direction:column}
+ body.m-pano .panel>*{order:6}body.m-pano .panel>#journey{order:0}body.m-pano .panel>#mode{order:1}body.m-pano .panel>#capH{order:2}
+ body.m-pano .panel>.btns{order:3}body.m-pano .panel>#pano{order:4}body.m-pano .panel>.pgide{order:5;margin-top:var(--s4)}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 """
 
@@ -342,7 +371,7 @@ function probs(r){const top=r.ranked[0][0],one=([c,p])=>`<div class="prob ${c===
 function dims(d){
  if(!d.available)return `<section class="card"><div class="kicker">Dimensions</div><p class="hungr u-m0">${esc(d.reason)}</p></section>`;
  const num=v=>v>=100?Math.round(v).toLocaleString():v, row=(k,v)=>`<div class="drow"><span>${esc(k)}</span><b>${v}</b></div>`;
- let h=`<section class="card"><div class="kicker">Estimated dimensions, depth trust: ${esc(d.depth_trust)}</div>`,more='';
+ let h=`<section class="card" id="dimcard"><div class="kicker">Estimated size <span class="dtrust t-${esc(d.depth_trust)}"><span>Depth trust:</span> ${esc(d.depth_trust)}</span></div>`,more='';
  if(d.overlay)h+=`<img class="dimg" src="${d.overlay}" alt="Measured area outlined">`;
  h+=d.measures.map(m=>row(m.name,`${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small>`)).join('');
  if(d.size_class){const sp=d.size_class_prob||{};h+=row('Size class (Fell 1994)',esc(d.size_class)+(Object.keys(sp).length>1?' <small>('+Object.entries(sp).map(([k,v])=>esc(k)+' '+Math.round(v*100)+'%').join(', ')+')</small>':''));}
@@ -372,9 +401,9 @@ function render(r){
   if(bp) note=`<p class="note"><b>Not reliable.</b> <span>This does not look like a ground photo of a slope</span> (${pct(r.usable)} <span>usable</span>). <span>This is the model's own answer, not adjusted. Retake the photo before relying on it:</span></p><ol class="steps">${D.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`;
   else if(fam) note=`<p class="note">Clearly a ${esc(r.family)}; the exact type is close between <b>${esc(n[r.ranked[0][0]])}</b> and <b>${esc(n[r.ranked[1][0]])}</b>. Check the points below for both.</p>`;
   else if(unsure) note=`<p class="note">Not confident. Second choice: <b>${esc(n[r.ranked[1][0]])}</b>. Take another photo with the whole slope in view, or check the points below for both types.</p>`;
-  h=`<section class="card result${bp?' lowq':''}" aria-live="polite"><div class="rhead">${summit(gname,conf,bp?'bad':sig?'signal':'')}<div>
+  h=`<section class="card result${bp?' lowq':unsure?' unsure':''}" aria-live="polite"><div class="rhead">${summit(gname,conf,bp?'bad':sig?'signal':'')}<div>
     <div class="kicker">${kicker}</div><div class="title">${esc(fam||i.title)}</div></div></div>
-    ${fam?'':`<p class="hungr u-t2"><span>Hungr et al. 2014</span>: ${esc(i.hungr)}</p>`}
+    ${fam||!i.hungr||i.hungr==='-'?'':`<p class="hungr u-t2"><span>Hungr et al. 2014</span>: ${esc(i.hungr)}</p>`}
     <div class="meter"><div class="row"><span><span>Model confidence</span>${fam?' <span>(family)</span>':''}: <b class="cband">${conf>=.8?'High':conf>=D.conf?'Moderate':'Low'}</b></span><span class="val">${pct(conf)}</span></div>
     <div class="cscale${bp?' bad':sig?' signal':''}" style="--v:${conf};--c:${D.conf}" aria-hidden="true"><i></i></div>
     <p class="hungr u-t1">Answers below ${pct(D.conf)} are marked uncertain.</p></div>${note}</section>
@@ -389,7 +418,7 @@ function render(r){
 function loading(){setChip('','Analysing…',true);
  out.innerHTML='<section class="card result" aria-busy="true"><div class="kicker">Analysing photo</div><div class="skel" style="width:60%;height:22px"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:40%"></div></section>';}
 function fail(msg){setChip('bad','Error');
- out.innerHTML=`<section class="card bad" role="alert"><div class="kicker">Something went wrong</div><h2>${esc(msg)}</h2><p class="hungr u-m0">${/image|photo|jpe?g|png|megapixel|read|format|large|file/i.test(msg)?'Choose another photo: a JPEG or PNG of the slope, under 40 megapixels.':'Check the connection to the computer running the app, then try again.'}</p></section>`;}
+ out.innerHTML=`<section class="card bad" role="alert"><h2>${/image|photo|jpe?g|png|megapixel|read|format|large|file/i.test(msg)?'This photo could not be read':'The photo could not be analysed'}</h2><p class="u-m0">${esc(msg.charAt(0).toUpperCase()+msg.slice(1))}.</p><p class="hungr u-t1 u-m0">${/image|photo|jpe?g|png|megapixel|read|format|large|file/i.test(msg)?'Choose another photo: a JPEG or PNG of the slope, under 40 megapixels.':'Check the connection to the computer running the app, then try again.'}</p></section>`;}
 // photo pick -> the guidance layer (src/guide.py) runs the photo check, upload, progress and next steps
 function go(e){const fs=[...e.target.files];if(!fs.length)return;e.target.value='';const cam=e.target.id==='cam';
  if(App.onPicks&&App.onPicks(fs,cam))return;App.onPick(fs[0],cam)}
@@ -414,16 +443,15 @@ document.addEventListener('DOMContentLoaded',()=>{const $=q=>document.querySelec
  const cam=$('#camBtn'),gal=$('#gal')?.closest('label');
  function prim(){const d=wide.matches&&fine.matches;   // with a mouse the upload is the main way in, the live camera second
   if(cam){cam.classList.toggle('primary',!d);cam.classList.toggle('ghost',d)}if(gal){gal.classList.toggle('primary',d);gal.classList.toggle('ghost',!d)}}
- function state(){const o=$('#out'),f=$('#fig'),res=!!(o&&o.firstElementChild)||!!(f&&f.style.display==='block');B.classList.toggle('has-res',res);
+ function state(){const o=$('#out'),f=$('#fig'),res=!!(o&&o.firstElementChild&&!(o.children.length===1&&o.firstElementChild.matches('.card.bad')))||!!(f&&f.style.display==='block');B.classList.toggle('has-res',res);
   const m=(g()&&g().mode&&g().mode())||'single';['single','survey','pano'].forEach(k=>B.classList.toggle('m-'+k,m===k));
-  const pf=$('#plateFor');if(pf){const t=m==='survey'?(($('#capH')||{}).textContent||''):'';if(pf.textContent!==t)pf.textContent=t}}
+  const pf=$('#plateFor');if(pf){const t='';if(pf.textContent!==t)pf.textContent=t}}
  place();prim();state();
  wide.addEventListener('change',()=>{place();prim()});fine.addEventListener('change',prim);
  const mo=new MutationObserver(state);
  [['#out',{childList:true}],['#fig',{attributes:true,attributeFilter:['style']}],['#mode',{childList:true,subtree:true,attributes:true}],['#capH',{childList:true,characterData:true,subtree:true}]]
   .forEach(([q,o])=>{const n=$(q);if(n)mo.observe(n,o)});
  plate.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&b.dataset.a==='cam'){$('#camBtn').click();return}$('#gal').click()});
- plate.addEventListener('keydown',e=>{if(e.target===plate&&(e.key==='Enter'||e.key===' ')){e.preventDefault();$('#gal').click()}});
  addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;const t=document.activeElement,vf=$('#vf');
   if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))return;
   if(document.querySelector('.modal:not([hidden])')||(vf&&!vf.hidden))return;
@@ -465,7 +493,7 @@ body.has-res .panel .tips,body.has-res .panel #capH{display:none}
 .dropplate{display:grid;justify-items:center;align-content:center;gap:12px;min-height:clamp(340px,calc(100vh - 260px),560px);padding:36px 28px;text-align:center;cursor:pointer;
  border:2px dashed var(--contour);border-radius:14px;background:var(--grain),var(--surface);background-color:var(--surface);box-shadow:var(--lift);transition:border-color .2s ease,background-color .2s ease}
 .dropplate:hover,body.dragging .dropplate{border-color:var(--brand);background-color:color-mix(in srgb,var(--brand) 6%,var(--surface))}
-.dropplate:focus-visible{outline:2.5px solid var(--focus);outline-offset:4px}
+.dropplate:focus-within{border-color:var(--brand)}
 .frameart{display:block;width:min(400px,70%);height:auto;margin-bottom:6px}
 .fa-hill{fill:var(--surface-2);stroke:var(--contour);stroke-width:1.5}.fa-scar{fill:var(--scar);opacity:.85}.fa-crown{fill:none;stroke:var(--scar-ink);stroke-width:2;stroke-linecap:round}
 .fa-frame{fill:none;stroke:var(--brand);stroke-width:2.5;stroke-dasharray:9 6}.fa-level{stroke:var(--mute);stroke-width:1.5;stroke-dasharray:2 5}
@@ -559,6 +587,31 @@ body.has-res.m-single .stage{display:none}
 .iconbtn{min-width:40px;height:40px}
 .vf video{object-fit:contain}
 }
+
+/* ===== audit pass: desktop ===== */
+@media (min-width:1100px){
+#out>.safety{grid-column:span 5;order:2}
+#out>#repsec{order:3}
+#out>#askcard,#out>#nextcard{order:4}
+.colB:not(:has(#fig[style*="block"])) #out>.safety{grid-column:span 5}
+.colB:not(:has(#fig[style*="block"])) #out>#askcard,.colB:not(:has(#fig[style*="block"])) #out>#nextcard{grid-column:1/-1}
+#fig img{background:var(--surface-2)}
+.colB:has(#fig[style*="block"]) #fig{align-self:start;height:auto}.colB:has(#fig[style*="block"]) #fig img{height:auto;max-height:calc(100vh - 60px)}
+.dropplate{min-height:clamp(300px,50vh,440px)}
+.stage>#shots{order:0}.stage>.dropplate{order:1}.stage>#pano{order:2}.stage>.pgide{order:3}
+body.m-survey .panel .tips{display:none}
+kbd{font-size:.85em}
+.vfhud>.vfb{grid-column:2;grid-row:5;background:none;padding:8px 18px 4px}
+.vfhud>.vfkeys{grid-row:6;padding-top:0}
+.vfhud{grid-template-rows:auto auto auto 1fr auto auto}
+.vf .vfg{bottom:40px}.vf .ptarget{bottom:40px}
+}
+/* with a photo: verdict, safety, save and size stack beside it; the checklist and all types share the row below */
+@media (min-width:1100px){.colB:has(#fig[style*="block"]) #fig{grid-row:span 5}
+.colB:has(#fig[style*="block"]) #out>#dimcard{grid-column:span 5}
+.colB:has(#fig[style*="block"]) #out>#checkcard{grid-column:1/span 6}.colB:has(#fig[style*="block"]) #out>#typescard{grid-column:7/span 6}}
+@media (min-width:1100px) and (max-width:1399px){.colB:has(#fig[style*="block"]) #out>#dimcard,#out>.safety{grid-column:span 6}}
+@media (min-width:1100px) and (max-height:760px){.colA{position:static;max-height:none;overflow:visible}}
 /* Windows high-contrast themes: keep every control and region outlined */
 @media (forced-colors:active){
 .btn,.iconbtn,.seg,.card.result,.panel,#repsec,#askcard,.dropplate,.sheet,.vfd,.vfmsg{border:1px solid CanvasText}
@@ -593,14 +646,14 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 .drow>span::after{content:"";flex:1;min-width:14px;border-bottom:2px dotted var(--contour);translate:0 -4px}.drow b{text-align:right;font-weight:600;font-variant-numeric:lining-nums tabular-nums}.drow small{opacity:.75;font-weight:400;font-style:italic}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--edge);transition:border-color .2s ease,box-shadow .25s ease;font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
 __DCSS__</style></head><body>__DEFS__<main>
 <div class="hero" id="hero" aria-hidden="true"></div>
-<header><div class="logo">__LOGO__</div><div class="brand"><b>Landslide Type Check</b><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
+<header><div class="logo">__LOGO__</div><div class="brand"><h1><b>Landslide Type Check</b></h1><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
 <div id="netbar" class="netbar" role="status" hidden>You are offline. Photos cannot be analysed until the connection is back.</div>
 <div class="layout"><div class="colA">
 <section class="card panel"><ol class="journey" id="journey" aria-label="Progress"></ol><div class="seg" id="mode" role="group" aria-label="Capture mode"></div><ul class="shots" id="shots"></ul><h2 id="capH">Photograph the slope from below</h2>
 <ul class="tips">
 <li>__I_pos__<span>Stand at the foot of the slope or across the road, facing up at it.</span></li>
 <li>__I_frame__<span>Fit the whole slope: the top (scarp or source) and the bottom (deposit).</span></li>
-<li>__I_sun__<span>Hold the phone level, in daylight. One slope per photo.</span></li></ul>
+<li>__I_sun__<span>Hold the camera level, in daylight. One slope per photo.</span></li></ul>
 <div class="btns">
 <button type="button" class="btn primary wide" id="camBtn">__I_camera__Guided camera</button>
 <label class="btn ghost" id="camNat">__I_camera__Phone camera<input id="cam" type="file" accept="image/*" capture="environment"></label>
@@ -610,7 +663,7 @@ __DCSS__</style></head><body>__DEFS__<main>
 <input id="dist" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 40" aria-describedby="disthint"><span class="hint" id="disthint">Makes the sizes more accurate. 40, 40 m or 130 ft all work.</span></label></section>
 </div><div class="colB">
 <div class="stage" id="stage">
-<div class="dropplate" id="plate" role="button" tabindex="0" aria-labelledby="plateH" aria-describedby="plateFor">
+<div class="dropplate" id="plate">
 <svg class="frameart" viewBox="0 0 360 170" aria-hidden="true"><path class="fa-hill" d="M0 150 C60 120 90 70 150 52 C200 38 230 60 270 90 C300 112 330 128 360 132 V170 H0Z"/>
 <path class="fa-scar" d="M168 50 C180 46 198 47 206 54 L222 118 C206 132 176 134 160 124 Z"/><path class="fa-crown" d="M166 52 C182 44 200 45 208 54"/>
 <rect class="fa-frame" x="112" y="26" width="150" height="124" rx="4"/><path class="fa-level" d="M100 160 H274"/>

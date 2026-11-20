@@ -86,6 +86,15 @@ QUIZ = [
 
 # ---------------------------------------------------------------- Hindi (machine-drafted; needs a native-speaker review)
 HI = {
+    "Stand at the foot of the slope (or across the road) and point the camera up at it": "ढलान के निचले सिरे पर (या सड़क के उस पार) खड़े होकर कैमरा ऊपर की ओर करें",
+    "Fit the whole slope in the frame: the top (scarp/source) and the bottom (deposit/toe)": "पूरी ढलान फ़्रेम में लें: ऊपरी भाग (दरार/स्रोत) और निचला भाग (मलबा/तलहटी)",
+    "Hold the camera level; take the photo in daylight": "कैमरा सीधा रखें; फ़ोटो दिन की रोशनी में लें",
+    "Do not use drone, satellite or map images; one photo per slope": "ड्रोन, उपग्रह या नक्शे की तस्वीरें न लें; एक ढलान की एक फ़ोटो",
+    "Estimated size": "अनुमानित आकार",
+    "Depth trust:": "गहराई भरोसा:",
+    "This photo could not be read": "यह फ़ोटो पढ़ी नहीं जा सकी",
+    "The photo could not be analysed": "फ़ोटो का विश्लेषण नहीं हो सका",
+    "Not sure. Take a second photo from another spot, and mark the signs you can see on site below.": "निश्चित नहीं। दूसरी जगह से एक और फ़ोटो लें, और नीचे स्थल पर दिखने वाले संकेत चिह्नित करें।",
     "close": "बंद करें",
     "Choose photos": "फ़ोटो चुनें",
     "take the photo": "फ़ोटो लें",
@@ -140,7 +149,7 @@ HI = {
     "New observation": "नया अवलोकन", "Photograph the slope from below": "ढलान की फ़ोटो नीचे से लें",
     "Stand at the foot of the slope or across the road, facing up at it.": "ढलान के नीचे या सड़क के उस पार खड़े होकर ऊपर की ओर देखें।",
     "Fit the whole slope: the top (scarp or source) and the bottom (deposit).": "पूरी ढलान फ़्रेम में लें: ऊपर (दरार/स्रोत) और नीचे (मलबा)।",
-    "Hold the phone level, in daylight. One slope per photo.": "फ़ोन सीधा रखें, दिन की रोशनी में। एक फ़ोटो में एक ढलान।",
+    "Hold the camera level, in daylight. One slope per photo.": "कैमरा सीधा रखें, दिन की रोशनी में। एक फ़ोटो में एक ढलान।",
     "Take photo": "फ़ोटो लें", "From gallery": "गैलरी से",
     "Distance from you to the slope, metres (optional, makes sizes more accurate)": "आपसे ढलान तक की दूरी, मीटर (वैकल्पिक, आकार अधिक सटीक होते हैं)",
     "e.g. 40": "जैसे 40",
@@ -273,7 +282,7 @@ HI = {
     "Model result combined with your answers.": "मॉडल परिणाम आपके उत्तरों के साथ मिलाया गया।", "Starts from the model result.": "मॉडल परिणाम से शुरू।",
     "The answer weights are expert rules of thumb from the Hungr 2014 type descriptions, not trained on data; a geologist has the final word.":
         "उत्तरों के भार हंगर 2014 के विवरणों पर आधारित विशेषज्ञ अनुमान हैं, डेटा से सीखे नहीं गए; अंतिम निर्णय भूविज्ञानी का है।",
-    "Tap each sign you can see on site.": "स्थल पर दिखने वाले हर संकेत को छुएँ।", "Signs seen:": "दिखे संकेत:",
+    "Mark each sign you can see on site.": "स्थल पर दिखने वाले हर संकेत को छुएँ।", "Signs seen:": "दिखे संकेत:",
     "The field signs support this type.": "स्थल-संकेत इस प्रकार का समर्थन करते हैं।",
     "Few signs match: take another photo or ask a geologist.": "कम संकेत मिलते हैं: एक और फ़ोटो लें या भूविज्ञानी से पूछें।",
     "The type with the larger share of signs seen is the better field match.": "जिस प्रकार के अधिक संकेत दिखे, वही स्थल पर बेहतर मेल है।",

@@ -179,9 +179,9 @@ INFO = {
     },
 }
 
-PHOTO_TIPS = ["Stand at the foot of the slope (or across the road) and point the phone up at it",
+PHOTO_TIPS = ["Stand at the foot of the slope (or across the road) and point the camera up at it",
               "Fit the whole slope in the frame: the top (scarp/source) and the bottom (deposit/toe)",
-              "Hold the phone level; take the photo in daylight",
+              "Hold the camera level; take the photo in daylight",
               "Do not use drone, satellite or map images; one photo per slope"]
 
 # The page (design system, glyphs, demo mode) lives in src/ui.py
