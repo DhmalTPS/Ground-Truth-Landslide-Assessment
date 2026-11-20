@@ -18,7 +18,7 @@ Each stage of the journey has its own aid:
            observations, offline banner, retry, sun mode (high contrast), voice, keyboard and
            screen-reader support
 
-Settings and history stay in this browser (localStorage); nothing extra is sent to the server.
+Settings and history stay in this browser (localStorage); nothing extra is sent to the server. Map tiles in the image report come from OpenStreetMap (optional).
 """
 import json
 from pathlib import Path
@@ -46,7 +46,7 @@ GLOSSARY = {
     "Depth trust": "How well the 3-D depth checks agreed (high / medium / low). Low: treat sizes as order-of-magnitude.",
     "Grain size D16/D50/D84": "Block or boulder sizes: 16%, 50% and 84% of the counted pieces are smaller than these.",
     "Travel angle (H/L)": "Drop height over run-out length. A low angle means the material travelled far (mobile, dangerous).",
-    "Size class (Fell 1994)": "Volume class from 'extremely small' (<500 m3) to 'very large', used in hazard reports.",
+    "Size class (Fell 1994)": "Volume class from 'extremely small' (<500 m³) to 'very large', used in hazard reports.",
     "Slope angle": "Steepness of the ground surface in the outlined area, in degrees.",
 }
 
@@ -133,11 +133,11 @@ CSS = """
 #mode:has(button:nth-child(2)[aria-pressed=true])::before{translate:calc(100% + 4px) 0}#mode:has(button:nth-child(3)[aria-pressed=true])::before{translate:calc(200% + 8px) 0}
 #mode:not(:has([aria-pressed=true]))::before{opacity:0}
 .shots{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}
-.shots li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid transparent;font-size:.88rem;color:var(--ink-2);cursor:pointer}
-.shots li b{display:block;color:var(--ink);font-size:.93rem}
-.shots li .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:1.5px solid var(--line)}
-.shots li.cur{border-color:var(--brand);background:var(--tint-ground)}.shots li.newsite{border-color:var(--contour)}.shots li.cur .n{background:var(--brand);color:var(--on-brand);border:0}
-.shots li.done .n{background:var(--tint-ground);color:var(--link);border-color:var(--teal-400)}
+.shots .sh{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid transparent;font-size:.88rem;color:var(--ink-2);cursor:pointer}
+.shots .sh b{display:block;color:var(--ink);font-size:.93rem}
+.shots .sh .n{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;border:1.5px solid var(--line)}
+.shots .sh.cur{border-color:var(--brand);background:var(--tint-ground)}.shots .sh.newsite{border-color:var(--contour)}.shots .sh.cur .n{background:var(--brand);color:var(--on-brand);border:0}
+.shots .sh.done .n{background:var(--tint-ground);color:var(--link);border-color:var(--teal-400)}
 .pace{margin-top:8px;font-size:.85rem;color:var(--ink-2)}.pace summary{cursor:pointer;color:var(--link);font-weight:600;min-height:44px;display:flex;align-items:center}
 .pace .pr{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .pace input{width:76px;min-height:44px;padding:8px;border-radius:9px;border:1px solid var(--edge);font:inherit;background:transparent;color:inherit}
@@ -180,10 +180,10 @@ CSS = """
 .gloss dt{font-weight:650;color:var(--ink);margin-top:8px;font-size:.9rem}.gloss dd{margin:2px 0 0;color:var(--ink-2);font-size:.88rem}
 details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointer;color:var(--link);font-weight:600;min-height:44px;display:flex;align-items:center}
 .hist{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:8px}
-.hist{gap:0!important}.hist li{display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;min-height:64px;padding:10px 6px;font-size:.88rem;color:var(--ink-2);border-bottom:1px solid var(--line)}
-.hist li:last-child{border-bottom:0}.hist li>span:last-child{text-align:right;font:600 1.12rem/1.2 var(--f-disp);color:var(--ink);font-variant-numeric:lining-nums}
-.hist li>span:last-child small{font:400 .8rem var(--f-body);color:var(--mute)}.hist b{font:600 1.02rem/1.25 var(--f-disp)}
-.hist img{width:56px;height:56px;object-fit:cover;border-radius:2px;border:3px solid var(--surface);outline:1px solid var(--frame);box-shadow:var(--lift);transition:rotate .4s var(--spring)}.hist li:hover img{rotate:-2deg}.hist b{color:var(--ink)}
+.hist{gap:0!important}.hist .hi{display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;min-height:64px;padding:10px 6px;font-size:.88rem;color:var(--ink-2);border-bottom:1px solid var(--line)}
+.hist .hi:last-child{border-bottom:0}.hist .hi>span:last-child{text-align:right;font:600 1.12rem/1.2 var(--f-disp);color:var(--ink);font-variant-numeric:lining-nums}
+.hist .hi>span:last-child small{font:400 .8rem var(--f-body);color:var(--mute)}.hist b{font:600 1.02rem/1.25 var(--f-disp)}
+.hist img{width:56px;height:56px;object-fit:cover;border-radius:2px;border:3px solid var(--surface);outline:1px solid var(--frame);box-shadow:var(--lift);transition:rotate .4s var(--spring)}.hist .hi:hover img{rotate:-2deg}.hist b{color:var(--ink)}
 .netbar{position:sticky;top:0;z-index:40;margin:-8px -4px 10px;padding:9px 12px;border-radius:12px;background:#7a2b1d;color:#fff;font-size:.86rem;text-align:center}
 .netbar[hidden]{display:none}
 .switch{display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.92rem}
@@ -243,10 +243,10 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .pills .bad{box-shadow:inset 0 0 0 1.5px #ff745e;color:#ffb3a3}.shutter.poor{border-color:#ff745e}.netbar.sync{background:#0e4d45}
 .qa{display:flex;gap:8px;flex-wrap:wrap}.qa .minibtn{min-width:84px;min-height:44px}
 .quiz{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0}.quiz button{border:2px solid var(--edge);border-radius:14px;background:var(--surface-2);padding:6px;cursor:pointer;color:var(--ink-2);font-weight:700;font-size:.9rem;font-family:inherit}
-.quiz svg{width:100%;height:auto;max-height:190px}.quiz .right{border-color:#34b08c;box-shadow:0 0 0 3px rgba(52,176,140,.25)}.quiz .wrong{opacity:.5}
+.quiz svg{width:100%;height:auto;max-height:190px}.quiz .right{border-color:#34b08c;box-shadow:0 0 0 3px rgba(52,176,140,.25)}.quiz .wrong{filter:grayscale(1);border-style:dashed}.quiz .wrong svg{opacity:.45}
 #obsbox textarea,#obsbox select{width:100%;margin-top:8px;padding:9px;border-radius:10px;border:1px solid var(--edge);font:inherit;background:transparent;color:inherit}#obsbox select{width:auto}
-.hist li[role=button]{cursor:pointer;border-radius:10px}.hist li[role=button]:hover{background:var(--surface-2)}
-.shots li.newsite{border-style:dashed}.switch select{font:inherit;padding:4px 6px;border-radius:8px;background:transparent;color:inherit;border:1px solid var(--edge)}
+.hist button.hi{cursor:pointer;border-radius:10px}.hist button.hi:hover{background:var(--surface-2)}
+.shots .sh.newsite{border-style:dashed}.switch select{font:inherit;padding:4px 6px;border-radius:8px;background:transparent;color:inherit;border:1px solid var(--edge)}
 .langbtn{margin-left:6px;width:auto;padding:0 10px;border-radius:21px;font-size:.85rem}
 body.sun{--mute:var(--ink-2);--line:#9aa6a0;font-size:17.5px}body.sun .card{border-width:2px}body.sun .hungr{color:var(--ink-2)}
 """
@@ -254,14 +254,16 @@ body.sun{--mute:var(--ink-2);--line:#9aa6a0;font-size:17.5px}body.sun .card{bord
 JS = r"""
 (()=>{const A=window.App,D=A.D,esc=A.esc,G=D.guide,T=G.check.thresholds,$=s=>document.querySelector(s),out=$('#out');
 const store={get(k,d){try{const v=localStorage.getItem('lsg.'+k);return v==null?d:JSON.parse(v)}catch(_){return d}},
- set(k,v){try{localStorage.setItem('lsg.'+k,JSON.stringify(v))}catch(_){}}};
+ set(k,v){try{localStorage.setItem('lsg.'+k,JSON.stringify(v))}catch(_){if(k==='hist'&&!store.full){store.full=1;setTimeout(()=>toast(tr('Recent photos list is full on this browser.')),0)}}}};
 const sess={get(k){try{return sessionStorage.getItem('lsg.'+k)}catch(_){return null}},set(k,v){try{sessionStorage.setItem('lsg.'+k,v)}catch(_){}}};
-const buzz=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(_){}};
+const buzz=p=>{try{if(navigator.vibrate&&(!navigator.userActivation||navigator.userActivation.hasBeenActive))navigator.vibrate(p)}catch(_){}};
 let voice=store.get('voice',false),lang=store.get('lang','en');
 function say(t){if(!voice||!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(lang==='hi'?tr(t):t);u.lang=lang==='hi'?'hi-IN':'en-IN';u.rate=1.03;speechSynthesis.speak(u)}catch(_){}}
 const ICO=n=>D.icons[n].replace('<svg','<svg class="ico"');
 const LIVE=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.isSecureContext);
 if(store.get('sun',false))document.body.classList.add('sun');
+{const sb=$('#sunBtn');const sync=()=>{if(sb)sb.setAttribute('aria-pressed',document.body.classList.contains('sun'))};sync();
+ if(sb)sb.onclick=()=>{const on=!document.body.classList.contains('sun');document.body.classList.toggle('sun',on);store.set('sun',on);sync()};A.syncSun=sync}
 
 /* ---------- journey stepper, mode and survey shot list ---------- */
 const J=['Safe spot','Frame','Check','Result','Report'];
@@ -272,11 +274,11 @@ let mode=store.get('mode','single'),shot=+(sess.get('shot')||0),done=new Set(JSO
 function saveShots(){sess.set('shot',shot);sess.set('done',JSON.stringify([...done]))}
 function drawMode(){
  $('#mode').innerHTML=`<button type="button" data-m="single" aria-pressed="${mode==='single'}">Single photo</button><button type="button" data-m="survey" aria-pressed="${mode==='survey'}">Site survey (4 shots)</button><button type="button" data-m="pano" aria-pressed="${mode==='pano'}">Overlapping set</button>`;
- $('#shots').innerHTML=mode!=='survey'?'':G.shots.map((s,k)=>`<li data-k="${k}" class="${k===shot?'cur':''} ${done.has(s.id)?'done':''}" tabindex="0" role="button" aria-current="${k===shot}"><span class="n">${done.has(s.id)?'&#10003;':k+1}</span><span><b>${esc(s.t)}</b><span>${esc(s.d)}</span></span></li>`).join('')+(done.size?`<li class="newsite" data-new="1" role="button" tabindex="0"><span class="n">+</span><span><b>Start a new site</b><span>Clears the shot list, notes and location for the next landslide.</span></span></li>`:'');
+ $('#shots').innerHTML=mode!=='survey'?'':G.shots.map((s,k)=>`<button type="button" data-k="${k}" class="sh ${k===shot?'cur':''} ${done.has(s.id)?'done':''}"${k===shot?' aria-current="step"':''}><span class="n">${done.has(s.id)?'&#10003;':k+1}</span><span><b>${esc(s.t)}</b><span>${esc(s.d)}</span></span></button>`).join('')+(done.size?`<button type="button" class="sh newsite" data-new="1"><span class="n">+</span><span><b>Start a new site</b><span>Clears the shot list, notes and location for the next landslide.</span></span></button>`:'');
  const h=$('#capH');if(h)h.textContent=mode==='survey'?'Shot '+(shot+1)+' of '+G.shots.length+': '+G.shots[shot].t:mode==='pano'?'Cover the slope with overlapping photos':'Photograph the slope from below';
  A.pano&&A.pano.show(mode==='pano')}
 $('#mode').addEventListener('click',e=>{const m=e.target.dataset.m;if(m){mode=m;store.set('mode',m);drawMode()}});
-$('#shots').addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;if(li.dataset.new){newSite();return}shot=+li.dataset.k;saveShots();drawMode()});
+$('#shots').addEventListener('click',e=>{const li=e.target.closest('.sh');if(!li)return;if(li.dataset.new){newSite();return}shot=+li.dataset.k;saveShots();drawMode()});
 function newSite(){done.clear();shot=0;saveShots();['survey','site','notes','gps','weather'].forEach(k=>sess.set(k,''));sess.set('siteId',String(Date.now()));
  const n=$('#notes');if(n){n.value='';$('#weather').value='';gps=null;$('#gpsout').textContent=''}drawMode();$('#sitecard')?.remove();toast('New site started.')}
 $('#shots').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.target.click()}});
@@ -285,7 +287,7 @@ const curShot=()=>mode==='survey'?G.shots[shot]:null;
 
 /* ---------- distance helper ---------- */
 const dist=$('#dist');
-function parseDist(v){v=String(v||'').trim().toLowerCase().replace(/[०-९]/g,c=>'०१२३४५६७८९'.indexOf(c)).replace(/(\d),(\d)/,'$1.$2');if(!v)return null;
+function parseDist(v){v=String(v||'').trim().toLowerCase().replace(/[०-९]/g,c=>'०१२३४५६७८९'.indexOf(c)).replace(/^(\d{1,3}),(\d{3})(?!\d)/,'$1$2').replace(/(\d),(\d)/,'$1.$2');if(!v)return null;
  const m=v.match(/^(\d+(?:\.\d+)?)\s*(m|mtr|mtrs|meter|meters|metre|metres|मी|मीटर|ft|feet|foot|'|yd|yds|yard|yards|km)?\.?$/);if(!m)return NaN;
  const k={ft:.3048,feet:.3048,foot:.3048,"'":.3048,yd:.9144,yds:.9144,yard:.9144,yards:.9144,km:1000}[m[2]]||1;return Math.round(parseFloat(m[1])*k*10)/10}
 A._parseDist=v=>parseDist(v);const distM=()=>{const v=parseDist(dist.value);return v>=1&&v<=3000?v:null};
@@ -294,7 +296,7 @@ A._parseDist=v=>parseDist(v);const distM=()=>{const v=parseDist(dist.value);retu
 <div class="pr">Pace it to the toe (only where safe): <input id="steps" type="number" min="1" inputmode="numeric" placeholder="steps"> &times;
 <input id="stride" type="number" step="0.05" min="0.4" max="1.2" value="${store.get('stride',0.75)}" aria-label="metres per step"> m =
 <b id="paced">&ndash;</b><button type="button" class="minibtn" id="usepace">Use</button></div>
-<p class="u-t2">Other ways: a laser rangefinder, or Google Maps &rarr; right-click &rarr; <i>Measure distance</i> from where you stand to the slope. A normal walking step is about 0.75 m; measure 10 of your steps once to know yours.</p></details>`);
+<p class="u-t2">Other ways: a laser rangefinder, or Google Maps: long-press (phone) or right-click (computer), then Measure distance from where you stand to the slope. A normal walking step is about 0.75 m; measure 10 of your steps once to know yours.</p></details>`);
 const paced=()=>{const s=parseFloat($('#steps').value),k=parseFloat($('#stride').value);return s>0&&k>0?Math.round(s*k*10)/10:null};
 $('#steps').oninput=$('#stride').oninput=()=>{const p=paced();$('#paced').textContent=p?p+' m':'–';if(+$('#stride').value)store.set('stride',+$('#stride').value)};
 $('#usepace').onclick=()=>{const p=paced();if(p){dist.value=p;dist.dispatchEvent(new Event('input'));buzz(15)}};
@@ -314,19 +316,26 @@ document.body.insertAdjacentHTML('beforeend',`<div class="modal" id="mTour" hidd
 <button type="button" class="vfd" data-a="task" aria-expanded="false"></button><div class="pills" aria-hidden="true"></div>
 <div class="vfdock"><div class="vfq" aria-hidden="true"></div><div class="vfmsg" aria-live="polite"></div></div>
 <div class="vfb"><span></span><button type="button" class="shutter" data-a="shoot" aria-label="Take photo"><span></span></button><span class="vfr"></span></div></div></div>`);
-let lastFocus=null;
-function openM(id,html){const m=$('#'+id);m.firstElementChild.innerHTML=html;m.hidden=false;lastFocus=document.activeElement;
+let lastFocus=null,tilesAsk=null;
+// dialogs: everything behind an open dialog or the camera is inert (no Tab, no clicks, hidden from screen readers)
+function behind(on){for(const el of document.body.children)if(!el.matches('.modal,.vf,script,style,.toast'))el.inert=on}
+function anyOpen(){return [...document.querySelectorAll('.modal')].some(m=>!m.hidden)||!$('#vf').hidden}
+function openM(id,html){const m=$('#'+id);if(html!=null)m.firstElementChild.innerHTML=html;const a=document.activeElement;
+ if(a&&!a.closest('.modal,.vf'))lastFocus=a;m.hidden=false;behind(true);if(!(history.state&&history.state.m))try{history.pushState({...(history.state||{}),m:1},'')}catch(_){}
  (m.querySelector('[data-f]')||m.querySelector('button,input'))?.focus();return m}
-function closeM(id){$('#'+id).hidden=true;lastFocus?.focus?.()}
+function closeM(id){$('#'+id).hidden=true;if(id==='mTour'&&tilesAsk){const f=tilesAsk;tilesAsk=null;f(false)}
+ setTimeout(()=>{if(!anyOpen()&&history.state&&history.state.m&&!navBack){popOwn=true;history.back()}},0);if(anyOpen())return;behind(false);if(lastFocus&&lastFocus.isConnected&&lastFocus.offsetParent)lastFocus.focus();else $('#helpBtn')?.focus()}
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;['mTour','mSafe','mHelp'].forEach(id=>{if(!$('#'+id).hidden)closeM(id)});if(!$('#vf').hidden)closeFinder()});
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeM(m.id)}));
 
 function tour(i=0){const [t,b]=G.tour[i],n=G.tour.length;
  openM('mTour',`<div class="kicker">Guide ${i+1} of ${n}</div><h2 id="tourT">${esc(t)}</h2>${i>0?G.illus[i-1]:''}<p>${esc(b)}</p>
  <div class="row"><button type="button" class="minibtn" data-a="skip">${i?'Back':'Skip'}</button><div class="dots">${G.tour.map((_,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div>
- <button type="button" class="minibtn pri" data-f data-a="next">${i<n-1?'Next':'Start'}</button></div>`);
- $('#mTour').onclick=e=>{const a=e.target.dataset.a;if(e.target.id==='mTour'||a==='skip'&&!i){store.set('toured',1);closeM('mTour')}
-  else if(a==='skip')tour(i-1);else if(a==='next'){if(i<n-1)tour(i+1);else{store.set('toured',1);quiz(0)}}}}
+ <button type="button" class="minibtn pri" data-f data-a="next">${i<n-1?'Next':'Start using the app'}</button></div>
+ ${i?`<div class="row u-t2"><button type="button" class="minibtn" data-a="close">${i<n-1?'Skip the guide':'Try a 1-minute practice'}</button></div>`:''}`);
+ $('#mTour').onclick=e=>{const a=e.target.dataset.a;if(e.target.id==='mTour'||a==='skip'&&!i||a==='close'&&i<n-1){store.set('toured',1);closeM('mTour')}
+  else if(a==='close'){store.set('toured',1);quiz(0)}
+  else if(a==='skip')tour(i-1);else if(a==='next'){if(i<n-1)tour(i+1);else{store.set('toured',1);closeM('mTour')}}}}
 if(!store.get('toured',0)&&!new URLSearchParams(location.search).get('demo'))tour(0);
 
 function safety(then){
@@ -340,20 +349,20 @@ function safety(then){
 
 function help(){const g=G.glossary;
  openM('mHelp',`<div class="row u-m0"><h2 id="helpT" class="u-m0">Help &amp; guide</h2><button type="button" class="minibtn" data-a="x" data-f aria-label="Close help">Close</button></div>
- <h3>Taking a good photo</h3><ol class="steps"><li>Stand below the slope or across the road, 20&ndash;80 m away; never on it.</li><li>Fit the scarp (top) and the toe (bottom) in one frame. Portrait or landscape both work.</li>
- <li>Daylight, sun behind or beside you. Wipe the lens. Hold level with two hands, tap the slope to focus.</li><li>Unsure result? Take more photos from other spots, or use <b>Site survey</b> mode.</li><li>Type the distance (or pace it) for better sizes; a person or car near the toe also helps.</li></ol>
+ <h3>Taking a good photo</h3><ol class="steps"><li>Stand below the slope or across the road, 20–80 m away; never on it.</li><li>Fit the scarp (top) and the toe (bottom) in one frame. Portrait or landscape both work.</li>
+ <li>Daylight, sun behind or beside you. Wipe the lens. Hold level with two hands, tap the slope to focus.</li><li>Unsure result? Take more photos from other spots, or use the Site survey mode.</li><li>Type the distance (or pace it) for better sizes; a person or car near the toe also helps.</li></ol>
  <h3>Safety</h3><ul class="steps">${G.safety.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
  <h3>Reading the result</h3><dl class="gloss">${Object.entries(g).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
  <h3>Limits</h3><p>Labels used to train the model were made by AI and the sizes are not yet checked against field measurements; treat sizes as estimates within their ranges. Always confirm with a geologist or geotechnical engineer before acting.</p>
- <h3>Settings</h3><label class="switch">Voice guidance (camera and results)<input type="checkbox" id="sVoice" ${voice?'checked':''}></label>
+ <h3>Settings</h3><label class="switch">Voice guidance (camera and results)<input type="checkbox" id="sVoice" ${voice?'checked':''}></label><label class="switch">Keyboard shortcuts (U, C, ?)<input type="checkbox" id="sKeys" ${store.get('keys',true)?'checked':''}></label>
  <label class="switch">Sun mode (high contrast, bigger text)<input type="checkbox" id="sSun" ${document.body.classList.contains('sun')?'checked':''}></label>
  <label class="switch">Language / भाषा<select id="sLang"><option value="en" ${lang==='en'?'selected':''}>English</option><option value="hi" ${lang==='hi'?'selected':''}>हिन्दी</option></select></label>
  <div class="row"><button type="button" class="minibtn" data-a="tour">Replay the guide</button><button type="button" class="minibtn" data-a="quiz">Practice quiz</button><button type="button" class="minibtn" data-a="clear">Clear recent photos</button></div>
  <p class="hungr">Live camera guide: ${LIVE?'available':'needs a secure address (https or localhost); the phone camera app is used instead'}.</p>`);
  const m=$('#mHelp');
  m.onclick=e=>{const a=e.target.dataset.a;if(a==='x'||e.target===m)closeM('mHelp');if(a==='tour'){closeM('mHelp');tour(0)}if(a==='quiz'){closeM('mHelp');quiz(0)}if(a==='clear'){store.set('hist',[]);safe(async()=>{for(const x of await DB.all('results'))await DB.del('results',x.id)});drawHist();e.target.textContent='Cleared'}};
- m.onchange=e=>{if(e.target.id==='sVoice'){voice=e.target.checked;store.set('voice',voice);say('Voice guidance on')}
-  if(e.target.id==='sSun'){document.body.classList.toggle('sun',e.target.checked);store.set('sun',e.target.checked)}
+ m.onchange=e=>{if(e.target.id==='sKeys')store.set('keys',e.target.checked);if(e.target.id==='sVoice'){voice=e.target.checked;store.set('voice',voice);say('Voice guidance on')}
+  if(e.target.id==='sSun'){document.body.classList.toggle('sun',e.target.checked);store.set('sun',e.target.checked);A.syncSun&&A.syncSun()}
   if(e.target.id==='sLang'){store.set('lang',e.target.value);location.reload()}}}
 function quiz(i=0,score=0){const Q=G.quiz,n=Q.length;
  if(i>=n){store.set('quizzed',score);openM('mTour',`<div class="kicker">Practice</div><h2 id="tourT">${score} of ${n} correct</h2><p>${score===n?'Well done. You are ready for the field.':'Read the photo tips once more; the live camera guide will also help on site.'}</p><div class="row"><span></span><button type="button" class="minibtn pri" data-f data-a="end">Done</button></div>`);
@@ -386,7 +395,7 @@ function pctl(a,p){a=[...a].sort((x,y)=>x-y);const i=(a.length-1)*p/100,l=Math.f
 // Browser canvas scaling differs between browsers and made sharpness ~40% higher in tests.
 function taps(inN,outN){const sc=inN/outN,fs=Math.max(1,sc),T=[];for(let i=0;i<outN;i++){const c=(i+.5)*sc,a=Math.max(0,Math.floor(c-fs+.5)),b=Math.min(inN,Math.floor(c+fs+.5)),w=[];let s=0;
  for(let x=a;x<b;x++){const t=Math.max(0,1-Math.abs((x-c+.5)/fs));w.push(t);s+=t}T.push([a,w.map(v=>s?v/s:0)])}return T}
-function metrics(src,keep){const w0=src.videoWidth||src.width,h0=src.videoHeight||src.height,k0=Math.min(1,(keep?1024:4096)/Math.max(w0,h0)),W=Math.round(w0*k0),H=Math.round(h0*k0);
+function metrics(src,keep){const w0=src.videoWidth||src.width,h0=src.videoHeight||src.height,k0=Math.min(1,(keep?(slowCam?512:1024):4096)/Math.max(w0,h0)),W=Math.round(w0*k0),H=Math.round(h0*k0);
  mc=mc||document.createElement('canvas');mc.width=W;mc.height=H;const x=mc.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0,W,H);
  const S=x.getImageData(0,0,W,H).data,s=512/Math.max(W,H),w=Math.max(3,Math.round(W*s)),h=Math.max(3,Math.round(H*s)),tx=taps(W,w),ty=taps(H,h),M=new Uint8Array(w*H*3),R=v=>v<0?0:v>255?255:Math.floor(v+.5);
  for(let y=0;y<H;y++)for(let i=0;i<w;i++){const [a,wt]=tx[i];let r=0,gg=0,b=0;for(let k=0,p=(y*W+a)*4;k<wt.length;k++,p+=4){const c=wt[k];r+=S[p]*c;gg+=S[p+1]*c;b+=S[p+2]*c}const q=(y*w+i)*3;M[q]=R(r);M[q+1]=R(gg);M[q+2]=R(b)}
@@ -450,8 +459,11 @@ async function camState(){try{if(!camPerm&&navigator.permissions){camPerm=await 
  return camPerm?camPerm.state:'unknown'}catch(_){return 'unknown'}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!vf.hidden&&vf.classList.contains('blocked'))camState().then(s=>{if(s==='granted')openFinder(true)})});
 // our own history.back() (camera closed by its button) must not close a camera reopened right after it
-window.addEventListener('popstate',()=>{if(popOwn){popOwn=false;return}navBack=true;if(!vf.hidden)closeFinder();navBack=false});
-async function openFinder(go){listenOri();step(1);vf.hidden=false;const s=curShot(),pz=mode==='pano'&&A.pano;
+window.addEventListener('popstate',()=>{if(popOwn){popOwn=false;return}navBack=true;
+ const o=['mTour','mSafe','mHelp'].find(i=>!$('#'+i).hidden);if(o)closeM(o);else if(!vf.hidden)closeFinder();
+ else if(cur&&!(history.state&&history.state.res))act('newobs');navBack=false});
+let vfBack=null;
+async function openFinder(go){listenOri();step(1);{const a=document.activeElement;if(a&&!a.closest('.modal,.vf'))vfBack=a}vf.hidden=false;behind(true);const s=curShot(),pz=mode==='pano'&&A.pano;
  vf.querySelector('.vfg').dataset.frame=s?s.frame:pz?'pano':'full';// title plus the task right now (where to stand, what to fit), shown the whole time the camera is open
  const todo=s?s.d:pz?A.pano.hint():'Stand at the foot of the slope or across the road, facing up. Fit the top (scarp) and the bottom (deposit), hold level, shoot when the ring turns green.';
  vf.querySelector('.vfs').textContent=tr(s?'Shot '+(shot+1)+': '+s.t:pz?A.pano.label():'Frame the whole slope');
@@ -497,8 +509,11 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden&&stream)clo
 document.addEventListener('keydown',e=>{if(e.code!=='Space'||e.repeat||vf.hidden||!stream)return;const tg=document.activeElement&&document.activeElement.tagName;
  if(['BUTTON','INPUT','TEXTAREA','SELECT'].includes(tg))return;e.preventDefault();shoot()});
 function closeFinder(){clearInterval(loop);loop=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;vf.hidden=true;camFix(null);A.pano&&A.pano.finder(false);
+ if(!anyOpen()){behind(false);(vfBack&&vfBack.isConnected&&vfBack.offsetParent?vfBack:$('#helpBtn'))?.focus()}
  if(wake){wake.release().catch(()=>{});wake=null}if(!navBack&&history.state&&history.state.vf){popOwn=true;history.back()}}
-function liveTick(){if(!vid.videoWidth)return;liveShow(metrics(vid,true),ori,mode==='pano'&&A.pano?A.pano.tick(vid,ori):null)}
+let slowCam=false;
+function liveTick(){if(!vid.videoWidth)return;const t0=performance.now();liveShow(metrics(vid,true),ori,mode==='pano'&&A.pano?A.pano.tick(vid,ori):null);
+ if(performance.now()-t0>60&&!slowCam&&loop){slowCam=true;clearInterval(loop);loop=setInterval(liveTick,1000)}}
 // one live reading -> pills (coloured by severity), quality meter, one instruction with a direction arrow, shutter
 // ring. Level and instruction change only after 2 readings in a row agree. The shutter always works.
 const lv={q:{},m:{}};
@@ -519,10 +534,11 @@ function liveShow(m,t,px){const c=judge(m,t).filter(x=>x[0]!=='Resolution'&&!(mo
  va.className='vfarrow'+(ch==='\u2190'?' h l':ch==='\u2192'?' h':'');va.innerHTML=ch?esc(ch)+(pa&&pa[1]?`<small>${esc(String(pa[1]))}</small>`:''):'';
  const sh=vf.querySelector('.shutter');sh.classList.toggle('ready',ready&&q===0);sh.classList.toggle('poor',q>=2);
  sh.setAttribute('aria-label',tr('Take photo')+', '+tr('Photo quality')+': '+tr(QL[q]));
- vf.querySelector('.vfr').textContent=ready&&q===0?'Ready':q===1?'OK to shoot':q>=2?'Can still shoot':'';
+ vf.querySelector('.vfr').textContent=ready&&q===0?'Ready':q===1?'OK to shoot':q>=2?'You can still shoot':'';
  const now=Date.now();if(ready&&!wasReady){buzz(30);say(msg);lastSay=now}else if(!ready&&(msg!==lv.said||now-lastSay>5000)){say(msg);lastSay=now}lv.said=msg;wasReady=ready;
  return {q,ready,msg}}
-async function shoot(){const t=ori;let blob=null;buzz([20,40,20]);
+let shooting=false;
+async function shoot(){if(shooting)return;shooting=true;setTimeout(()=>{shooting=false},800);const t=ori;let blob=null;buzz([20,40,20]);
  try{if(cap&&cap.takePhoto)blob=await cap.takePhoto()}catch(_){blob=null}
  if(!blob){const c=document.createElement('canvas');c.width=vid.videoWidth;c.height=vid.videoHeight;c.getContext('2d').drawImage(vid,0,0);blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.92))}
  if(mode==='pano'&&A.pano){gstate.live=true;A.pano.shot(blob,t,vid);return}
@@ -532,7 +548,7 @@ vf.addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;
 
 /* ---------- language: English / Hindi (text nodes are translated as they appear) ---------- */
 const HI=G.hi||{};
-const RX=[[/^Shot (\d) of (\d): (.+)$/,(m,a,b,c)=>`शॉट ${a}/${b}: ${HI[c]||c}`],[/^Shot (\d): (.+)$/,(m,a,b)=>`शॉट ${a}: ${HI[b]||b}`],
+const RX=[[/^You are offline\. (\d+) photos? waiting to be sent\.$/,(m,a)=>`आप ऑफ़लाइन हैं। ${a} फ़ोटो भेजे जाने की प्रतीक्षा में।`],[/^Sending (\d+) saved photos?…$/,(m,a)=>`${a} सहेजी गई फ़ोटो भेजी जा रही हैं…`],[/^Small image \((\d+)×(\d+)\)\. (.+)$/,(m,a,b,c)=>`छोटी फ़ोटो (${a}×${b})। ${HI[c]||c}`],[/^Phone tilted sideways by (\d+)°\. Hold it level\.$/,(m,a)=>`फ़ोन ${a}° बगल में झुका है। इसे सीधा रखें।`],[/^Location: (.+)$/,(m,a)=>`स्थान: ${a}`],[/^Shot (\d) of (\d): (.+)$/,(m,a,b,c)=>`शॉट ${a}/${b}: ${HI[c]||c}`],[/^Shot (\d): (.+)$/,(m,a,b)=>`शॉट ${a}: ${HI[b]||b}`],
  [/^Uploading… (\d+)%$/,(m,a)=>`अपलोड हो रहा है… ${a}%`],[/^(\d+) s, about (\d+) s left$/,(m,a,b)=>`${a} सेकंड, लगभग ${b} सेकंड बाकी`],
  [/^(\d+) s, taking longer than usual, still working$/,(m,a)=>`${a} सेकंड, सामान्य से अधिक समय, काम जारी है`],[/^Guide (\d) of (\d)$/,(m,a,b)=>`गाइड ${a}/${b}`],
  [/^Practice (\d) of (\d)$/,(m,a,b)=>`अभ्यास ${a}/${b}`],[/^(\d) of (\d) correct$/,(m,a,b)=>`${b} में से ${a} सही`],[/^Tip: (.+)$/,(m,a)=>'सुझाव: '+(HI[a]||a)],
@@ -542,12 +558,12 @@ const RX=[[/^Shot (\d) of (\d): (.+)$/,(m,a,b,c)=>`शॉट ${a}/${b}: ${HI[c]|
  [/^(.+) \(second choice\)$/,(m,a)=>`${HI[a]||a} (दूसरा विकल्प)`],[/^Measured with your distance of ([\d.]+) m\.$/,(m,a)=>`आपकी ${a} मीटर दूरी से मापा गया।`]];
 function tr(s){if(lang!=='hi'||!s)return s;const k=s.trim();if(!k)return s;let v=HI[k];if(v==null)for(const [re,f] of RX){if(re.test(k)){v=k.replace(re,f);break}}return v==null?s:s.replace(k,v)}
 function trTree(n){if(n.nodeType===3){const v=tr(n.nodeValue);if(v!==n.nodeValue)n.nodeValue=v;return}
- if(n.nodeType!==1||/^(SCRIPT|STYLE|svg|TEXTAREA)$/.test(n.tagName))return;
- for(const a of ['placeholder','aria-label','title']){const v=n.getAttribute(a);if(v){const t=tr(v);if(t!==v)n.setAttribute(a,t)}}
- n.childNodes.forEach(trTree)}
+ if(n.nodeType!==1||/^(SCRIPT|STYLE|svg)$/.test(n.tagName))return;
+ for(const a of ['placeholder','aria-label','title','alt']){const v=n.getAttribute(a);if(v){const t=tr(v);if(t!==v)n.setAttribute(a,t)}}
+ if(n.tagName!=='TEXTAREA')n.childNodes.forEach(trTree)}   // a textarea's text is what the user typed: never translated
 if(lang==='hi'){document.documentElement.lang='hi';trTree(document.body);
- new MutationObserver(ms=>{for(const m of ms)m.addedNodes.forEach(trTree)}).observe(document.body,{childList:true,subtree:true})}
-$('#langBtn').textContent=lang==='hi'?'English':'हिंदी';$('#langBtn').onclick=()=>{store.set('lang',lang==='hi'?'en':'hi');location.reload()};
+ new MutationObserver(ms=>{for(const m of ms){if(m.type==='attributes'){const v=m.target.getAttribute(m.attributeName);if(v){const t=tr(v);if(t!==v)m.target.setAttribute(m.attributeName,t)}}else m.addedNodes.forEach(trTree)}}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['title','placeholder','aria-label','alt']})}
+$('#langBtn').textContent=lang==='hi'?'English':'हिंदी';$('#langBtn').lang=lang==='hi'?'en':'hi';$('#langBtn').onclick=()=>{store.set('lang',lang==='hi'?'en':'hi');location.reload()};
 
 /* ---------- local database: offline queue and full results (IndexedDB, this phone only) ---------- */
 const DB=(()=>{let p=null;const open=()=>p||(p=new Promise((res,rej)=>{try{const r=indexedDB.open('landslide-guide',1);
@@ -601,13 +617,15 @@ const sevTag=s=>s?`<span class="sev s${s}">${s===2?'serious':'minor'}</span>`:''
 let photoQ={level:0,issues:[]};
 let lastF35=null,lastBlob=null,lastTilt=null,lastSrc='cam',lastDist=null,xhr=null,job=null,cur=null,curMeta=null,curPhoto='';
 A.onPick=(f,fromCam)=>start(f,fromCam,fromCam?ori:null,false);
-async function start(file,fromCam,t,live){lastSrc=fromCam?'cam':'gal';gstate.live=!!live;gstate.override=false;step(2);
+async function start(file,fromCam,t,live){const my=++pickSeq;if(xhr){const o=xhr;xhr=null;try{o.abort()}catch(_){}}guard(false);lastSrc=fromCam?'cam':'gal';gstate.live=!!live;gstate.override=false;step(2);
  lastHead=fromCam&&head&&Date.now()-head.t<5000?{...head,src:'compass'}:null;if(fromCam)freshGps();
- lastF35=A.f35Of?await A.f35Of(file):null;lastPGps=A.gpsOf?await A.gpsOf(file):null;
- const fig=$('#fig'),prev=$('#prev');prev.src=URL.createObjectURL(file);fig.style.display='block';A.setChip('','Checking photo…',true);
- fig.scrollIntoView({behavior:'smooth',block:'start'});
- let m=null;try{const bmp=await createImageBitmap(file,{imageOrientation:'from-image'});m=metrics(bmp);bmp.close&&bmp.close()}catch(_){}
- lastBlob=await A.shrink(file);lastTilt=t;
+ lastF35=A.f35Of?await A.f35Of(file):null;lastPGps=A.gpsOf?await A.gpsOf(file):null;if(my!==pickSeq)return;
+ const fig=$('#fig'),prev=$('#prev');let m=null;
+ // measure first: the photo's box gets its real proportions before it paints, so nothing below it jumps
+ try{const bmp=await createImageBitmap(file,{imageOrientation:'from-image'});prev.width=bmp.width;prev.height=bmp.height;m=metrics(bmp);bmp.close&&bmp.close()}catch(_){}
+ if(my!==pickSeq)return;prev.src=URL.createObjectURL(file);fig.style.display='block';A.setChip('','Checking photo…',true);
+ if(matchMedia('(min-width:1100px)').matches)scrollTo({top:0,behavior:'auto'});else fig.scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'start'});
+ lastBlob=await A.shrink(file);if(my!==pickSeq)return;lastTilt=t;
  const c=m?judge(m,t):[],bad=c.filter(x=>x[1]).sort((a,b)=>b[2]-a[2]);gstate.flags=bad.map(b=>b[0]);
  photoQ={level:grade(c,false),issues:bad};
  if(photoQ.level<2){send();return}       // Good / Fair: no stop; a Fair result carries its quality band
@@ -631,12 +649,16 @@ function prog(el,stages,eta,withUpload){
  return {up:v=>{up=v},srv:()=>{ts=ts||Date.now()},stop:()=>clearInterval(iv)}}
 function tipRot(el){let i=Math.floor(Math.random()*G.tips.length);const put=()=>{el.textContent='Tip: '+G.tips[i]};put();
  const iv=setInterval(()=>{if(!el.isConnected){clearInterval(iv);return}i=(i+1)%G.tips.length;put()},7000)}
-function post(url,body,P,h){const x=new XMLHttpRequest();xhr=x;x.open('POST',url);x.timeout=240000;
+function post(url,body,P,h){const x=new XMLHttpRequest();xhr=x;const live=()=>xhr===x;x.open('POST',url);x.timeout=240000;guard(true);
  if(body){x.setRequestHeader('Content-Type',body.type||'application/octet-stream');x.upload.onprogress=e=>{if(e.lengthComputable&&P)P.up(e.loaded/e.total)};x.upload.onload=()=>P&&P.srv()}
- x.onload=()=>{P&&P.stop();let r;try{r=JSON.parse(x.responseText)}catch(_){r={error:'Unexpected reply from the server ('+x.status+')'}}x.status===200?h.ok(r):h.err(r.error||('Server error '+x.status),x.status)};
- x.onerror=()=>{P&&P.stop();h.err('Could not reach the server. Check the Wi-Fi or hotspot connection to the laptop running the app.',0)};
- x.ontimeout=()=>{P&&P.stop();h.err('The server took more than 4 minutes. It may be busy or out of memory; try again.',-1)};
- x.onabort=()=>{P&&P.stop();h.err(null,-2)};x.send(body||null);return x}
+ x.onload=()=>{P&&P.stop();if(!live())return;guard(false);let r;try{r=JSON.parse(x.responseText)}catch(_){r={error:'Unexpected reply from the server ('+x.status+')'}}x.status===200?h.ok(r):h.err(r.error||('Server error '+x.status),x.status)};
+ x.onerror=()=>{P&&P.stop();if(!live())return;guard(false);h.err('Could not reach the server. Check the Wi-Fi or hotspot connection to the laptop running the app.',0)};
+ x.ontimeout=()=>{P&&P.stop();if(!live())return;guard(false);h.err('The server took more than 4 minutes. It may be busy or out of memory; try again.',-1)};
+ x.onabort=()=>{P&&P.stop();if(!live())return;guard(false);h.err(null,-2)};x.send(body||null);return x}
+// M12: while a request runs, a reload or pull-to-refresh would throw the analysis away: ask first
+function guard(on){document.documentElement.style.overscrollBehaviorY=on?'contain':''}
+addEventListener('beforeunload',e=>{if(xhr&&xhr.readyState>0&&xhr.readyState<4){e.preventDefault();e.returnValue=''}});
+let pickSeq=0;
 function busy(title){out.innerHTML=`<section class="card result" aria-busy="true"><div class="kicker">${esc(title)}${curShot()?', '+esc(curShot().t):''}</div><div id="pg"></div><div class="tipline" id="ptip"></div>
  <div class="u-t3"><button type="button" class="minibtn" id="pcancel">Cancel</button></div></section>`;tipRot($('#ptip'));$('#pcancel').onclick=()=>xhr&&xhr.abort()}
 function cancelled(){A.setChip('','Cancelled');out.innerHTML='';step(1)}
@@ -672,8 +694,8 @@ function qBand(r){const q=r.quality||{level:qLevel(r),issues:[],failed:r.status=
   'Rough result: treat it as a first look and retake if you can.','Not reliable: shown only for reference. Retake before acting on it.'][l];
  const items=q.issues.map(([k,v,s])=>`<li><b>${esc(k)}</b>${sevTag(s)} <span>${esc(v)}</span></li>`);
  if(q.failed)items.unshift(`<li><b>Photo check</b>${sevTag(2)} <span>This does not look like a ground photo of a slope</span> (${Math.round((r.usable||0)*100)}% <span>usable</span>).</li>`);
- const h=`<section class="qband q${l}" id="qband" role="status"><span class="qd"></span><div><b><span>Photo quality</span>: <span>${QL[l]}</span></b>${qmeter(l)}<p>${what}</p>
-  ${items.length?`<ul>${items.join('')}</ul>`:''}${l?`<p>Nothing is adjusted to look better: the confidence and sizes are the model's own.</p>`:''}
+ const h=`<section class="qband q${l}" id="qband"><span class="qd"></span><div><b><span>Photo quality</span>: <span>${QL[l]}</span></b>${qmeter(l)}<p>${what}</p>
+  ${items.length?`<ul>${items.join('')}</ul>`:''}${q.failed?`<p><b>Retake the photo before relying on it:</b></p><ol class="steps">${D.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`:''}${l?`<p>Nothing is adjusted to look better: the confidence and sizes are the model's own.</p>`:''}
   ${l>=2?`<div class="btns"><button type="button" class="btn ${l===3?'primary':'ghost'}" data-a="retake">${ICO('camera')}Retake</button></div>`:''}</div></section>`;
  const rc=out.querySelector('.card.result');if(l===0&&rc)rc.insertAdjacentHTML('beforeend',h.replace('class="qband q0"','class="qband q0 qlite"'));else out.insertAdjacentHTML('afterbegin',h);
  $('#qband [data-a=retake]')?.addEventListener('click',()=>act('retake'))}
@@ -695,11 +717,10 @@ function fail(msg,net){A.fail(msg);const c=out.firstElementChild;
 function addAct(t,l,a){const nc=$('#nextcard');if(!nc)return;nc.hidden=false;const li=document.createElement('li');
  li.innerHTML=`<span>${t}</span>${l?`<button type="button" class="minibtn${a==='next'||a==='retake'?' pri':''}" data-a="${a}">${l}</button>`:''}`;
  nc.querySelector('.acts').appendChild(li);li.querySelector('button')?.addEventListener('click',()=>act(a))}
-function afterType(r,replay){step(4);const N=D.names,top=r.ranked[0][0],sec=r.ranked[1][0],close=r.ranked[0][1]-r.ranked[1][1]<.2;
- (out.querySelector('.card.safety')||out.querySelector('.card.result')).insertAdjacentHTML('afterend','<section class="card" id="nextcard" hidden><div class="kicker">Next steps</div><ul class="acts"></ul></section>');
+function afterType(r,replay){step(4);if(!(history.state&&history.state.res))try{history.pushState({res:1},'')}catch(_){}const N=D.names,top=r.ranked[0][0],sec=r.ranked[1][0],close=r.ranked[0][1]-r.ranked[1][1]<.2;
+ (out.querySelector('.card.safety')||out.querySelector('.card.result')).insertAdjacentHTML('afterend','<section class="card" id="nextcard" hidden><h2 class="kicker">Next steps</h2><ul class="acts"></ul></section>');
  qBand(r);
- if(r.status==='bad_photo')addAct('Retake from below with the whole slope in view.','Retake','retake');
- else if(r.status==='uncertain')addAct(r.family?`Answer the questions or tick the signs below to tell <b>${esc(N[top])}</b> from <b>${esc(N[sec])}</b>.`:'Not sure. Answer the questions below, or take a second photo from another spot.','Another photo','retake');
+ if(r.status==='uncertain')addAct(r.family?`Answer the questions or tick the signs below to tell <b>${esc(N[top])}</b> from <b>${esc(N[sec])}</b>.`:'Not sure. Answer the questions below, or take a second photo from another spot.','Another photo','retake');
  if(r.status==='bad_photo'||r.status==='uncertain'||close)ask(r,replay);
  {const ak=$('#askcard'),sp=$('#nextcard .acts li:last-child>span');   // no questions on screen: do not point to them
   if(r.status==='uncertain'&&!r.family&&(!ak||ak.hidden)&&sp)sp.textContent='Not sure. Take a second photo from another spot, and mark the signs you can see on site below.'}
@@ -716,13 +737,17 @@ function afterDims(r,replay){const d=r.dimensions;if(!d)return;locLine();const c
 function cutMsg(e){const how={top:'tilt the phone up or step back so the scarp is inside the frame',bottom:'tilt down or step back so the toe and deposit are inside',left:'turn left or step back',right:'turn right or step back'};
  return `<b>${esc(tr('The landslide runs off the edge of the photo'))}</b> (${e.map(x=>esc(tr(x))).join(', ')}): ${esc(tr('sizes are minimums'))}. ${(s=>s.charAt(0).toUpperCase()+s.slice(1))(e.map(x=>esc(tr(how[x]))).join('; '))}.`}
 function act(a){if(a==='retake'){gstate.retakes++;out.innerHTML='';$('#fig').style.display='none';step(1);lastSrc==='cam'?openCamera():galIn.click();return}
- if(a==='dist'){dist.scrollIntoView({behavior:'smooth',block:'center'});dist.focus();$('.pace').open=!dist.value;
+ if(a==='dist'){dist.scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'center'});dist.focus();$('.pace').open=!dist.value;
   if(!$('#remeasure')){dist.insertAdjacentHTML('afterend','<button type="button" class="minibtn pri u-t2" id="remeasure">Re-measure this photo</button>');
    $('#remeasure').onclick=()=>{const v=distM();if(!v){$('#distmsg').textContent='Type a distance between 1 and 3000 m first.';return}
-    $('#remeasure').remove();if(job){findDims()?.scrollIntoView({behavior:'smooth',block:'center'});measure(v)}else if(lastBlob)fullSend(v);else toast('Re-measuring needs the photo: take it again.')}}
+    $('#remeasure').remove();if(job){findDims()?.scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'center'});measure(v)}else if(lastBlob)fullSend(v);else toast('Re-measuring needs the photo: take it again.')}}
   return}
  if(a==='sitereport'){siteReport();return}
- if(a==='newobs'){out.innerHTML='';$('#fig').style.display='none';cur=null;curMeta=null;step(1);A.setChip('','');window.scrollTo({top:0,behavior:'smooth'});return}
+ if(a==='newobs'){out.innerHTML='';$('#fig').style.display='none';cur=null;curMeta=null;step(1);A.setChip('','');
+  dist.value='';dist.dispatchEvent(new Event('input'));lastDist=null;{const l=$('#srlive');if(l)l.textContent=''}
+  if(($('#notes')||{}).value)toast(tr('Notes kept from the last observation.'));
+  if(history.state&&history.state.res&&!navBack){popOwn=true;history.back()}
+  setTimeout(()=>(matchMedia('(min-width:1100px)').matches?$('#plate button'):$('#camBtn'))?.focus({preventScroll:true}),50);window.scrollTo({top:0,behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth')});return}
  const k={scale:3,deposit:2,next:shot}[a];if(k!=null){if(a!=='next'){mode='survey';store.set('mode','survey')}shot=k;saveShots();drawMode();out.innerHTML='';$('#fig').style.display='none';step(1);openCamera()}}
 
 /* decision questions: Bayes update of the model's probabilities with yes/no field answers; the next question is
@@ -753,8 +778,8 @@ function tickList(ul,cb,saved){   // each sign is a real checkbox button inside 
   b.setAttribute('aria-checked',saved&&saved[i]?'true':'false');b.append(...li.childNodes);li.append(b);
   b.onclick=()=>{b.setAttribute('aria-checked',b.getAttribute('aria-checked')==='true'?'false':'true');cb()};return b})}
 function ticks(r){const card=$('#checkcard');if(!card)return;const N=D.names,top=r.ranked[0][0],sec=r.ranked[1][0],cmp=r.status==='uncertain'&&sec!=='no_landslide'&&D.info[sec];
- card.querySelector('h2').insertAdjacentHTML('afterend','<p class="hungr u-sub">Mark each sign you can see on site.</p>');
- if(cmp)card.insertAdjacentHTML('beforeend',`<h2 class="u-t4">${esc(D.info[sec].title)} (second choice)</h2><ul class="list" id="ck2">${D.info[sec].check.map(t=>`<li>${ICO('check')}<span>${esc(t)}</span></li>`).join('')}</ul>`);
+ card.querySelector('.ctype').insertAdjacentHTML('afterend','<p class="hungr u-sub">Mark each sign you can see on site.</p>');
+ if(cmp)card.insertAdjacentHTML('beforeend',`<h3 class="ctype u-t4"><span>${esc(D.info[sec].title)}</span> <span>(second choice)</span></h3><ul class="list" id="ck2">${D.info[sec].check.map(t=>`<li>${ICO('check')}<span>${esc(t)}</span></li>`).join('')}</ul>`);
  card.insertAdjacentHTML('beforeend','<div class="tally" id="tally" aria-live="polite"></div>');
  const ul1=card.querySelector('ul.list'),ul2=$('#ck2'),sv=r.signs||{};let l1=[],l2=[];
  const upd=()=>{const on=l=>l.map(li=>li.getAttribute('aria-checked')==='true'),a=on(l1).filter(Boolean).length,b=on(l2).filter(Boolean).length;
@@ -780,16 +805,16 @@ async function finishNow(r){const first=!r.__id;if(first){r.__id=Date.now();curP
   saveShots();drawMode();if(Object.keys(sv).length>=2)fuse(sv)}}
 function fuse(sv){const x=new XMLHttpRequest();x.open('POST','fuse?'+params({}));x.setRequestHeader('Content-Type','application/json');
  x.onload=()=>{if(x.status!==200)return;let s;try{s=JSON.parse(x.responseText)}catch(_){return}sess.set('site',JSON.stringify(s));siteCard(s)};x.send(JSON.stringify({shots:Object.values(sv)}))}
-const num=v=>v>=100?Math.round(v).toLocaleString():v;
+const num=v=>{v=+v;if(!isFinite(v))return v;const r=Number(v.toPrecision(2));return r>=1000?r.toLocaleString():r};
 function siteCard(s){const N=D.names,t=s.type.ranked,d=s.dimensions,old=$('#sitecard');
- let h=`<section class="card" id="sitecard"><div class="kicker">Site result, ${s.n} shots combined</div><h2>${esc(N[t[0][0]])}, ${Math.round(t[0][1]*100)}%</h2>
+ let h=`<section class="card" id="sitecard"><h2 class="kicker">Site result, ${s.n} shots combined</h2><h3 class="ctype"><span>${esc(N[t[0][0]])}</span>, ${Math.round(t[0][1]*100)}%</h3>
  <div class="probs">${t.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(N[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>`;
  if(d&&d.available)h+=d.measures.map(m=>`<div class="drow"><span>${esc(m.name)}</span><b>${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small></b></div>`).join('')+
   (d.measures.some(m=>m.between_photo_log_sd>.7)?`<p class="note">${esc(tr('The shots disagree strongly on size (more than 2x). Check that they show the same landslide, or retake the whole-slope shot with the distance typed in.'))}</p>`:'')+
   `<p class="hungr u-t2">${esc(tr('Sizes: median of the whole-slope shots, with the spread between photos added to the range.'))} (${s.size_shots.map(k=>esc((G.shots.find(x=>x.id===k)||{}).t||k)).join(', ')})</p>`;
  if(s.grains)h+=`<div class="drow"><span>Grain size D16 / D50 / D84</span><b>${s.grains.D16_m} / ${s.grains.D50_m} / ${s.grains.D84_m} m</b></div>`;
  h+=`<div class="u-t3"><button type="button" class="minibtn pri" data-a="sitereport">Save site report</button></div></section>`;
- const w=document.createElement('div');w.innerHTML=h;const c=w.firstElementChild,first=out.querySelector('.card.result');if(old)old.replaceWith(c);else if(first)first.after(c);else return;c.querySelector('[data-a]').onclick=siteReport}
+ const w=document.createElement('div');w.innerHTML=h;const c=w.firstElementChild,first=out.querySelector('.card.safety')||out.querySelector('.card.result');if(old)old.replaceWith(c);else if(first)first.after(c);else return;c.querySelector('[data-a]').onclick=siteReport}
 
 /* ---------- location: where the photo was taken and, with a compass bearing and a distance, where the landslide is ----------
    camera = EXIF GPS of the original photo (exact place and time of the shot) or else the phone fix nearest the photo.
@@ -821,7 +846,7 @@ function locHTML(L){if(!L)return '<p>No location recorded.</p>';const c=L.cam;
 // in the result view: where this photo was taken, with a one-tap fix when there is none
 function locLine(){const el=$('#locline');if(!el)return;const L=cur?locOf(curMeta,cur):null;
  if(!L){el.innerHTML=`<span class="lpin off"></span><div><span>No location for this photo.</span> <button type="button" class="minibtn" data-a="gps">Add my location</button></div>`;el.querySelector('[data-a=gps]').onclick=askGps;return}
- const c=L.cam;el.innerHTML=`<span class="lpin"></span><div><b>Location</b> <a href="${osm(c)}" target="_blank" rel="noopener">${ll(c)}</a>${pm(c.acc)} <small>(${c.src==='photo'?'photo GPS':'phone GPS'})</small>`+
+ const c=L.cam;el.innerHTML=`<span class="lpin"></span><div><b>Location</b> <a href="${osm(c)}" target="_blank" rel="noopener">${ll(c)}</a>${pm(c.acc)} <small>(${c.src==='photo'?'photo GPS':'device location'})</small>`+
   (L.tgt?`<br><span>Landslide about</span> <a href="${osm(L.tgt)}" target="_blank" rel="noopener">${ll(L.tgt)}</a>${pm(L.tgt.acc)}`:'')+'</div>'}
 
 /* ---------- image report: the photo with a GPS stamp, a map panel with markers and every result, as one JPEG ---------- */
@@ -909,11 +934,12 @@ async function reportImage(r,mt,photo,blob,tiles){
   one(`${T('Depth trust')}: ${T(d.depth_trust||'')}${(d.cut_edges||[]).length?', '+T('sizes are minimums')+' ('+d.cut_edges.map(T).join(', ')+')':''}`,c.x,c.y+20,c.w,17,400,ink2);c.y+=30});
  // RIGHT 1: the answer
  part(cols.r,'type',c=>{sec(c,'Landslide type');one(T(N[r.label]||r.label),c.x,c.y+38,c.w,38,700,ink);c.y+=52;
-  one(`${Math.round((r.confidence||0)*100)}%, ${T(STW[r.status]||r.status)}${r.family?', '+T(r.family)+' '+T('family'):''}`,c.x,c.y+22,c.w,22,600,r.status==='ok'?teal:r.status==='uncertain'?'#8a5d00':'#b8381f');c.y+=36;
+  one(`${Math.round((r.confidence||0)*100)}%, ${qLevel(r)>=3?T('Not reliable'):T(STW[r.status]||r.status)+(qLevel(r)===2?T(', rough photo'):'')}${r.family?', '+T(r.family)+' '+T('family'):''}`,c.x,c.y+22,c.w,22,600,qLevel(r)>=3||r.status==='bad_photo'?'#b8381f':qLevel(r)===2||r.status==='uncertain'?'#8a5d00':teal);c.y+=36;
   const nw=Math.round(c.w*.44),bx=c.x+nw+12,bw=c.w-nw-12-62;
   for(const [k,p] of (r.ranked||[]).slice(0,3)){one(T(N[k]||k),c.x,c.y+20,nw,19,400,ink);x.fillStyle='#e3ebe7';x.fillRect(bx,c.y+6,bw,16);
    x.fillStyle=teal;x.fillRect(bx,c.y+6,bw*Math.max(0,Math.min(1,p)),16);one(Math.round(p*100)+'%',c.x+c.w-56,c.y+21,56,19,600,ink,'r');c.y+=32}
   if(r.fieldRanked&&r.answers&&r.answers.some(a=>a.a!=='not sure')){one(`${T('With your field answers')}: ${T(N[r.fieldRanked[0][0]])} ${Math.round(r.fieldRanked[0][1]*100)}%`,c.x,c.y+22,c.w,20,600,ink);c.y+=34}});
+ part(cols.r,'safety',c=>{const i=D.info[r.label];if(!i||!i.safety)return;sec(c,'Safety');x.font=F(21,600);x.fillStyle='#8a2c0b';c.y=wrapT(x,T(i.safety),c.x,c.y+26,c.w,30)+6});
  // RIGHT 2: location map and coordinates
  {const c=cols.r;sec(c,'Location');
   if(L){const mh=Math.round(c.w*.56);let used=false;try{used=await drawMap(x,c.x,c.y,c.w,mh,L,tiles)}catch(e){miss.push('map')}c.y+=mh+10;
@@ -933,7 +959,7 @@ async function reportImage(r,mt,photo,blob,tiles){
   for(const a of ans){one(`${T(a.q)}${/[?:]$/.test(T(a.q))?' ':': '}${T(a.a)}`,c.x,c.y+20,c.w,19,400,ink);c.y+=28}
   for(const [k,v] of Object.entries(sg)){one(`${T('Signs seen:')} ${v.filter(Boolean).length} / ${v.length} (${T(N[k]||k)})`,c.x,c.y+20,c.w,19,400,ink);c.y+=28}
   if(mt.weather){one(`${T('Weather')}: ${T(mt.weather)}`,c.x,c.y+20,c.w,19,400,ink);c.y+=28}
-  if(mt.notes){one(`${T('Notes')}: ${String(mt.notes).replace(/\s+/g,' ')}`,c.x,c.y+20,c.w,19,400,ink);c.y+=28}});
+  if(mt.notes){x.font=F(19);const nt=`${T('Notes')}: ${String(mt.notes).replace(/\s+/g,' ')}`;one(nt,c.x,c.y+20,c.w,19,400,ink);c.y+=28;if(x.measureText(nt).width>c.w){one(T('(full notes in the web page report)'),c.x,c.y+18,c.w,16,400,ink2);c.y+=24}}});
  // footer across both columns: responsibility on one line, provenance on the next
  let y=Math.max(cols.l.y,cols.r.y)+18;x.fillStyle=line;x.fillRect(M,y,W-2*M,2);y+=8;
  one(T('Decision support only: confirm with a geologist or geotechnical engineer before acting.'),M,y+24,W-2*M,18,600,ink2);y+=30;
@@ -985,11 +1011,15 @@ let repBusy=false;
 async function saveImageReport(){if(!cur||repBusy)return;repBusy=true;const btn=$('#repbar [data-a=img]'),bt=btn?btn.innerHTML:'';
  if(btn){btn.disabled=true;btn.setAttribute('aria-busy','true');btn.innerHTML='<span class="spin"></span>'+esc(tr('Making the image report…'))}
  const r=cur,mt=curMeta||meta();let res=null;
- for(const tiles of [true,false]){try{res=await reportImage(r,mt,curPhoto,lastBlob,tiles);break}catch(_){res=null}}   // retry without map tiles (offline, blocked, tainted)
+ let useT=false;if(locOf(mt,r)){useT=store.get('tiles',null);if(useT==null){useT=await askTiles()}}
+ for(const tiles of useT?[true,false]:[false]){try{res=await reportImage(r,mt,curPhoto,lastBlob,tiles);break}catch(_){res=null}}   // retry without map tiles (offline, blocked, tainted)
  repBusy=false;if(btn){btn.disabled=false;btn.removeAttribute('aria-busy');btn.innerHTML=bt}
  if(!res){toast(tr('The image report could not be drawn on this phone: the page report is saved instead.'));saveReport();return null}
  const name=fname('observation',mt.t,'jpg');const ok=saveBlob(res.blob,name);repShow(res.blob,name,res.tiles,ok);
  if(ok){toast(tr('Report saved')+': '+name);step(5);buzz(30)}return res}
+function askTiles(){return new Promise(res=>{tilesAsk=res;const m=openM('mTour',`<h2 id="tourT">Map in the image report</h2><p>The map background is downloaded from OpenStreetMap, which sees the approximate location. Use the map?</p>
+ <div class="row"><button type="button" class="minibtn" data-a="no">Plain grid</button><button type="button" class="minibtn pri" data-f data-a="yes">Use map</button></div>`);
+ m.onclick=e=>{const a=e.target.dataset.a;if(a!=='yes'&&a!=='no'&&e.target!==m)return;const v=a==='yes';if(a)store.set('tiles',v);tilesAsk=null;closeM('mTour');res(v)}})}
 function repShow(blob,name,tiles,ok){$('#repcard')?.remove();let u='';try{u=URL.createObjectURL(blob)}catch(_){}
  const c=document.createElement('div');c.id='repcard';c.className='u-t4';
  c.innerHTML=`<p class="done-line" role="status"><b>${ok?esc(tr('Report saved')):esc(tr('Image report'))}</b> <span class="hungr">${esc(name)}</span></p>${u?`<img class="dimg" src="${u}" alt="Image report with location and results">`:''}<p class="hungr u-b3"><span>If no file was downloaded, long-press the image to save it, or use Share.</span>${tiles?' <span>Map © OpenStreetMap contributors.</span>':''}</p>
@@ -1008,6 +1038,7 @@ const partH=(name,f)=>{try{return f()}catch(e){return `<p class="m">(${esc(name)
 function resultHTML(r,photo,mt){const N=D.names,d=r.dimensions;let h=photo?`<img src="${photo}" alt="photo">`:'';
  h+=partH('location',()=>`<h2>Location</h2>${locHTML(locOf(mt,r))}`);
  h+=partH('photo quality',()=>{const ql=qLevel(r);return `<h2>Photo quality</h2><p><b>${QL[ql]}</b>${r.quality&&r.quality.issues&&r.quality.issues.length?': '+r.quality.issues.map(x=>esc(x[0])+(x[2]===2?' (serious)':'')).join(', '):''}${r.status==='bad_photo'?', photo check failed: the result is not reliable':''}</p>`});
+ h+=partH('safety',()=>{const i=D.info[r.label];return i&&i.safety?`<h2>Safety</h2><p><b>${esc(i.safety)}</b></p>`:''});
  h+=partH('type',()=>`<h2>Type</h2><p><b>${esc(N[r.label]||r.label)}</b>, ${Math.round((r.confidence||0)*100)}% (${esc(r.status)}${r.family?', '+esc(r.family)+' family':''})</p><table>${(r.ranked||[]).map(([c,p])=>`<tr><td>${esc(N[c]||c)}</td><td>${Math.round(p*100)}%</td></tr>`).join('')}</table>`);
  if(r.answers&&r.answers.length)h+=partH('field questions',()=>`<h2>Field questions</h2><table>${r.answers.map(a=>`<tr><td>${esc(a.q)}</td><td>${esc(a.a)}</td></tr>`).join('')}</table>${r.fieldRanked?`<p>With these answers: <b>${esc(N[r.fieldRanked[0][0]])}</b> ${Math.round(r.fieldRanked[0][1]*100)}%</p>`:''}`);
  if(r.signs)h+=partH('signs',()=>`<h2>Signs checked on site</h2><table>${Object.entries(r.signs).map(([c,v])=>v.map((on,i)=>`<tr><td>${esc(((D.info[c]||{}).check||[])[i]||'sign '+(i+1))}</td><td>${on?'seen':'not seen'}</td></tr>`).join('')).join('')}</table>`);
@@ -1018,8 +1049,8 @@ function resultHTML(r,photo,mt){const N=D.names,d=r.dimensions;let h=photo?`<img
  return h}
 const foot=m=>`<p class="m">Landslide Type Check field app${m?' ('+esc(m)+')':''}. Decision support only: confirm with a geologist or geotechnical engineer before acting. Coordinates WGS-84.</p>`;
 function download(name,html){const b=new Blob([html],{type:'text/html'});if(saveBlob(b,name)){toast(tr('Report saved')+': '+name);if(cur)step(5)}else if(!openBlob(b))toast(tr('Could not save the report on this browser.'))}
-const fname=(k,t,ext='html')=>`landslide_${k}_${new Date(t||Date.now()).toISOString().slice(0,16).replace(/[:T]/g,'-')}.${ext}`;
-const page=(title,body)=>`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>${RCSS}</style></head><body>${body}</body></html>`;
+const fname=(k,t,ext='html')=>{const p=n=>String(n).padStart(2,'0'),d=new Date(t||Date.now());return `landslide_${k}_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}-${p(d.getHours())}-${p(d.getMinutes())}.${ext}`};
+const page=(title,body)=>`<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><style>${RCSS}</style></head><body>${body}</body></html>`;
 function saveReport(){if(!cur)return;const mt=curMeta||meta();
  download(fname('observation',mt.t),page('Landslide observation',`<h1>Landslide observation</h1>${metaHTML(mt)}${resultHTML(cur,curPhoto,mt)}${foot(cur.model)}`))}
 async function siteReport(){let s=null;try{s=JSON.parse(sess.get('site')||'null')}catch(_){}const hs=store.get('hist',[]),N=D.names,mt=meta();
@@ -1046,7 +1077,7 @@ async function queueIt(){const it={id:Date.now(),blob:lastBlob,q:params({stage:'
  const ok=await safe(async()=>{await DB.put('queue',it);return true},false);
  A.setChip('signal',ok?'Saved for later':'Offline');step(1);
  out.innerHTML=`<section class="card bad" aria-live="polite"><div class="kicker">No connection</div><h2>${ok?'Saved on the phone: it will be analysed automatically when the connection is back':'You are offline and this browser cannot store the photo'}</h2>
- <p class="hungr u-m0">${ok?'Keep the app open or open it again later. You can keep photographing; each photo waits in the queue.':'Reconnect to the laptop or server and tap Try again.'}</p></section>`;
+ <p class="hungr u-m0">${ok?'Keep this page open; do not reload it while offline. You can keep photographing; each photo waits in the queue.':'Reconnect to the laptop or server and tap Try again.'}</p></section>`;
  if(ok&&mode==='survey'&&it.meta.shotId){done.add(it.meta.shotId);const nx=G.shots.findIndex(s=>!done.has(s.id));if(nx>=0)shot=nx;saveShots();drawMode()}
  gstate={flags:[],override:false,retakes:0,live:false};netUI()}
 let flushing=false;
@@ -1060,7 +1091,7 @@ async function flush(){if(flushing||!navigator.onLine)return;const q=await safe(
  flushing=false;netUI()}
 const nb=$('#netbar');
 async function netUI(){const n=(await safe(()=>DB.all('queue'),[])).length;nb.hidden=navigator.onLine&&!n;nb.classList.toggle('sync',navigator.onLine);
- nb.textContent=navigator.onLine?(n?`Sending ${n} saved photo(s)…`:''):(n?`You are offline. ${n} photo(s) waiting to be sent.`:'You are offline. New photos will be saved and sent later.')}
+ const ph=n===1?'photo':'photos';nb.textContent=navigator.onLine?(n?`Sending ${n} saved ${ph}…`:''):(n?`You are offline. ${n} ${ph} waiting to be sent.`:'You are offline. New photos will be saved and sent later.')}
 window.addEventListener('online',()=>{netUI();flush()});window.addEventListener('offline',netUI);netUI();setTimeout(flush,1500);setInterval(flush,60000);
 
 /* ---------- history: every result is kept on this phone (last 20) and can be reopened ---------- */
@@ -1072,18 +1103,18 @@ async function saveResult(id,r,mt,photo,queued,blob,site){await safe(()=>DB.put(
  h.sort((a,b)=>b.t-a.t);const keep=h.slice(0,20);store.set('hist',keep);
  const ids=new Set(keep.map(o=>o.id));for(const x of await safe(()=>DB.all('results'),[]))if(!ids.has(x.id))safe(()=>DB.del('results',x.id));drawHist()}
 function drawHist(){const h=store.get('hist',[]),el=$('#history');if(!h.length){el.innerHTML='';return}
- el.innerHTML=`<section class="card"><div class="kicker">Recent observations on this device</div><ul class="hist">${h.map(o=>`<li ${o.id?`data-id="${o.id}" role="button" tabindex="0"`:''}>${o.th?`<img src="${o.th}" alt="">`:'<span></span>'}<span><b>${esc(D.names[o.label]||o.label)}</b>${o.q>=2?` <span class="sev s${o.q-1}">${o.q===3?'Very poor photo':'Poor photo'}</span>`:''}${o.status==='uncertain'?' <span>(uncertain)</span>':''}${o.queued?' <span>(sent later)</span>':''}<br>${esc([o.shot,o.size].filter(Boolean).join(', '))}</span><span>${Math.round(o.conf*100)}%<br><small>${new Date(o.t).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</small></span></li>`).join('')}</ul></section>`;
- el.querySelectorAll('li[data-id]').forEach(li=>{const go=()=>openHist(+li.dataset.id);li.onclick=go;li.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}}})}
+ el.innerHTML=`<section class="card"><h2 class="kicker">Recent observations on this device</h2><div class="hist">${h.map(o=>`<${o.id?'button type="button"':'div'} class="hi"${o.id?` data-id="${o.id}"`:''}>${o.th?`<img src="${o.th}" alt="">`:'<span></span>'}<span><b>${esc(D.names[o.label]||o.label)}</b>${o.q>=2?` <span class="sev s${o.q-1}">${o.q===3?'Very poor photo':'Poor photo'}</span>`:''}${o.status==='uncertain'?' <span>(uncertain)</span>':''}${o.queued?' <span>(sent later)</span>':''}<br>${[o.shot?`<span>${esc(o.shot)}</span>`:'',o.size?(m=>m?`<span>${esc(m[1])}</span> ${esc(m[2])}`:`<span>${esc(o.size)}</span>`)(/^([A-Za-z]+) (.+)$/.exec(o.size)):''].filter(Boolean).join(', ')}</span><span>${Math.round(o.conf*100)}%<br><small>${(new Date(o.t).toDateString()===new Date().toDateString()?'':new Date(o.t).toLocaleDateString(lang==='hi'?'hi-IN':[],{day:'numeric',month:'short'})+', ')+new Date(o.t).toLocaleTimeString(lang==='hi'?'hi-IN':[],{hour:'2-digit',minute:'2-digit'})}</small></span></${o.id?'button':'div'}>`).join('')}</div></section>`;
+ el.querySelectorAll('.hi[data-id]').forEach(b=>{b.onclick=()=>openHist(+b.dataset.id)})}
 async function openHist(id){const x=await safe(()=>DB.get('results',id),null);if(!x){toast('This result is no longer stored on this device.');return}
  cur=x.r;curMeta=x.meta;curPhoto=x.photo||'';lastBlob=x.blob||null;lastDist=x.meta&&x.meta.dist||null;job=null;
- $('#prev').src=curPhoto;$('#fig').style.display=curPhoto?'block':'none';photoQ={level:0,issues:[]};A.render(cur);typeChip(cur);afterType(cur,true);if(cur.dimensions)afterDims(cur,true);
- $('#fig').scrollIntoView({behavior:'smooth',block:'start'})}
+ $('#prev').removeAttribute('width');$('#prev').removeAttribute('height');$('#prev').src=curPhoto;$('#fig').style.display=curPhoto?'block':'none';photoQ={level:0,issues:[]};A.render(cur);typeChip(cur);afterType(cur,true);if(cur.dimensions)afterDims(cur,true);
+ if(matchMedia('(min-width:1100px)').matches)scrollTo({top:0,behavior:'auto'});else $('#fig').scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'start'})}
 drawHist();A._metrics=metrics;A._judge=judge;A._grade=grade;A._hold=hold;A._live=liveShow;A._fuse=fuse;A._flush=flush;A._q=()=>safe(()=>DB.all('queue'),[]);A._st=()=>({flushing,done:[...done],shot,mode,curId:cur&&cur.__id,metaShot:curMeta&&curMeta.shotId,site:!!sess.get('site')});   // exposed for tests
 /* ---------- shared with the overlapping-set module (src/pano.py) ---------- */
 function runSet(r,blob,g,label){lastBlob=blob;lastPGps=null;lastHead=null;lastSrc=g?'cam':'gal';lastTilt=g?{g}:null;lastDist=distM();
- curMeta=meta();curMeta.set=label||'';cur=r;job=r.job||null;const fig=$('#fig');$('#prev').src=URL.createObjectURL(blob);fig.style.display='block';
+ curMeta=meta();curMeta.set=label||'';cur=r;job=r.job||null;const fig=$('#fig');$('#prev').removeAttribute('width');$('#prev').removeAttribute('height');$('#prev').src=URL.createObjectURL(blob);fig.style.display='block';
  if(r.ms)store.set('etaT',ema('etaT',r.ms,4000));photoQ={level:0,issues:[]};withQ(r);A.render(r);afterType(r);sizes(r)}
-A._g={say,buzz,toast,tr,store,sess,step,safety,openFinder,closeFinder,openCamera,ICO,LIVE,prog,post,busy,cancelled,params,gx,runSet,fail,RX,out,vf,vid,
+A._g={say,buzz,toast,tr,store,sess,step,safety,openFinder,closeFinder,openM,closeM,openCamera,ICO,LIVE,prog,post,busy,cancelled,params,gx,runSet,fail,RX,out,vf,vid,
  ori:()=>ori,dist:()=>distM(),head:()=>head&&Date.now()-head.t<3000?head:null,mode:()=>mode,shoot:()=>shoot(),setMode:m=>{mode=m;store.set('mode',m);drawMode()},abort:()=>xhr&&xhr.abort(),camIn,galIn,ema};
 A.pano&&A.pano.init();
 const demo=new URLSearchParams(location.search).get('demo');   // demo pages show the guidance too (nothing saved)

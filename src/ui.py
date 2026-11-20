@@ -301,7 +301,7 @@ input::placeholder{font-family:var(--f-body)!important;font-style:normal!importa
  body.m-pano .panel{display:flex;flex-direction:column}
  body.m-pano .panel>*{order:6}body.m-pano .panel>#journey{order:0}body.m-pano .panel>#mode{order:1}body.m-pano .panel>#capH{order:2}
  body.m-pano .panel>.btns{order:3}body.m-pano .panel>#pano{order:4}body.m-pano .panel>.pgide{order:5;margin-top:var(--s4)}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 """
 
 JS = r"""
@@ -313,7 +313,7 @@ const ico=n=>D.icons[n].replace('<svg','<svg class="ico"');
 function setChip(kind,text,busy){chip.className='chip '+kind;chip.innerHTML=(busy?'<span class="spin"></span>':'<span class="dot"></span>')+esc(text)}
 async function shrink(file){
  try{const bmp=await createImageBitmap(file,{imageOrientation:'from-image'});
-  const s=Math.min(1,1280/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');
+  const s=Math.min(1,Math.max(1280/Math.max(bmp.width,bmp.height),Math.min(720/Math.min(bmp.width,bmp.height),Math.sqrt(2.4e6/(bmp.width*bmp.height)))));const c=document.createElement('canvas');
   c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
   return await new Promise(r=>c.toBlob(r,'image/jpeg',0.9));}catch(e){return file;}}
 // summit gauge: contour rings of a hill drawn from a seed (the type name, so every type has its own terrain);
@@ -369,9 +369,9 @@ function probs(r){const top=r.ranked[0][0],one=([c,p])=>`<div class="prob ${c===
  const rest=r.ranked.slice(3);
  return r.ranked.slice(0,3).map(one).join('')+(rest.length?`<details class="more"><summary>Show all ${r.ranked.length} types</summary><div class="probs">${rest.map(one).join('')}</div></details>`:'')}
 function dims(d){
- if(!d.available)return `<section class="card"><div class="kicker">Dimensions</div><p class="hungr u-m0">${esc(d.reason)}</p></section>`;
- const num=v=>v>=100?Math.round(v).toLocaleString():v, row=(k,v)=>`<div class="drow"><span>${esc(k)}</span><b>${v}</b></div>`;
- let h=`<section class="card" id="dimcard"><div class="kicker">Estimated size <span class="dtrust t-${esc(d.depth_trust)}"><span>Depth trust:</span> ${esc(d.depth_trust)}</span></div>`,more='';
+ if(!d.available)return `<section class="card" id="dimcard"><h2 class="kicker">Estimated size</h2><p class="hungr u-m0">${esc(String(d.reason||'').replace(/^./,c=>c.toUpperCase()).replace(/([^.])$/,'$1.'))}</p></section>`;
+ const num=v=>{v=+v;if(!isFinite(v))return v;const r=Number(v.toPrecision(2));return r>=1000?r.toLocaleString():r}, row=(k,v)=>`<div class="drow"><span>${esc(k)}</span><b>${v}</b></div>`;
+ let h=`<section class="card" id="dimcard"><h2 class="kicker"><span>Estimated size</span> <span class="dtrust t-${esc(d.depth_trust)}"><span>Depth trust:</span> ${esc(d.depth_trust)}</span></h2>`,more='';
  if(d.overlay)h+=`<img class="dimg" src="${d.overlay}" alt="Measured area outlined">`;
  h+=d.measures.map(m=>row(m.name,`${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small>`)).join('');
  if(d.size_class){const sp=d.size_class_prob||{};h+=row('Size class (Fell 1994)',esc(d.size_class)+(Object.keys(sp).length>1?' <small>('+Object.entries(sp).map(([k,v])=>esc(k)+' '+Math.round(v*100)+'%').join(', ')+')</small>':''));}
@@ -387,7 +387,7 @@ function dims(d){
  h+=`<details class="more"><summary>How the sizes were measured</summary><p class="hungr u-t1">Scale: ${esc(d.scale_source)}. ${notes.map(esc).join(' ')}</p></details></section>`;
  return h}
 function render(r){
- const n=D.names;let h='';
+ const n=D.names;let h='',ann='';
  {
   // a photo that fails the photo check still gets its full result, shown as computed (nothing adjusted),
   // clearly marked as not reliable; the quality band above it (guide.py) says why and how to fix it
@@ -398,33 +398,44 @@ function render(r){
   const kicker=bp?'Best guess: photo check failed':fam?'Landslide family':unsure?'Uncertain: most likely':'Most likely type';
   const conf=fam?r.ranked[0][1]+r.ranked[1][1]:r.confidence;
   let note='';
-  if(bp) note=`<p class="note"><b>Not reliable.</b> <span>This does not look like a ground photo of a slope</span> (${pct(r.usable)} <span>usable</span>). <span>This is the model's own answer, not adjusted. Retake the photo before relying on it:</span></p><ol class="steps">${D.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>`;
-  else if(fam) note=`<p class="note">Clearly a ${esc(r.family)}; the exact type is close between <b>${esc(n[r.ranked[0][0]])}</b> and <b>${esc(n[r.ranked[1][0]])}</b>. Check the points below for both.</p>`;
-  else if(unsure) note=`<p class="note">Not confident. Second choice: <b>${esc(n[r.ranked[1][0]])}</b>. Take another photo with the whole slope in view, or check the points below for both types.</p>`;
-  h=`<section class="card result${bp?' lowq':unsure?' unsure':''}" aria-live="polite"><div class="rhead">${summit(gname,conf,bp?'bad':sig?'signal':'')}<div>
-    <div class="kicker">${kicker}</div><div class="title">${esc(fam||i.title)}</div></div></div>
+  if(bp) note=`<p class="note"><b>Not reliable.</b> <span>This is the model's own answer to a photo that failed the photo check; nothing is adjusted.</span></p>`;
+  else if(fam) note=`<p class="note"><span>${r.family==='flow'?'Clearly a flow-type landslide; the exact type is close between':'Clearly a slide; the exact type is close between'}</span> <b>${esc(n[r.ranked[0][0]])}</b> <span>and</span> <b>${esc(n[r.ranked[1][0]])}</b>. <span>Check the points below for both.</span></p>`;
+  else if(unsure) note=`<p class="note"><span>Not confident.</span> <span>Second choice:</span> <b>${esc(n[r.ranked[1][0]])}</b>. <span>${r.ranked[1][0]==='no_landslide'?'Take another photo with the whole slope in view.':'Take another photo with the whole slope in view, or check the points below for both types.'}</span></p>`;
+  h=`<section class="card result${bp?' lowq':unsure?' unsure':''}"><div class="rhead">${summit(gname,conf,bp?'bad':sig?'signal':'')}<div>
+    <div class="kicker">${kicker}</div><h2 class="title">${esc(fam||i.title)}</h2></div></div>
     ${fam||!i.hungr||i.hungr==='-'?'':`<p class="hungr u-t2"><span>Hungr et al. 2014</span>: ${esc(i.hungr)}</p>`}
     <div class="meter"><div class="row"><span><span>Model confidence</span>${fam?' <span>(family)</span>':''}: <b class="cband">${conf>=.8?'High':conf>=D.conf?'Moderate':'Low'}</b></span><span class="val">${pct(conf)}</span></div>
     <div class="cscale${bp?' bad':sig?' signal':''}" style="--v:${conf};--c:${D.conf}" aria-hidden="true"><i></i></div>
-    <p class="hungr u-t1">Answers below ${pct(D.conf)} are marked uncertain.</p></div>${note}</section>
+    <p class="hungr u-t1">Answers below ${pct(D.conf)} are marked uncertain.</p></div>${note}<p class="safe1" aria-hidden="true">${ico('alert')}<span>${esc(i.safety)}</span></p></section>
    <section class="card safety"><h2>${ico('alert')}Safety</h2><p>${esc(i.safety)}</p></section>
-   <section class="card" id="typescard"><div class="kicker">All types</div><div class="probs u-t3">${probs(r)}</div></section>
-   <section class="card" id="checkcard"><div class="kicker">Check on site</div><h2>${esc(i.title)}</h2><ul class="list">${i.check.map(t=>`<li>${ico('check')}<span>${esc(t)}</span></li>`).join('')}</ul></section>`;
+   <section class="card" id="typescard"><h2 class="kicker">All types</h2><div class="probs u-t3">${probs(r)}</div></section>
+   <section class="card" id="checkcard"><h2 class="kicker">Check on site</h2><h3 class="ctype">${esc(i.title)}</h3><ul class="list">${i.check.map(t=>`<li>${ico('check')}<span>${esc(t)}</span></li>`).join('')}</ul></section>`;
+  ann=`<span>${kicker}</span>: <span>${esc(fam||i.title)}</span>, ${pct(conf)}`;document.title=`${fam||i.title} ${pct(conf)}: Landslide Type Check`;
  }
- if(r.vlm){h+=`<section class="card"><div class="kicker">Second opinion from Qwen2.5-VL (zero-shot)</div><h2 style="display:flex;gap:8px;align-items:center">${ico('spark')}${esc(n[r.vlm.label]||r.vlm.label)}, ${pct(r.vlm.confidence)}</h2><p class="hungr u-m0">${esc(r.vlm.description)}</p></section>`;}
+ if(r.vlm){h+=`<section class="card"><h2 class="kicker">Second opinion from Qwen2.5-VL (zero-shot)</h2><h3 class="ctype" style="display:flex;gap:8px;align-items:center">${ico('spark')}${esc(n[r.vlm.label]||r.vlm.label)}, ${pct(r.vlm.confidence)}</h3><p class="hungr u-m0">${esc(r.vlm.description)}</p></section>`;}
  if(r.dimensions)h+=dims(r.dimensions);
  h+=`<p class="meta"><span>Model</span>: <span>${esc(r.model)}</span>, <span>${(r.ms/1000).toFixed(1)} s</span></p>`;
- out.innerHTML=h;}
-function loading(){setChip('','Analysing…',true);
+ out.innerHTML=h;
+ announce(ann);}
+// one persistent polite live region: screen readers hear the result once, not every re-render
+function announce(html){const l=document.getElementById('srlive');if(!l||html===announce.last)return;announce.last=html;l.textContent='';setTimeout(()=>{l.innerHTML=html},80)}
+function loading(){setChip('','Analysing…',true);announce('<span>Analysing photo</span>');
  out.innerHTML='<section class="card result" aria-busy="true"><div class="kicker">Analysing photo</div><div class="skel" style="width:60%;height:22px"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:40%"></div></section>';}
-function fail(msg){setChip('bad','Error');
- out.innerHTML=`<section class="card bad" role="alert"><h2>${/image|photo|jpe?g|png|megapixel|read|format|large|file/i.test(msg)?'This photo could not be read':'The photo could not be analysed'}</h2><p class="u-m0">${esc(msg.charAt(0).toUpperCase()+msg.slice(1))}.</p><p class="hungr u-t1 u-m0">${/image|photo|jpe?g|png|megapixel|read|format|large|file/i.test(msg)?'Choose another photo: a JPEG or PNG of the slope, under 40 megapixels.':'Check the connection to the computer running the app, then try again.'}</p></section>`;}
+function fail(msg){setChip('bad','Error');msg=String(msg||'').trim();
+ const photo=/image|photo|jpe?g|png|megapixel|format|too large|file/i.test(msg)&&!/server|model|cuda|memory/i.test(msg),
+  net=/reach the server|network|wi-?fi|hotspot|offline|failed to fetch/i.test(msg),slow=/minutes|timed? ?out|took more than/i.test(msg);
+ const head=photo?'This photo could not be read':net?'Could not reach the app':slow?'The analysis took too long':'The app could not analyse the photo';
+ const tip=photo?'Choose another photo: a JPEG or PNG of the slope, under 40 megapixels.':net?'Check the Wi-Fi or hotspot connection to the computer running the app, then try again.':'Try again in a minute. If it happens again, tell whoever runs the app.';
+ const say=msg?msg.charAt(0).toUpperCase()+msg.slice(1)+(/[.!?…]$/.test(msg)?'':'.'):'';
+ out.innerHTML=`<section class="card bad" role="alert"><h2>${head}</h2><p class="u-m0">${tip}</p>${say?(photo||net?`<p class="hungr u-t1 u-m0">${esc(say)}</p>`:`<details class="u-t1"><summary>Details for whoever runs the app</summary><p class="hungr u-m0">${esc(say)}</p></details>`):''}</section>`;
+ announce(`<span>${head}</span>`)}
 // photo pick -> the guidance layer (src/guide.py) runs the photo check, upload, progress and next steps
 function go(e){const fs=[...e.target.files];if(!fs.length)return;e.target.value='';const cam=e.target.id==='cam';
  if(App.onPicks&&App.onPicks(fs,cam))return;App.onPick(fs[0],cam)}
 document.getElementById('cam').onchange=go;document.getElementById('gal').onchange=go;
 {let dn=0;const B=document.body,img=f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name);
  const take=fs=>{fs=fs.filter(img);if(!fs.length||!App.onPick||document.querySelector('.vf:not([hidden]),.modal:not([hidden])'))return;
+  if(fs.length>1&&!document.body.classList.contains('m-pano')&&App._g)App._g.toast(App._g.tr('Only the first photo is used in Single photo mode.'));
   if(App.onPicks&&App.onPicks(fs,false))return;App.onPick(fs[0],false)};
  const files=e=>[...(e.dataTransfer?.types||[])].includes('Files');
  addEventListener('dragenter',e=>{if(!files(e))return;e.preventDefault();dn++;B.classList.add('dragging')});
@@ -451,13 +462,15 @@ document.addEventListener('DOMContentLoaded',()=>{const $=q=>document.querySelec
  const mo=new MutationObserver(state);
  [['#out',{childList:true}],['#fig',{attributes:true,attributeFilter:['style']}],['#mode',{childList:true,subtree:true,attributes:true}],['#capH',{childList:true,characterData:true,subtree:true}]]
   .forEach(([q,o])=>{const n=$(q);if(n)mo.observe(n,o)});
+ {let op=[];addEventListener('beforeprint',()=>{op=[...document.querySelectorAll('#out details:not([open])')];op.forEach(d=>d.open=true)});
+  addEventListener('afterprint',()=>{op.forEach(d=>d.open=false);op=[]})}
  plate.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&b.dataset.a==='cam'){$('#camBtn').click();return}$('#gal').click()});
- addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;const t=document.activeElement,vf=$('#vf');
+ addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey||e.repeat)return;try{if(localStorage.getItem('lsg.keys')==='false')return}catch(_){}const t=document.activeElement,vf=$('#vf');
   if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))return;
   if(document.querySelector('.modal:not([hidden])')||(vf&&!vf.hidden))return;
-  const k=e.key.toLowerCase();if(k==='u'){e.preventDefault();$('#gal').click()}else if(k==='c'){e.preventDefault();$('#camBtn').click()}else if(k==='?'){e.preventDefault();$('#helpBtn').click()}});
+  const k=e.code==='KeyU'?'u':e.code==='KeyC'?'c':e.key.toLowerCase();if(k==='u'){e.preventDefault();$('#gal').click()}else if(k==='c'){e.preventDefault();$('#camBtn').click()}else if(k==='?'){e.preventDefault();$('#helpBtn').click()}});
  const hud=$('#vf .vfhud');if(hud&&!hud.querySelector('.vfkeys'))hud.insertAdjacentHTML('beforeend','<p class="vfkeys"><kbd>Space</kbd> take the photo &nbsp; <kbd>Esc</kbd> close</p>');
- if(cam)cam.title='Live camera with guidance (C)';if(gal)gal.title='Choose a photo from this device (U)';
+ if(cam)cam.title='Live camera with guidance (C)';if(gal)gal.title='Upload a photo from this device (U)';
 });
 const demo=new URLSearchParams(location.search).get('demo');
 if(demo){const S=D.samples[demo]||D.samples.ok;   // sample result, no photo (presentations, UI checks)
@@ -508,8 +521,8 @@ body.has-res.m-single .stage{display:none}
 /* survey: the four shots as a row of slots */
 .stage #shots{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin:0}
 .stage #shots:empty{display:none}
-.stage #shots li{background:var(--surface);border-color:var(--line);align-content:start;min-height:96px}
-.stage #shots li.cur{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface))}
+.stage #shots .sh{background:var(--surface);border-color:var(--line);align-content:start;min-height:96px}
+.stage #shots .sh.cur{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface))}
 /* overlapping set: tray first, then the how-to beside its diagram */
 .stage #pano:not([hidden]){padding:18px 20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
 .stage .pgide:not([hidden]){display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);column-gap:32px;align-items:start;padding:20px 24px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
@@ -577,7 +590,7 @@ body.has-res.m-single .stage{display:none}
 @media (hover:hover) and (pointer:fine){
 .mob{display:none}.desk{display:inline}
 .btn:hover{filter:brightness(1.06)}.btn.ghost:hover{border-color:var(--brand)}
-.hist li[data-id]:hover,.stage #shots li:hover{background:var(--tint-ground)}
+.hist .hi[data-id]:hover,.stage #shots .sh:hover{background:var(--tint-ground)}
 }
 @media (hover:hover) and (pointer:fine){#camNat{display:none}#camNat~label{grid-column:1/-1}}
 @media (min-width:1100px) and (hover:hover) and (pointer:fine){
@@ -611,7 +624,68 @@ kbd{font-size:.85em}
 .colB:has(#fig[style*="block"]) #out>#dimcard{grid-column:span 5}
 .colB:has(#fig[style*="block"]) #out>#checkcard{grid-column:1/span 6}.colB:has(#fig[style*="block"]) #out>#typescard{grid-column:7/span 6}}
 @media (min-width:1100px) and (max-width:1399px){.colB:has(#fig[style*="block"]) #out>#dimcard,#out>.safety{grid-column:span 6}}
-@media (min-width:1100px) and (max-height:760px){.colA{position:static;max-height:none;overflow:visible}}
+@media (min-width:1100px) and (max-height:760px){.colA{position:static;max-height:none;overflow:visible}body.has-res .colA{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto}}
+
+/* ===== final audit ===== */
+:where(.shots .sh,.hist .hi){display:grid;width:100%;font:inherit;color:inherit;text-align:left;background:none;border:0;margin:0}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);border:0}.sr-only *{white-space:normal}
+h2.title{margin-top:4px}h2.kicker{margin-top:0}
+.ctype{font:600 1.42rem/1.2 var(--f-disp);margin:0 0 var(--s3)}
+#dimslot{min-height:320px}main>.layout{min-height:100vh}@media (max-width:1099px){body.has-res #out:not(:empty),body.busy #out:not(:empty){min-height:100vh}}@media (min-width:1100px){body.m-survey:not(.has-res) .stage>#shots:empty{display:grid;min-height:96px}}.card.result[aria-busy=true]{min-height:340px}#fig img:not([width]){aspect-ratio:auto 4/3}#fig img{height:auto}
+#safeT .ico{display:inline-block;vertical-align:-3px;margin-right:6px}
+#sLang{min-height:44px;min-width:96px}#weather,.vfxn{min-height:44px}.vfb .pdir{min-width:44px}
+.olinks li{grid-template-columns:52px 1fr minmax(84px,auto)}
+#mHelp .sheet>.row:first-child{position:sticky;top:0;z-index:2;background:var(--surface);padding-block:8px}
+/* phone and tablet: the answer, what to do, what to check, the sizes, then save (answers and ticks go into the report) */
+@media (max-width:1099px){
+#out{display:flex;flex-direction:column}#out>*{order:5}#out>.qband{order:0}#out>.card.result{order:1}#out>#sitecard{order:2}
+#out>.safety{order:3}#out>#nextcard{order:4}#out>#askcard{order:5}#out>#ovcard,#out>#percard{order:6}#out>#checkcard{order:7}
+#out>#dimcard,#out>#dimslot{order:8}#out>#typescard{order:9}#out>#repsec{order:10}#out>.meta{order:11}
+body.has-res.m-pano .pgide :is(.pintro,.pdiag,.prules,.pvid){display:none}}
+@media (min-width:900px) and (max-width:1099px){main{max-width:820px}}
+/* landscape phone: short hero so the first action is on screen */
+@media (orientation:landscape) and (max-height:500px){:root{--hero-h:140px}header{min-height:0!important}.brand span{display:none}}
+/* landscape phone camera: the frame on the left, the controls in a side panel (the guide no longer folds over itself) */
+@media (orientation:landscape) and (max-height:500px){.vf{--side:min(300px,40vw)}.vf video{width:calc(100% - var(--side));object-fit:cover}.vf .pghost{right:var(--side)}.vf .vfg{inset:calc(52px + env(safe-area-inset-top)) calc(var(--side) + 3%) calc(14px + env(safe-area-inset-bottom)) 3%}.vf .ptarget{top:52px;bottom:14px}.vf .vfarrow,.vf .lvl{left:calc((100% - var(--side))/2)}.vfhud{display:grid;grid-template-columns:minmax(0,1fr) var(--side);grid-template-rows:auto auto auto 1fr auto;z-index:1}.vfhud::after{content:"";position:absolute;top:0;right:0;bottom:0;width:var(--side);background:rgba(8,12,18,.88);z-index:-1}.vfhud>.vft{grid-column:1/-1;grid-row:1}.vfhud>.vfd{grid-column:2;grid-row:2;margin:4px 10px;font-size:.78rem;max-width:none}.vfhud>.pills{grid-column:2;grid-row:3;justify-content:flex-start;padding:0 10px}.vfhud>.vfdock{grid-column:2;grid-row:4;margin:6px 0 0;padding:0 10px;align-self:start;align-items:stretch}.vfhud>.vfb{grid-column:2;grid-row:5;background:none;padding:6px 10px calc(8px + env(safe-area-inset-bottom))}.vf .shutter{width:64px;height:64px}}
+/* the task text: a clean two-line clamp, no clipped third line */
+.vfd{padding-block:0!important;border-top:7px solid transparent!important;border-bottom:7px solid transparent!important}
+@media (min-width:1100px){
+#out>#sitecard{order:2;grid-column:span 5}#out>#percard{order:9;grid-column:1/-1}
+.colB:has(#sitecard) #fig{grid-row:span 6}
+.colB:not(:has(#fig[style*="block"])) #out>#sitecard{grid-column:span 7}
+.colB:has(#fig[style*="block"]) #out>.card.bad{grid-column:span 5;order:1}
+#out>.card.bad .btns{max-width:460px}
+/* reading and tab order match: verdict, safety, next steps, save, sizes */
+#out>#askcard,#out>#nextcard{order:3}#out>#repsec{order:4}
+}
+/* 1100-1399: the photo gives up width so the verdict column is readable */
+@media (min-width:1100px) and (max-width:1399px){
+.colB:has(#fig[style*="block"]) #fig{grid-column:1/span 5}
+.colB:has(#fig[style*="block"]) #out>:is(.card.result,#repsec,#askcard,#nextcard,.safety,#dimcard,#sitecard,.card.bad){grid-column:span 7}}
+/* Windows high contrast: meters drawn with backgrounds stay visible */
+@media (forced-colors:active){.cscale i,.fill,.fl,.obar .v,.qm i.on,.dots i.on,.cscale::after{forced-color-adjust:none;background:Highlight}.cscale::before,.track,.tr,.obar{border:1px solid CanvasText}}
+
+/* second audit: safety on the first screen of a phone result; titles and size rows that fit any width; sunlight */
+.safe1{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:start;margin:var(--s3) 0 0;padding:10px 12px;border-radius:10px;border-left:4px solid var(--warn);background:var(--warn-bg);color:var(--ink);font-weight:600;font-size:.92rem;line-height:1.4}
+.safe1 .ico{color:var(--warn);margin-top:2px}.safe1>span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media (min-width:1100px){.safe1{display:none}}
+.rhead{grid-template-columns:auto minmax(0,1fr)!important}@media (max-width:340px){.rhead{grid-template-columns:1fr!important}}
+.drow{flex-wrap:wrap}.drow>span{flex:1 0 auto;min-width:min(11em,100%)}.drow b{margin-left:auto}
+:root:not([data-theme=dark]) .card.safety h2{color:#7a2a0c}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .card.safety h2{color:var(--warn)}}
+body.sun{--bg:#fff;--surface:#fff;--surface-2:#f1f3f2;--ink:#000;--ink-2:#151515;--mute:#2b2b2b;--line:#8a948f;--link:#0b4a3e;--brand:#155e51;--on-brand:#fff;--warn:#6b1f00;--warn-bg:#fff0e6;--caution:#5c3d00;--ruby:#8f1d0a;--focus:#0b57d0;color-scheme:light;background:#fff;color:#000}
+body.sun .hero{display:none}body.sun .card.safety h2{color:#6b1f00}
+#sunBtn[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+/* short screens (laptop at 200 % zoom, landscape phones): every camera control reachable */
+@media (orientation:landscape) and (max-height:500px){.vfhud{grid-template-rows:auto auto auto minmax(0,1fr) auto;height:100%}.vfhud>.vfdock{min-height:0;overflow:hidden auto}}
+@media (max-height:360px){.vfdock .ostrip{display:none}}
+/* the size placeholder (before sizes are measured) takes the size card's place */
+@media (min-width:1100px){#out>#dimslot{order:6;grid-column:span 6}.colB:has(#fig[style*="block"]) #out>#dimslot{grid-column:span 5}}
+@media (min-width:1100px) and (max-width:1399px){.colB:has(#fig[style*="block"]) #out>#dimslot{grid-column:span 7}}
+/* desktop, photo shown: the quality band heads the right column instead of pushing the photo down */
+@media (min-width:1100px){.colB:has(#fig[style*="block"]) #out>.qband{order:0;grid-column:span 5}
+.colB:has(#fig[style*="block"]):has(#out>.qband) #fig{grid-row:span 7}}
+@media (min-width:1100px) and (max-width:1399px){.colB:has(#fig[style*="block"]) #out>.qband{grid-column:span 7}}
 /* Windows high-contrast themes: keep every control and region outlined */
 @media (forced-colors:active){
 .btn,.iconbtn,.seg,.card.result,.panel,#repsec,#askcard,.dropplate,.sheet,.vfd,.vfmsg{border:1px solid CanvasText}
@@ -619,12 +693,13 @@ kbd{font-size:.85em}
 }
 /* printing the result (Ctrl+P): the answer and its evidence on white paper */
 @media print{
-:root{--bg:#fff;--surface:#fff;--surface-2:#f4f4f4;--ink:#000;--ink-2:#222;--mute:#444;--line:#bbb;--contour:#999;--grain:none;color-scheme:light}
+:root{--bg:#fff;--surface:#fff;--surface-2:#f4f4f4;--ink:#000;--ink-2:#222;--mute:#444;--line:#bbb;--contour:#999;--frame:#bbb;--grain:none;--brand:#1a6a5b;--on-brand:#fff;--link:#155e51;--teal-600:#155e51;--warn:#a3401a;--orange:#a3401a;--warn-bg:#fbeee6;--warn-line:#edc4ac;--ruby:#b8381f;--caution:#7c5400;--edge:#6f817c;--info:#1e6edc;--dup:#3a62c4;--g-ground:#1a6a5b;--g-signal:#c8562a;--g-track:#a9cfbd;--tint-ground:rgba(26,106,91,.09);--tint-signal:rgba(200,86,42,.1);color-scheme:light}
+#out details>summary::after,.chip,.ask .row,.ask button{display:none!important}
 body{background:#fff}
 *,*::before,*::after{animation:none!important;transition:none!important}
 #fig{position:relative!important;top:auto!important;height:auto!important;max-height:none!important}#fig img{height:auto!important}
 header{min-height:0!important;padding:0 0 12px}
-.hero,header button,.colA,.stage,.dropzone,#netbar,#nextcard,#askcard,#history,.btns,.btn,.minibtn,#repsec,.toast,.modal,.vf{display:none!important}
+.hero,header button,.colA,.stage,.dropzone,#netbar,#nextcard,#history,#srlive,.btns,.btn,.minibtn,#repsec,.toast,.modal,.vf{display:none!important}
 main{max-width:none;padding:0}.layout,.colB{display:block}#out{display:block}
 .card{break-inside:avoid;box-shadow:none!important}#fig{display:block!important;max-width:70%}#fig img{max-height:none;box-shadow:none;border:1px solid #999}
 a{color:#000}
@@ -643,13 +718,13 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="theme-color" content="#08101d" media="(prefers-color-scheme: dark)">
 <style>__CSS____GCSS____PCSS__.drow{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 0;font-size:.92rem}
 .drow>span{display:flex;align-items:baseline;flex:1;min-width:0;gap:8px}
-.drow>span::after{content:"";flex:1;min-width:14px;border-bottom:2px dotted var(--contour);translate:0 -4px}.drow b{text-align:right;font-weight:600;font-variant-numeric:lining-nums tabular-nums}.drow small{opacity:.75;font-weight:400;font-style:italic}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--edge);transition:border-color .2s ease,box-shadow .25s ease;font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
-__DCSS__</style></head><body>__DEFS__<main>
+.drow>span::after{content:"";flex:1;min-width:14px;border-bottom:2px dotted var(--contour);translate:0 -4px}.drow b{text-align:right;font-weight:600;font-variant-numeric:lining-nums tabular-nums}.dimg{width:100%;border-radius:10px;margin:10px 0}.dist{display:block;margin-top:var(--s4);font-size:.9rem;color:var(--ink-2)}.dist .dl{font-weight:650;color:var(--ink)}.dist .hint{display:block;margin-top:var(--s1);font-size:.84rem;color:var(--mute)}.dist input{display:block;width:100%;min-height:var(--tap);margin-top:6px;padding:10px 12px;border-radius:8px;border:1.5px solid var(--edge);transition:border-color .2s ease,box-shadow .25s ease;font:inherit;background:var(--surface);color:inherit}.dist input:focus{border-color:var(--link);outline:none}
+__DCSS__</style></head><body><script>/* capture mode known before first paint: the survey slots take their space at once, nothing jumps */try{var m=JSON.parse(localStorage.getItem('lsg.mode')||'"single"');document.body.className='m-'+(/^(single|survey|pano)$/.test(m)?m:'single')}catch(_){}</script>__DEFS__<main>
 <div class="hero" id="hero" aria-hidden="true"></div>
-<header><div class="logo">__LOGO__</div><div class="brand"><h1><b>Landslide Type Check</b></h1><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
+<header><div class="logo">__LOGO__</div><div class="brand"><h1><b>Landslide Type Check</b></h1><span>Field classifier after Hungr 2014</span></div><button type="button" id="sunBtn" class="iconbtn" aria-pressed="false" aria-label="Sun mode" title="Sun mode">&#9728;</button><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" lang="hi" title="Language / भाषा">हिं</button></header>
 <div id="netbar" class="netbar" role="status" hidden>You are offline. Photos cannot be analysed until the connection is back.</div>
-<div class="layout"><div class="colA">
-<section class="card panel"><ol class="journey" id="journey" aria-label="Progress"></ol><div class="seg" id="mode" role="group" aria-label="Capture mode"></div><ul class="shots" id="shots"></ul><h2 id="capH">Photograph the slope from below</h2>
+<div id="srlive" class="sr-only" role="status" aria-live="polite"></div><div class="layout"><div class="colA">
+<section class="card panel"><ol class="journey" id="journey" aria-label="Progress"></ol><div class="seg" id="mode" role="group" aria-label="Capture mode"></div><div class="shots" id="shots" role="group" aria-label="Survey shots"></div><h2 id="capH">Photograph the slope from below</h2>
 <ul class="tips">
 <li>__I_pos__<span>Stand at the foot of the slope or across the road, facing up at it.</span></li>
 <li>__I_frame__<span>Fit the whole slope: the top (scarp or source) and the bottom (deposit).</span></li>
@@ -670,8 +745,8 @@ __DCSS__</style></head><body>__DEFS__<main>
 <text x="268" y="40">top: scarp</text><text x="268" y="146">bottom: toe</text></svg>
 <h2 id="plateH"><span class="pm-one">Drop a photo of the slope here</span><span class="pm-set">Drop the overlapping photos here</span></h2>
 <p class="pfor" id="plateFor"></p>
-<div class="pbtns"><button type="button" class="btn primary" data-a="up">__I_image__<span class="pm-one">Choose a photo</span><span class="pm-set">Choose photos</span></button><button type="button" class="btn ghost" data-a="cam">__I_camera__Guided camera</button></div>
-<p class="pkeys"><kbd>Ctrl</kbd> + <kbd>V</kbd> pastes a copied photo. Shortcuts: <kbd>U</kbd> upload, <kbd>C</kbd> camera, <kbd>?</kbd> help.</p>
+<div class="pbtns"><button type="button" class="btn primary" data-a="up">__I_image__<span class="pm-one">Upload a photo</span><span class="pm-set">Upload photos</span></button><button type="button" class="btn ghost" data-a="cam">__I_camera__Guided camera</button></div>
+<p class="pkeys"><kbd>Ctrl</kbd> + <kbd>V</kbd> pastes a copied photo. Shortcuts: <kbd>U</kbd> upload, <kbd>C</kbd> camera, <kbd>?</kbd> help (can be turned off in Help).</p>
 </div></div>
 <figure id="fig"><img id="prev" alt="Your photo"><div id="chip" class="chip"></div></figure>
 <div id="out"></div>
@@ -719,4 +794,4 @@ def build_page(logo_svg, info, names, tips, confident_min):
     # JSON inside <script>: escape "</" so no string can close the script element
     page = page.replace("__GCSS__", guide.CSS).replace("__GJS__", guide.JS).replace("__PCSS__", pano.CSS).replace("__PJS__", pano.JS)
     page = page.replace("__DCSS__", DESK_CSS)
-    return page.replace("__JS__", JS.replace("__DATA__", json.dumps(data).replace("</", "<\\/")))
+    return page.replace("__JS__", JS.replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("</", "<\\/")))

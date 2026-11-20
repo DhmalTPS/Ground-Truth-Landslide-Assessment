@@ -297,7 +297,7 @@ CSS = """
 .pit img{width:100%;height:100%;object-fit:cover;display:block}
 .pit .pn{position:absolute;left:4px;top:4px;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:.72rem;line-height:20px;font-family:inherit;text-align:center}
 .pit .px{position:absolute;right:2px;top:2px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:.9rem;line-height:1;font-family:inherit;cursor:pointer}
-.pit.empty{border:1.5px dashed var(--line);background:transparent}.pit.empty .pn{opacity:.6}
+.pit.empty{border:1.5px dashed var(--line);background:transparent}.pit.empty .pn{background:var(--surface-2);color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line)}
 .pit.cam::after{content:"";position:absolute;right:5px;bottom:5px;width:7px;height:7px;border-radius:50%;background:#5fd1a8}
 .plink{flex:0 0 auto;min-width:46px;margin:0 2px;text-align:center;font-size:.7rem;font-weight:700;color:var(--mute)}
 .plink i{display:block;height:4px;border-radius:2px;margin:3px 4px 0;background:var(--line)}
@@ -309,7 +309,7 @@ CSS = """
 .exgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
 .excard{border:1.5px solid var(--line);border-radius:12px;padding:6px 8px 8px;font-size:.78rem;line-height:1.3;color:var(--ink-2)}
 .excard b{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;color:#fff;font-size:.7rem;margin-right:4px;vertical-align:-3px}
-.excard.ok{border-color:var(--teal-400)}.excard.ok b{background:var(--brand);color:var(--on-brand)}.excard.no b{background:var(--ruby)}
+.excard.ok{border-color:var(--teal-400)}.excard.ok b{background:var(--brand);color:var(--on-brand)}.excard.no b{background:var(--ruby);color:var(--on-brand)}
 .omap{position:relative;border-radius:12px;overflow:hidden;margin:8px 0 6px;background:#000}
 .omap img{display:block;width:100%;height:auto}.omap svg{position:absolute;inset:0;width:100%;height:100%}
 .omap .q{fill:none;stroke:#fff;stroke-width:2.2;vector-effect:non-scaling-stroke;opacity:.9}
@@ -354,7 +354,7 @@ CSS = """
 .pstrip img{width:44px;height:33px;object-fit:cover;border-radius:5px;border:1.5px solid #fff;opacity:.9}
 .vf.pano .vfr{display:none}
 .vfb .pdone,.vfb .pdir{grid-row:1;min-height:44px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font-weight:700;font-size:.8rem;font-family:inherit;cursor:pointer}
-.vfb .pdone{grid-column:3;justify-self:end;background:#2bb38a}
+.vfb .pdone{grid-column:3;justify-self:end;background:#2bb38a;color:#06261f}
 .vf .pauto{min-height:44px;position:absolute;top:calc(56px + env(safe-area-inset-top));right:12px;border:0;border-radius:99px;padding:7px 12px;background:rgba(0,0,0,.5);color:#fff;font-weight:700;font-size:.78rem;font-family:inherit;cursor:pointer}
 .vf .pauto.on{background:#2bb38a}.vf:not(.pano) .pauto{display:none}.vfb .pdir{grid-column:1;justify-self:start}
 .pflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .25s}.pflash.on{opacity:.55;transition:none}
@@ -462,12 +462,12 @@ async function fromVideo(file){const st=$('#pano .pstat'),room=Math.max(0,P.max-
  catch(_){g.toast(L('vid_fail'));render()}
  finally{URL.revokeObjectURL(url)}}
 async function onPicks(files,cam){if(g.mode()!=='pano')return false;g.step(1);
- const vid=[...files].find(f=>f.type&&f.type.startsWith('video/'));if(vid){await fromVideo(vid);$('#pano .tray')?.scrollIntoView({behavior:'smooth',block:'nearest'});return true}
+ const vid=[...files].find(f=>f.type&&f.type.startsWith('video/'));if(vid){await fromVideo(vid);$('#pano .tray')?.scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'nearest'});return true}
  const room=Math.max(0,P.max-S.items.length);
  if(files.length>room)g.toast(L('max',{n:P.max}));
  for(const f of files.slice(0,room))await add(f,cam?g.ori():null,cam?'cam':'gal');
  if(cam&&S.items.length<P.max){const k=S.items.length;g.toast(L('added',{k})+' '+(S.kind==='turn'?L('next_turn',{d:L(S.dir<0?'left':'right')}):L('next_walk')))}
- $('#pano .tray')?.scrollIntoView({behavior:'smooth',block:'nearest'});return true}
+ $('#pano .tray')?.scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'nearest'});return true}
 
 /* ---------- panel: guide, rules, examples, tray ---------- */
 function build(){const card=$('#capH').closest('.card');
@@ -497,9 +497,9 @@ const vidTimes=()=>{const it=S.items;return it.length>1&&it.every(i=>i.vt!=null&
 function steps(){const v=+($('.pgide .psteps input')?.value||0),t=vidTimes();if(S.kind!=='walk'||!(v>0))return null;
  if(t.length>1&&S.vidT){const x=v*((t[t.length-1]-t[0])/(t.length-1))/S.vidT;return x>0&&x<=50?Math.round(x*10)/10:null}
  return v<=50?Math.round(v):null}
-function examples(){const m=$('#mTour');m.firstElementChild.innerHTML=`<div class="row u-m0"><h2 id="tourT" class="u-m0">${esc(L('ex_title'))}</h2><button type="button" class="minibtn" data-a="x" data-f>${esc(L('close'))}</button></div>
- <div class="exgrid">${P.examples.map(([k,ok,svg])=>`<div class="excard ${ok?'ok':'no'}">${svg}<b>${ok?'&#10003;':'&#10005;'}</b>${esc(L('ex_'+k))}</div>`).join('')}</div>`;
- m.hidden=false;m.querySelector('[data-f]').focus();m.onclick=e=>{if(e.target===m||e.target.dataset.a==='x')m.hidden=true}}
+function examples(){const m=$('#mTour');g.openM('mTour',`<div class="row u-m0"><h2 id="tourT" class="u-m0">${esc(L('ex_title'))}</h2><button type="button" class="minibtn" data-a="x" data-f>${esc(L('close'))}</button></div>
+ <div class="exgrid">${P.examples.map(([k,ok,svg])=>`<div class="excard ${ok?'ok':'no'}">${svg}<b>${ok?'&#10003;':'&#10005;'}</b>${esc(L('ex_'+k))}</div>`).join('')}</div>`);
+ m.onclick=e=>{if(e.target===m||e.target.dataset.a==='x')g.closeM('mTour')}}
 function render(){const tr=$('#pano .tray');if(!tr)return;
  tr.innerHTML=S.items.map((it,k)=>{let link='';if(k<S.items.length-1){const e=S.est[k];
    link=!e?'<div class="plink"><i></i></div>':e.orient?`<div class="plink gap" title="${esc(L('est_orient'))}">&ne;<i></i></div>`:e.score<.3?`<div class="plink" title="${esc(L('est_q'))}">?<i></i></div>`:`<div class="plink ${band(e.ov)}">~${pct(e.ov)}%<i></i></div>`}
@@ -539,7 +539,7 @@ function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelecto
  const au=vf.querySelector('.pauto'),drawAuto=()=>{au.textContent=L(S.auto?'auto_on':'auto_off');au.setAttribute('aria-pressed',!!S.auto);au.classList.toggle('on',!!S.auto)};
  au.onclick=()=>{S.auto=!S.auto;g.store.set('pauto',S.auto);drawAuto();if(S.auto)g.say(L('auto_hint'))};drawAuto();live.sh=[];live.t=0;live.dx=null;
  ghost=vf.querySelector('.pghost img');tgt=vf.querySelector('.ptarget');meter=vf.querySelector('.pmeter');strip=vf.querySelector('.pstrip');flash=vf.querySelector('.pflash');
- vf.querySelector('.pdone').onclick=()=>{g.closeFinder();$('#pano .tray')?.scrollIntoView({behavior:'smooth',block:'nearest'})};
+ vf.querySelector('.pdone').onclick=()=>{g.closeFinder();$('#pano .tray')?.scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'nearest'})};
  vf.querySelector('.pdir').onclick=()=>{S.dir=(S.dir||1)*-1;layout()};
  const B=P.bands[S.kind];const z=meter.querySelector('.z');z.style.left=B.ideal[0]*100+'%';z.style.width=(B.ideal[1]-B.ideal[0])*100+'%';layout()}
 function box(){const v=g.vid,bw=v.clientWidth,bh=v.clientHeight,vw=v.videoWidth||bw,vh=v.videoHeight||bh,fit=getComputedStyle(v).objectFit==='contain'?Math.min:Math.max,s=fit(bw/vw,bh/vh);return {bw,bh,dw:vw*s,dh:vh*s}}   // cover on phones, letterboxed (contain) on desktop
@@ -660,7 +660,7 @@ function report(r){const out=g.out,n=S.items.length,ICO=g.ICO,B=r.bands,vt={read
  h+=`<div class="btns">${r.joinable?`<button type="button" class="btn primary" data-a="join">${esc(L(r.joined?'join':'together'))}</button>`:''}
   ${drop?`<button type="button" class="btn ghost" data-a="drop">${esc(L('drop'))}</button>`:''}<button type="button" class="btn ghost" data-a="more">${esc(L('addmore'))}</button></div>
   <div class="row u-t2"><button type="button" class="minibtn" data-a="restart">${esc(L('restart'))}</button><span></span></div></section>`;
- out.innerHTML=h;g.step(r.verdict==='fix'?1:2);const c=$('#ovcard');c.scrollIntoView({behavior:'smooth',block:'start'});
+ out.innerHTML=h;g.step(r.verdict==='fix'?1:2);const c=$('#ovcard');c.scrollIntoView({behavior:(matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'),block:'start'});
  g.say(vt+'. '+(iss.length?issueText(iss[0]):L('all_good')));g.buzz(r.verdict==='ready'?40:[40,80,40]);
  const sel=i=>{c.querySelectorAll('.q').forEach(q=>{q.classList.toggle('sel',q.dataset.i==i);q.classList.toggle('dim',i!=null&&q.dataset.i!=i)});
   c.querySelectorAll('.oiss li').forEach(li=>li.classList.toggle('hl',i!=null&&(li.dataset.a==i||li.dataset.b==i)))};
@@ -682,12 +682,12 @@ function join(retry){const r0=S.rep;if(!r0)return;g.busy(L('joining'));
 async function resend(){const body={kind:S.kind,images:await Promise.all(S.items.map(i=>toB64(i.blob))),f35:S.items.map(i=>i.f35)};
  g.post('overlap?'+g.params({kind:S.kind}),new Blob([JSON.stringify(body)],{type:'application/json'}),null,{ok:r=>{reorder(r);S.rep=r;join(true)},err:m=>pfail(m,check)})}
 function perPhoto(r,items,r0){const N=A.D.names,top=r.label,rows=[];
- if(r.set.joined_type)rows.push({img:r.image,t:L('per_joined'),lab:r.set.joined_type.label,c:r.set.joined_type.confidence});
+ if(r.set.joined_type&&r.image)rows.push({img:r.image,t:L('per_joined'),lab:r.set.joined_type.label,c:r.set.joined_type.confidence});
  r.set.photos.forEach(p=>{const k=r0._map[p.i];rows.push({img:items[k]?.thumb,t:L('per_photo',{k:k+1}),lab:p.label,c:p.confidence})});
  const agree=rows.filter(x=>x.lab===top).length;
- const html=`<section class="card" id="percard"><div class="kicker">${esc(L('per_h'))}</div><p class="hungr u-t1">${esc(L('per_note'))}</p>
+ const html=`<section class="card" id="percard"><h2 class="kicker">${esc(L('per_h'))}</h2><p class="hungr u-t1">${esc(L('per_note'))}</p>
   <p class="u-m0"><b>${esc(L('agree',{a:agree,n:rows.length}))}</b></p>
-  ${r.set.stereo_points?`<p class="hungr u-t1">${esc(L('stereo_ok',{n:r.set.stereo_points,p:r.set.stereo_pairs||1}))}</p>`:(r.set.steps_given?`<p class="hungr u-t1">${esc(L('stereo_no'))}</p>`:'')}<div class="perset">${rows.map(x=>`<div><img src="${x.img||''}" alt=""><p><b>${esc(x.t)}</b><br><span class="${x.lab===top?'agree':'dis'}">${esc(N[x.lab]||x.lab)} ${pct(x.c)}%</span></p></div>`).join('')}</div></section>`;
+  ${r.set.stereo_points?`<p class="hungr u-t1">${esc(L('stereo_ok',{n:r.set.stereo_points,p:r.set.stereo_pairs||1}))}</p>`:(r.set.steps_given?`<p class="hungr u-t1">${esc(L('stereo_no'))}</p>`:'')}<div class="perset">${rows.map(x=>`<div>${x.img?`<img src="${x.img}" alt="">`:'<span class="noimg"></span>'}<p><b>${esc(x.t)}</b><br><span class="${x.lab===top?'agree':'dis'}"><span>${esc(N[x.lab]||x.lab)}</span> ${pct(x.c)}%</span></p></div>`).join('')}</div></section>`;
  const anchor=g.out.querySelector('.card.result')||g.out.firstElementChild;if(anchor)anchor.insertAdjacentHTML('afterend',html)}
 
 A.f35Of=f35Of;A.gpsOf=gpsOf;   // also used by single photos (src/guide.py): the shrunk upload has no EXIF
