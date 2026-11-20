@@ -123,6 +123,13 @@ the window stays open. `cloudflared.exe` is a general tool and lives outside the
 
 ## User guidance in the app
 
+One page works on phones and on laptops/desktops. On screens 1000 px or wider it uses two columns: capture on the left,
+results on the right (with a "How it works" panel until there is a result). With a mouse it shows "Upload a photo"
+instead of the phone-only "Phone camera" option, and a photo can be dragged onto the page or pasted (Ctrl+V).
+The page is sent gzipped (~110 KB instead of ~400 KB). Behind a hosting proxy (Hugging Face, Render, a tunnel) the
+app does not redirect to its own https port, and `--port` defaults to `$PORT` when the host sets it; the Space
+Dockerfile runs with `--no-https` because the host already serves https.
+
 `src/guide.py` adds:
 - a first-run tour and a per-session safety checklist (with "Continue anyway");
 - single-photo or 4-shot site-survey mode;

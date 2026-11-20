@@ -17,7 +17,9 @@ Usage:  python src/app.py [--port 8000] [--model auto|probe_base|probe_large|pro
 import common  # noqa: F401  (sets HF cache dir; must precede transformers/timm)
 import argparse
 import base64
+import gzip
 import io
+import os
 import json
 import shutil
 import socket
@@ -210,6 +212,7 @@ def make_handler(pred, vlm, save, max_saved=2000, token=None, dim=None):
     olock = threading.Lock()      # overlap checks run on the CPU, beside the GPU photo lock
     names = {c: INFO[c]["title"] for c in CLASSES}
     page = build_page(LOGO_SVG, INFO, names, PHOTO_TIPS, pred.confident_min)
+    pages = {}   # the served page (https port filled in), plain and gzipped, built once
 
     class Handler(BaseHTTPRequestHandler):
         timeout = 30              # a stalled client cannot hold a thread forever
@@ -239,15 +242,30 @@ def make_handler(pred, vlm, save, max_saved=2000, token=None, dim=None):
             if urlparse(self.path).path in ("/", "/index.html"):
                 # phones only allow the in-page live camera on a secure page: send other devices that opened the
                 # plain http address to the https one (this laptop's own browser treats localhost as secure)
+                # (not behind a hosting proxy: it terminates https itself and only forwards its own port)
                 if (Handler.https_port and not isinstance(self.connection, ssl.SSLSocket)
-                        and not self.client_address[0].startswith("127.") and self.client_address[0] != "::1"):
+                        and not self.client_address[0].startswith("127.") and self.client_address[0] != "::1"
+                        and not self.headers.get("X-Forwarded-Proto") and not self.headers.get("X-Forwarded-For")):
                     host = (self.headers.get("Host") or lan_ip()).rsplit(":", 1)[0]
                     self.send_response(307)
                     self.send_header("Location", f"https://{host}:{Handler.https_port}{self.path}")
                     self.send_header("Content-Length", "0")
                     self.end_headers()
                     return
-                self._send(200, page, "text/html; charset=utf-8")
+                hp = str(Handler.https_port) if Handler.https_port else ""   # the page's "open the secure link" button
+                if pages.get("hp") != hp:
+                    body = page.replace('<meta name="https-port" content="">', f'<meta name="https-port" content="{hp}">', 1).encode()
+                    pages.update(hp=hp, raw=body, gz=gzip.compress(body, 6))
+                if "gzip" in (self.headers.get("Accept-Encoding") or ""):   # ~5x smaller: matters on field 3G
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Encoding", "gzip")
+                    self.send_header("Vary", "Accept-Encoding")
+                    self.send_header("Content-Length", str(len(pages["gz"])))
+                    self.end_headers()
+                    self.wfile.write(pages["gz"])
+                    return
+                self._send(200, pages["raw"], "text/html; charset=utf-8")
             else:
                 self._send(404, "not found", "text/plain")
 
@@ -520,7 +538,8 @@ def self_signed_cert(ip):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--port", type=int, default=int(os.environ.get("PORT") or 8000),
+                    help="default 8000, or $PORT when a hosting service sets it")
     ap.add_argument("--host", default="0.0.0.0", help="0.0.0.0 = reachable from phones on the same network")
     ap.add_argument("--model", default="auto",
                     help="auto = models/selected.json (chosen on train+val by tools/robustness_eval.py); "

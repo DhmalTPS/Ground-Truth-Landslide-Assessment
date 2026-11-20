@@ -86,6 +86,17 @@ QUIZ = [
 
 # ---------------------------------------------------------------- Hindi (machine-drafted; needs a native-speaker review)
 HI = {
+    "Upload a photo": "फ़ोटो अपलोड करें",
+    "How it works": "यह कैसे काम करता है",
+    "From one slope photo to landslide type and size": "ढलान की एक फ़ोटो से भूस्खलन का प्रकार और आकार",
+    "Take or upload a photo": "फ़ोटो लें या अपलोड करें",
+    "Use the guided camera, upload a photo, or drag one onto this page.": "गाइडेड कैमरा इस्तेमाल करें, फ़ोटो अपलोड करें, या उसे इस पेज पर खींचकर छोड़ें।",
+    "The photo is checked first": "पहले फ़ोटो की जाँच होती है",
+    "Sharpness, light, haze and framing are checked before anything is classified.": "वर्गीकरण से पहले साफ़पन, रोशनी, धुंध और फ़्रेमिंग जाँची जाती है।",
+    "Read the result": "परिणाम पढ़ें",
+    "Landslide type after Hungr 2014 with its confidence, the estimated size with a 90 % range, and what to check on site.": "Hungr 2014 के अनुसार भूस्खलन का प्रकार और उसका भरोसा, 90 % सीमा के साथ अनुमानित आकार, और स्थल पर क्या जाँचना है।",
+    "For the live camera guide in the field, open this same page on a phone.": "मैदान में लाइव कैमरा मार्गदर्शन के लिए यही पेज फ़ोन पर खोलें।",
+    "Drop the photo to analyse it": "जाँच के लिए फ़ोटो यहाँ छोड़ें",
     "Guided camera": "गाइडेड कैमरा",
     "Continue anyway": "फिर भी जारी रखें",
     "Continue": "जारी रखें",

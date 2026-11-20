@@ -475,7 +475,7 @@ const INAPP=/FBAN|FBAV|Instagram|WhatsApp|Line\/|Snapchat|GSA\/|; wv\)/.test(nav
 function camFix(e){let x=vf.querySelector('.vfx');if(!e){if(x)x.hidden=true;vf.classList.remove('blocked');return}
  if(!x){vf.insertAdjacentHTML('beforeend','<div class="vfx" role="alertdialog" aria-labelledby="vfxT"></div>');x=vf.querySelector('.vfx')}
  const n=e.name,local=/^(localhost|127\.|\[::1\])/.test(location.hostname),insecure=!window.isSecureContext||!navigator.mediaDevices;
- const https=location.protocol==='http:'&&!local?`https://${location.hostname}:8443${location.pathname}${location.search}`:'';
+ const hp=document.querySelector('meta[name=https-port]')?.content,https=location.protocol==='http:'&&!local&&hp?`https://${location.hostname}:${hp}${location.pathname}${location.search}`:'';
  const [t,steps]=INAPP?['This app\'s built-in browser blocks the live camera',['Tap the ⋮ or ↗ menu at the top.','Choose "Open in Chrome" (or Safari / your browser).','Tap Take photo again there.']]
   :insecure?['The live camera needs the secure (https) link',https?['Tap "Open secure link" below.','If the phone warns about the certificate: Advanced > Proceed (once).','Tap Take photo again there.']:['Open this page with an https:// address.','Ask whoever runs the app for the secure link.']]
   :n==='Ask'?['Allow the camera for the live guide',['The guide uses the camera to check light, sharpness, level and overlap while you aim.','Your browser asks next: tap Allow.','Nothing is recorded until you press the shutter.']]

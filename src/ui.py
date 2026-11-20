@@ -270,6 +270,28 @@ input:not([type=checkbox]):not([type=radio]):focus-visible,textarea:focus-visibl
 /* the colophon: provenance set like the last line of an atlas plate */
 .foot{font:italic 400 .95rem/1.6 var(--f-disp);color:var(--ink-2)}
 @media (max-width:380px){.btns{grid-template-columns:1fr}.title{font-size:1.7rem}.summit{width:96px;height:96px}.brand b{font-size:1.45rem}}
+/* wide screens (laptop, desktop, tablet landscape): two columns - capture on the left, results on the right */
+.intro,.desk{display:none}
+.dropzone{position:fixed;inset:12px;z-index:70;display:none;place-items:center;border:3px dashed var(--brand);border-radius:18px;background:color-mix(in srgb,var(--bg) 82%,transparent);font:600 1.3rem/1.3 var(--f-disp);color:var(--ink);pointer-events:none}
+body.dragging .dropzone{display:grid}
+@media (min-width:1000px){
+main{max-width:1240px;padding:var(--s4) var(--s6) var(--s6)}
+.layout{display:grid;grid-template-columns:minmax(380px,460px) minmax(0,1fr);column-gap:clamp(32px,4vw,64px);align-items:start}
+.colA>.card.panel{margin-top:var(--s5)}
+.colA{position:sticky;top:0;max-height:100vh;overflow:auto;scrollbar-width:thin;padding:0 6px var(--s4) 2px;margin:0 -6px 0 -2px}
+.colB{min-width:0}
+.colB:not(:has(#out>*)):not(:has(#fig[style*=block])):not(:has(#history>*)) .intro{display:block}
+.intro{position:relative;z-index:1;margin-top:var(--s5);padding:30px 0 0}
+.intro h2{font:600 clamp(1.5rem,2.2vw,1.9rem)/1.2 var(--f-disp);margin:0 0 var(--s4);max-width:28ch}
+.steps{list-style:none;margin:0;padding:0;display:grid;counter-reset:st}
+.steps li{counter-increment:st;display:grid;grid-template-columns:40px 1fr;column-gap:var(--s3);padding:var(--s3) 0;border-top:1px solid var(--line)}
+.steps li::before{content:counter(st);grid-row:1/3;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:600 1rem var(--f-disp);color:var(--on-brand);background:var(--brand)}
+.steps b{font-weight:650}.steps span{color:var(--ink-2);font-size:.95rem}
+.intro .hungr{margin-top:var(--s4)}
+.foot{grid-column:1/-1}
+}
+@media (min-width:1000px) and (hover:hover) and (pointer:fine){.mob{display:none}.desk{display:inline}#camNat{display:none}#camNat~label{grid-column:1/-1}}
+@media (min-width:1600px){main{max-width:1400px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 """
 
@@ -392,6 +414,15 @@ function fail(msg){setChip('bad','Error');
 function go(e){const fs=[...e.target.files];if(!fs.length)return;e.target.value='';const cam=e.target.id==='cam';
  if(App.onPicks&&App.onPicks(fs,cam))return;App.onPick(fs[0],cam)}
 document.getElementById('cam').onchange=go;document.getElementById('gal').onchange=go;
+{let dn=0;const B=document.body,img=f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name);
+ const take=fs=>{fs=fs.filter(img);if(!fs.length||!App.onPick||document.querySelector('.vf:not([hidden]),.modal:not([hidden])'))return;
+  if(App.onPicks&&App.onPicks(fs,false))return;App.onPick(fs[0],false)};
+ const files=e=>[...(e.dataTransfer?.types||[])].includes('Files');
+ addEventListener('dragenter',e=>{if(!files(e))return;e.preventDefault();dn++;B.classList.add('dragging')});
+ addEventListener('dragover',e=>{if(files(e))e.preventDefault()});
+ addEventListener('dragleave',()=>{if(--dn<=0){dn=0;B.classList.remove('dragging')}});
+ addEventListener('drop',e=>{if(e.defaultPrevented||!files(e))return;e.preventDefault();dn=0;B.classList.remove('dragging');take([...e.dataTransfer.files])});
+ addEventListener('paste',e=>{if(/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName))return;const fs=[...(e.clipboardData?.files||[])];if(fs.some(img)){e.preventDefault();take(fs)}})}
 window.App={D,esc,render,fail,setChip,shrink,dims,onPick:null};
 const demo=new URLSearchParams(location.search).get('demo');
 if(demo){const S=D.samples[demo]||D.samples.ok;   // sample result, no photo (presentations, UI checks)
@@ -400,6 +431,8 @@ if(demo){const S=D.samples[demo]||D.samples.ok;   // sample result, no photo (pr
 
 PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="https-port" content="">
+<meta name="description" content="Landslide type (Hungr 2014) and size from a slope photo, with a live camera guide for field engineers.">
 <title>Landslide Type Check</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="48x48" href="favicon.ico">
@@ -413,6 +446,7 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <div class="hero" id="hero" aria-hidden="true"></div>
 <header><div class="logo">__LOGO__</div><div class="brand"><b>Landslide Type Check</b><span>Field classifier after Hungr 2014</span></div><button type="button" id="helpBtn" class="iconbtn" aria-label="Help and guide">?</button><button type="button" id="langBtn" class="iconbtn langbtn" aria-label="Language: English or Hindi">हिं</button></header>
 <div id="netbar" class="netbar" role="status" hidden>You are offline. Photos cannot be analysed until the connection is back.</div>
+<div class="layout"><div class="colA">
 <section class="card panel"><ol class="journey" id="journey" aria-label="Progress"></ol><div class="seg" id="mode" role="group" aria-label="Capture mode"></div><ul class="shots" id="shots"></ul><h2 id="capH">Photograph the slope from below</h2>
 <ul class="tips">
 <li>__I_pos__<span>Stand at the foot of the slope or across the road, facing up at it.</span></li>
@@ -421,13 +455,24 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <div class="btns">
 <button type="button" class="btn primary wide" id="camBtn">__I_camera__Guided camera</button>
 <label class="btn ghost" id="camNat">__I_camera__Phone camera<input id="cam" type="file" accept="image/*" capture="environment"></label>
-<label class="btn ghost">__I_image__From gallery<input id="gal" type="file" accept="image/*"></label>
+<label class="btn ghost">__I_image__<span class="mob">From gallery</span><span class="desk">Upload a photo</span><input id="gal" type="file" accept="image/*"></label>
 </div>
 <label class="dist"><span class="dl">Distance to the slope (optional)</span>
 <input id="dist" type="text" inputmode="decimal" autocomplete="off" placeholder="e.g. 40" aria-describedby="disthint"><span class="hint" id="disthint">Makes the sizes more accurate. 40, 40 m or 130 ft all work.</span></label></section>
+</div><div class="colB">
+<aside class="intro" aria-label="How it works"><div class="kicker">How it works</div>
+<h2>From one slope photo to landslide type and size</h2>
+<ol class="steps">
+<li><b>Take or upload a photo</b><span>Use the guided camera, upload a photo, or drag one onto this page.</span></li>
+<li><b>The photo is checked first</b><span>Sharpness, light, haze and framing are checked before anything is classified.</span></li>
+<li><b>Read the result</b><span>Landslide type after Hungr 2014 with its confidence, the estimated size with a 90 % range, and what to check on site.</span></li>
+</ol>
+<p class="hungr">For the live camera guide in the field, open this same page on a phone.</p></aside>
 <figure id="fig"><img id="prev" alt="Your photo"><div id="chip" class="chip"></div></figure>
 <div id="out"></div>
 <div id="history"></div>
+</div></div>
+<div class="dropzone" aria-hidden="true">Drop the photo to analyse it</div>
 <p class="foot">Decision support only: confirm with a geologist or geotechnical engineer before acting.<br>
 Classification after Hungr, Leroueil &amp; Picarelli (2014).</p>
 </main><script>__JS__</script><script>__PJS__</script><script>__GJS__</script></body></html>"""

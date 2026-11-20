@@ -13,4 +13,4 @@ COPY --chown=user prefetch.py .
 RUN python prefetch.py
 COPY --chown=user . .
 EXPOSE 7860
-CMD ["python", "-u", "src/app.py", "--host", "0.0.0.0", "--port", "7860", "--no-save", "--no-dims"]
+CMD ["python", "-u", "src/app.py", "--host", "0.0.0.0", "--port", "7860", "--no-save", "--no-dims", "--no-https"]
