@@ -419,7 +419,7 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <li>__I_frame__<span>Fit the whole slope: the top (scarp or source) and the bottom (deposit).</span></li>
 <li>__I_sun__<span>Hold the phone level, in daylight. One slope per photo.</span></li></ul>
 <div class="btns">
-<label class="btn primary">__I_camera__Take photo<input id="cam" type="file" accept="image/*" capture="environment"></label>
+<button type="button" class="btn primary" id="camBtn">__I_camera__Take photo</button><input id="cam" type="file" accept="image/*" capture="environment" hidden>
 <label class="btn ghost">__I_image__From gallery<input id="gal" type="file" accept="image/*"></label>
 </div>
 <label class="dist"><span class="dl">Distance to the slope (optional)</span>

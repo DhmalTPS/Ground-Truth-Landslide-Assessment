@@ -205,6 +205,11 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .pills span{padding:4px 10px;border-radius:99px;font-size:.75rem;font-weight:650;background:rgba(0,0,0,.5)}
 .pills .ok{box-shadow:inset 0 0 0 1.5px #5fd1a8}.pills .warn{box-shadow:inset 0 0 0 1.5px #ffc862;color:#ffd58a}
 .vfmsg{position:absolute;left:12px;right:12px;bottom:calc(118px + env(safe-area-inset-bottom));text-align:center;font-weight:650;font-size:.95rem;text-shadow:0 1px 3px #000}
+.vfx{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));background:#0e1513;color:#eef4f1;overflow:auto}
+.vfx[hidden]{display:none}.vfs small{display:block;margin-top:3px;font-size:.76rem;font-weight:500;line-height:1.3;opacity:.88}.vf .pills{top:calc(96px + env(safe-area-inset-top))}.vfxi svg{width:44px;height:44px;color:#ffc862}.vfx h2{margin:0;font-size:1.25rem;line-height:1.3}
+.vfx ol{margin:0;padding-left:1.3em;display:grid;gap:8px;font-size:1rem;line-height:1.45}.vfxb{display:grid;gap:10px;margin-top:6px}.vfxb .btn{width:100%;text-align:center;text-decoration:none}
+.vfxn{justify-self:center;margin-top:4px;border:0;background:none;color:#a9bab3;text-decoration:underline;font:inherit;font-size:.85rem;padding:10px;cursor:pointer}
+.vf.blocked .vft,.vf.blocked .vfb{visibility:hidden}
 .vfb{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.7))}
 .vfb .alt{justify-self:start;min-height:44px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font-weight:600;font-size:.8rem;font-family:inherit;cursor:pointer}
 .shutter{width:78px;height:78px;border-radius:50%;border:4px solid #ffc862;background:transparent;padding:5px;cursor:pointer;transition:border-color .2s}
@@ -298,7 +303,7 @@ document.body.insertAdjacentHTML('beforeend',`<div class="modal" id="mTour" hidd
 <div class="lvl" aria-hidden="true"></div>
 <div class="vft"><button type="button" data-a="close" aria-label="Close camera">&#10005;</button><span class="vfs"></span><button type="button" data-a="voice" aria-label="Voice guidance"></button></div>
 <div class="pills" aria-hidden="true"></div><div class="vfarrow" aria-hidden="true"></div><div class="vfq" aria-hidden="true"></div><div class="vfmsg" aria-live="polite"></div>
-<div class="vfb"><button type="button" class="alt" data-a="native">Phone camera</button><button type="button" class="shutter" data-a="shoot" aria-label="Take photo"><span></span></button><span class="vfr"></span></div></div>`);
+<div class="vfb"><span></span><button type="button" class="shutter" data-a="shoot" aria-label="Take photo"><span></span></button><span class="vfr"></span></div></div>`);
 let lastFocus=null;
 function openM(id,html){const m=$('#'+id);m.firstElementChild.innerHTML=html;m.hidden=false;lastFocus=document.activeElement;
  (m.querySelector('[data-f]')||m.querySelector('button,input'))?.focus();return m}
@@ -355,11 +360,11 @@ $('#helpBtn').onclick=help;
 const camIn=$('#cam'),galIn=$('#gal');
 function autoGps(){if(store.get('gpsAsked',0)||!navigator.geolocation||!window.isSecureContext)return;store.set('gpsAsked',1);
  navigator.geolocation.getCurrentPosition(setGps,()=>{},{enableHighAccuracy:true,timeout:20000,maximumAge:60000})}
-function openCamera(){autoGps();if(LIVE)openFinder();else{toast(camErr(null));camIn.click()}}
+// "Take photo" always opens the live camera inside this page; the phone's camera app is used only when the
+// engineer explicitly taps "Use phone camera" on the camera screen
+function openCamera(){autoGps();openFinder()}
 camIn.addEventListener('click',()=>autoGps());
-camIn.parentElement.addEventListener('click',e=>{if(e.target===camIn)return;   // the input's own click (label activation or programmatic) passes through
- if(!sess.get('safe')){e.preventDefault();safety(openCamera);return}
- if(LIVE){e.preventDefault();openFinder()}});
+$('#camBtn').addEventListener('click',()=>{if(!sess.get('safe')){safety(openCamera);return}openCamera()});
 galIn.parentElement.addEventListener('click',()=>{if(sess.get('safe'))step(1)});
 
 /* ---------- photo metrics (same as tools/calibrate_photo_check.py) ---------- */
@@ -426,26 +431,45 @@ document.querySelectorAll('.btn').forEach(b=>b.addEventListener('click',listenOr
 let stream=null,loop=null,wasReady=false,lastSay=0,cap=null;
 const vf=$('#vf'),vid=vf.querySelector('video');
 async function openFinder(){listenOri();step(1);vf.hidden=false;const s=curShot(),pz=mode==='pano'&&A.pano;
- vf.querySelector('.vfg').dataset.frame=s?s.frame:pz?'pano':'full';vf.querySelector('.vfs').textContent=s?'Shot '+(shot+1)+': '+s.t:pz?A.pano.label():'Frame the whole slope';
+ vf.querySelector('.vfg').dataset.frame=s?s.frame:pz?'pano':'full';// title plus the task right now (where to stand, what to fit), shown the whole time the camera is open
+ const todo=s?s.d:pz?A.pano.hint():'Stand at the foot of the slope or across the road, facing up. Fit the top (scarp) and the bottom (deposit), hold level, shoot when the ring turns green.';
+ vf.querySelector('.vfs').innerHTML=esc(tr(s?'Shot '+(shot+1)+': '+s.t:pz?A.pano.label():'Frame the whole slope'))+`<small>${esc(tr(todo))}</small>`;
  if(pz)A.pano.finder(true);
- vf.querySelector('[data-a=voice]').textContent=voice?'\u{1F50A}':'\u{1F507}';
+ vf.querySelector('[data-a=voice]').textContent=voice?'\u{1F50A}':'\u{1F507}';camFix(null);
+ if(!LIVE){camFix({name:'Insecure'});return}
  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:3840},height:{ideal:2160}},audio:false});
   vid.srcObject=stream;await vid.play();
   try{const tr=stream.getVideoTracks()[0];cap=window.ImageCapture?new ImageCapture(tr):null}catch(_){cap=null}
   prevG=null;wasReady=false;loop=setInterval(liveTick,450);say(s?s.d:pz?A.pano.hint():'Frame the whole slope from below, top to bottom.');
   vf.querySelector('[data-a=shoot]').focus()}
- catch(err){closeFinder();toast(camErr(err));camIn.click()}}
-// why the live camera did not start, in plain words; the phone's own camera app opens instead
-function camErr(e){const n=e&&e.name;if(!window.isSecureContext||!navigator.mediaDevices)return 'The live camera needs a secure (https) link. Opening the phone camera app instead.';
- return n==='NotAllowedError'||n==='SecurityError'?'Camera blocked: allow camera access for this site in the browser settings. Opening the phone camera app instead.'
-  :n==='NotFoundError'||n==='OverconstrainedError'?'No camera found on this device. Opening the photo picker instead.'
-  :n==='NotReadableError'||n==='AbortError'?'The camera is busy in another app. Close it and try again. Opening the phone camera app instead.'
-  :'Could not start the live camera. Opening the phone camera app instead.'}
+ catch(err){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;camFix(err)}}
+// the live camera could not start: stay on the camera screen and say exactly why and what to do (never jump to the
+// phone's camera app on its own). In-app browsers (WhatsApp, Instagram, Facebook, Gmail...) block the camera.
+const INAPP=/FBAN|FBAV|Instagram|WhatsApp|Line\/|Snapchat|GSA\/|; wv\)/.test(navigator.userAgent);
+function camFix(e){let x=vf.querySelector('.vfx');if(!e){if(x)x.hidden=true;vf.classList.remove('blocked');return}
+ if(!x){vf.insertAdjacentHTML('beforeend','<div class="vfx" role="alertdialog" aria-labelledby="vfxT"></div>');x=vf.querySelector('.vfx')}
+ const n=e.name,local=/^(localhost|127\.|\[::1\])/.test(location.hostname),insecure=!window.isSecureContext||!navigator.mediaDevices;
+ const https=location.protocol==='http:'&&!local?`https://${location.hostname}:8443${location.pathname}${location.search}`:'';
+ const [t,steps]=INAPP?['This app\'s built-in browser blocks the live camera',['Tap the ⋮ or ↗ menu at the top.','Choose "Open in Chrome" (or Safari / your browser).','Tap Take photo again there.']]
+  :insecure?['The live camera needs the secure (https) link',https?['Tap "Open secure link" below.','If the phone warns about the certificate: Advanced > Proceed (once).','Tap Take photo again there.']:['Open this page with an https:// address.','Ask whoever runs the app for the secure link.']]
+  :n==='NotAllowedError'||n==='SecurityError'?['Camera permission is blocked for this page',['Tap the lock or ⓘ icon left of the address.','Permissions > Camera > Allow.','Tap Try again.']]
+  :n==='NotReadableError'||n==='AbortError'?['Another app is using the camera',['Close the other camera, video-call or scanner app.','Tap Try again.']]
+  :n==='NotFoundError'||n==='OverconstrainedError'?['No camera was found on this device',['Use a phone with a rear camera, or choose photos from the gallery.']]
+  :['The live camera could not start',['Close other apps that may use the camera.','Tap Try again. If it still fails, reload the page.']];
+ x.innerHTML=`<div class="vfxi" aria-hidden="true">${ICO('camera')}</div><h2 id="vfxT">${esc(tr(t))}</h2><ol>${steps.map(s=>`<li>${esc(tr(s))}</li>`).join('')}</ol>
+  <div class="vfxb">${https?`<a class="btn primary" href="${esc(https)}">${esc(tr('Open secure link'))}</a>`:''}${INAPP||(insecure&&!https)?`<button type="button" class="btn primary" data-x="copy">${esc(tr('Copy link'))}</button>`:''}
+  ${!insecure&&!INAPP?`<button type="button" class="btn primary" data-x="retry">${esc(tr('Try again'))}</button>`:''}
+  <button type="button" class="btn ghost" data-x="close">${esc(tr('Back'))}</button></div>
+  <button type="button" class="vfxn" data-x="native">${esc(tr('Use the phone camera app instead (no live guide)'))}</button>`;
+ x.hidden=false;vf.classList.add('blocked');say(tr(t));
+ x.onclick=ev=>{const a=ev.target.closest('[data-x]')?.dataset.x;if(!a)return;
+  if(a==='retry')openFinder();if(a==='close')closeFinder();if(a==='native'){closeFinder();camIn.click()}
+  if(a==='copy'){const u=https||location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast(tr('Link copied. Paste it in Chrome.')),()=>toast(u))}}}
 // the camera stops when the page is hidden (screen off, app switch) and the shutter answers the space bar
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&stream)closeFinder()});window.addEventListener('pagehide',()=>{if(stream)closeFinder()});
 document.addEventListener('keydown',e=>{if(e.code!=='Space'||e.repeat||vf.hidden||!stream)return;const tg=document.activeElement&&document.activeElement.tagName;
  if(['BUTTON','INPUT','TEXTAREA','SELECT'].includes(tg))return;e.preventDefault();shoot()});
-function closeFinder(){clearInterval(loop);loop=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;vf.hidden=true;A.pano&&A.pano.finder(false)}
+function closeFinder(){clearInterval(loop);loop=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;vf.hidden=true;camFix(null);A.pano&&A.pano.finder(false)}
 function liveTick(){if(!vid.videoWidth)return;liveShow(metrics(vid,true),ori,mode==='pano'&&A.pano?A.pano.tick(vid,ori):null)}
 // one live reading -> pills (coloured by severity), quality meter, one instruction with a direction arrow, shutter
 // ring. Level and instruction change only after 2 readings in a row agree. The shutter always works.
