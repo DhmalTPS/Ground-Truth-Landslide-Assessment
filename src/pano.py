@@ -215,6 +215,8 @@ TEXT = {
     "pill_tilt": ["Same tilt", "समान झुकाव"],
     "walk_n": ["about {n} steps (~{m} m)", "लगभग {n} कदम (~{m} मी)"],
     "steps_s": ["~{n} steps", "~{n} कदम"],
+    "v_up": ["Aim a little higher to line up with photo {k} (~{x}°).", "फ़ोटो {k} से मिलाने के लिए थोड़ा ऊपर करें (~{x}°)।"],
+    "v_down": ["Aim a little lower to line up with photo {k} (~{x}°).", "फ़ोटो {k} से मिलाने के लिए थोड़ा नीचे करें (~{x}°)।"],
     "pill_nm": ["{n} of {m} taken", "{m} में से {n} ली गईं"],
     "pill_face": ["Same facing", "समान दिशा"],
     "face_same": ["Face the same way as photo 1 (turned {x}°). Step sideways, do not turn.", "फ़ोटो 1 की दिशा में ही रखें ({x}° घूमे)। बगल में कदम लें, घूमें नहीं।"],
@@ -337,12 +339,15 @@ CSS = """
 .pghost{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .pghost img{position:absolute;opacity:.42;transition:transform .35s ease-out,opacity .3s;filter:saturate(.6);outline:2px dashed rgba(255,209,102,.9)}
 .pghost img.lost{opacity:.18}
-.ptarget{position:absolute;top:8%;bottom:22%;width:0;border-left:2px dashed #ffd166;pointer-events:none}
+.ptarget{position:absolute;top:calc(150px + env(safe-area-inset-top));bottom:calc(250px + env(safe-area-inset-bottom));width:0;border-left:2px dashed #ffd166;pointer-events:none}
 .ptarget span{position:absolute;top:-2px;left:6px;white-space:nowrap;font-size:.7rem;font-weight:700;color:#ffd166;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:6px}
 .ptarget.r span{left:auto;right:6px}
 .pmeter{position:absolute;left:12%;right:12%;bottom:calc(150px + env(safe-area-inset-bottom));height:12px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden;pointer-events:none}
 .pmeter .z{position:absolute;top:0;bottom:0;background:rgba(95,209,168,.35);border-left:2px solid #5fd1a8;border-right:2px solid #5fd1a8}
-.pov{position:absolute;right:10px;top:38%;padding:2px 10px;border-radius:99px;background:rgba(0,0,0,.6);font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.3;pointer-events:none;color:#ffc862}
+.prow{display:flex;align-items:center;gap:10px;width:min(92%,520px)}.prow[hidden]{display:none}.ptg{font-size:.72rem;font-weight:700;color:#cfe;white-space:nowrap}
+.vfdock .pmeter{position:relative;left:auto;right:auto;bottom:auto;flex:1}.vfdock .pstrip{position:static}
+.vf .vft .pauto{position:static;width:auto;height:36px;border-radius:99px;padding:0 12px;font-size:.78rem;font-weight:700}
+.pov{position:static;padding:2px 10px;border-radius:99px;background:rgba(0,0,0,.6);font-size:1.5rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.3;pointer-events:none;color:#ffc862}
 .pov.ok{color:#5fd1a8}.pov.lost{color:#ff745e}
 .pmeter .v{position:absolute;top:2px;bottom:2px;width:4px;margin-left:-2px;border-radius:2px;background:#fff;transition:left .3s}
 .pstrip{position:absolute;left:0;right:0;bottom:calc(104px + env(safe-area-inset-bottom));display:flex;gap:6px;justify-content:center;pointer-events:none}
@@ -351,7 +356,7 @@ CSS = """
 .vfb .pdone,.vfb .pdir{grid-row:1;min-height:44px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font-weight:700;font-size:.8rem;font-family:inherit;cursor:pointer}
 .vfb .pdone{grid-column:3;justify-self:end;background:#2bb38a}
 .vf .pauto{min-height:44px;position:absolute;top:calc(56px + env(safe-area-inset-top));right:12px;border:0;border-radius:99px;padding:7px 12px;background:rgba(0,0,0,.5);color:#fff;font-weight:700;font-size:.78rem;font-family:inherit;cursor:pointer}
-.vf .pauto.on{background:#2bb38a}.vf:not(.pano) .pauto{display:none}.vfb .pdir{grid-column:1;justify-self:start;margin-left:96px}
+.vf .pauto.on{background:#2bb38a}.vf:not(.pano) .pauto{display:none}.vfb .pdir{grid-column:1;justify-self:start}
 .pflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .25s}.pflash.on{opacity:.55;transition:none}
 """
 
@@ -525,10 +530,12 @@ function apply(){const on=want;$('.pgide').hidden=!on;$('#pano').hidden=!on;g.ga
 
 /* ---------- live camera: ghost of the last photo, target line, overlap meter ---------- */
 let ghost=null,tgt=null,meter=null,strip=null,flash=null,last=null;
-function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelectorAll('.pghost,.ptarget,.pmeter,.pov,.pstrip,.pflash,.pdone,.pdir,.pauto').forEach(e=>e.remove());last=null;if(!on){ghost=null;render();return}
+function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelectorAll('.pghost,.ptarget,.prow,.pmeter,.pov,.pstrip,.pflash,.pdone,.pdir,.pauto').forEach(e=>e.remove());last=null;if(!on){ghost=null;render();return}
  vf.querySelector('video').insertAdjacentHTML('afterend','<div class="pghost"><img alt=""></div>');
- vf.insertAdjacentHTML('beforeend',`<div class="ptarget"><span>${esc(L('target'))}</span></div><div class="pmeter"><div class="z"></div><div class="v"></div></div><b class="pov" aria-hidden="true"></b><div class="pstrip"></div><div class="pflash"></div>`);
- vf.querySelector('.vfb').insertAdjacentHTML('beforeend',`<button type="button" class="pdir" aria-label="${esc(L('dir'))}"></button><button type="button" class="pdone"></button><button type="button" class="pauto" aria-pressed="false"></button>`);
+ vf.insertAdjacentHTML('beforeend',`<div class="ptarget"><span>${esc(L('target'))}</span></div><div class="pflash"></div>`);
+ const B0=P.bands[S.kind];vf.querySelector('.vfdock').insertAdjacentHTML('afterbegin',`<div class="pstrip"></div><div class="prow"><b class="pov" aria-hidden="true"></b><div class="pmeter"><div class="z"></div><div class="v"></div></div><small class="ptg">${esc(L('ideal',{a:pct(B0.ideal[0]),b:pct(B0.ideal[1])}))}</small></div>`);
+ vf.querySelector('.vfb').insertAdjacentHTML('beforeend',`<button type="button" class="pdir" aria-label="${esc(L('dir'))}"></button><button type="button" class="pdone"></button>`);
+ vf.querySelector('[data-a=voice]').insertAdjacentHTML('beforebegin','<button type="button" class="pauto" aria-pressed="false"></button>');
  const au=vf.querySelector('.pauto'),drawAuto=()=>{au.textContent=L(S.auto?'auto_on':'auto_off');au.setAttribute('aria-pressed',!!S.auto);au.classList.toggle('on',!!S.auto)};
  au.onclick=()=>{S.auto=!S.auto;g.store.set('pauto',S.auto);drawAuto();if(S.auto)g.say(L('auto_hint'))};drawAuto();live.sh=[];live.t=0;live.dx=null;
  ghost=vf.querySelector('.pghost img');tgt=vf.querySelector('.ptarget');meter=vf.querySelector('.pmeter');strip=vf.querySelector('.pstrip');flash=vf.querySelector('.pflash');
@@ -539,7 +546,7 @@ function box(){const v=g.vid,bw=v.clientWidth,bh=v.clientHeight,vw=v.videoWidth|
 function layout(est){if(!ghost)return;const n=S.items.length,prev=S.items[n-1],vf=g.vf,dir=S.dir||1;
  vf.querySelector('.pdone').textContent=L('done',{n});vf.querySelector('.pdone').hidden=!n;vf.querySelector('.pdir').textContent=dir<0?'←':'→';vf.querySelector('.pdir').hidden=!n;
  strip.innerHTML=S.items.slice(-6).map(i=>`<img src="${i.thumb}" alt="">`).join('');
- tgt.hidden=meter.hidden=!n;if(!n){ghost.hidden=true;const pv=vf.querySelector('.pov');if(pv)pv.hidden=true;return}
+ tgt.hidden=!n;const pr=vf.querySelector('.prow');if(pr)pr.hidden=!n;if(!n){ghost.hidden=true;return}
  const b=box(),B=P.bands[S.kind],mid=(B.ideal[0]+B.ideal[1])/2;ghost.hidden=false;if(ghost.dataset.id!=String(prev.id)){ghost.src=prev.thumb;ghost.dataset.id=prev.id}
  ghost.style.width=b.dw+'px';ghost.style.height=b.dh+'px';ghost.style.left=(b.bw-b.dw)/2+'px';ghost.style.top=(b.bh-b.dh)/2+'px';
  // where the last photo's trailing edge should sit when the overlap is ideal
@@ -585,7 +592,12 @@ function tick(vid,t){const n=S.items.length,first=S.items[0],turn=S.kind==='turn
  else{const B=P.bands[S.kind],p=pct(e.ov),ok=e.ov>=B.ideal[0]&&e.ov<=B.ideal[1]+.08,ws=turn?null:walkSteps(vid,e.ov);out.pills.unshift(`<span class="${ok?'ok':'warn'}">${esc(L('pill_ov',{p}))}</span>`);
   if(e.ov>B.ideal[1]+.08){out.bad.push(['Overlap',turn?L('more_turn',{d:dw,p}):L('more_walk',{p})+(ws?' '+L('walk_n',ws):'')]);out.arrow.Overlap=[R,cq&&!cq.ok&&cq.more?cq.x+'°':ws?L('steps_s',{n:ws.n}):null]}
   else if(e.ov<B.ideal[0]){out.bad.push(['Overlap',turn?L('less_turn',{d:back,p}):L('less_walk',{p})+(ws?' '+L('walk_n',ws):'')]);out.arrow.Overlap=[K,cq&&!cq.ok&&!cq.more?cq.x+'°':ws?L('steps_s',{n:ws.n}):null]}
-  else out.good=L('good_ov',{p})}
+  else out.good=L('good_ov',{p});
+  // up/down: the match also gives the vertical shift to the last photo; more than ~12 % of the height means the aim
+  // drifted. Degrees = shift x vertical field of view (~50 deg landscape, ~69 deg portrait on a 26 mm camera).
+  const vfov=(vid.videoWidth||1)>=(vid.videoHeight||1)?50:69,vx=Math.round(Math.abs(e.dy)*vfov);
+  // dy > 0: the live view shows lower parts of the scene than the last photo, so the camera points lower (checked in the UI test)
+  if(Math.abs(e.dy)>.12){const up=e.dy>0;out.bad.push(['Height',L(up?'v_up':'v_down',{k:n,x:vx})]);out.arrow.Height=[up?'\u2191':'\u2193',vx+'°']}}
  // pan speed: change of the estimated shift between ticks (fraction of the width per second)
  const now=Date.now(),shv=sharp(vid);live.sh.push(shv);if(live.sh.length>8)live.sh.shift();let fast=false;
  if(e&&!e.orient&&e.score>.3){if(live.dx!=null&&live.t){const sp=Math.abs(e.dx-live.dx)/Math.max(.05,(now-live.t)/1000);fast=sp>.35?++live.fastN>=2:(live.fastN=0,false)}live.dx=e.dx}else live.dx=null;
@@ -601,7 +613,7 @@ async function shot(blob,t,vid){flash.classList.add('on');setTimeout(()=>flash.c
  const e=last;const it=await add(blob,t,'cam',vid);if(!it)return;const n=S.items.length;
  if(e&&!e.orient&&e.score>.3&&n===2&&!S.dir)S.dir=Math.sign(e.dx)||1;layout();
  g.say(L('added',{k:n})+' '+(n<P.max?(S.kind==='turn'?L('next_turn',{d:L((S.dir||1)<0?'left':'right')}):L('next_walk')):''));
- g.vf.querySelector('.vfs').textContent=L('label_turn',{k:n+1});if(n>=P.max)g.closeFinder()}
+ g.vf.querySelector('.vfs').textContent=L('label_turn',{k:n+1});const td=g.vf.querySelector('.vfd');if(td)td.textContent=A.pano.hint();if(n>=P.max)g.closeFinder()}
 
 /* ---------- overlap check (server) and the overlap map ---------- */
 function check(){if(S.items.length<2)return;if(!navigator.onLine){g.toast(L('need_net'));return}

@@ -209,7 +209,16 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .vfx[hidden]{display:none}.vfs small{display:block;margin-top:3px;font-size:.76rem;font-weight:500;line-height:1.3;opacity:.88}.vf .pills{top:calc(96px + env(safe-area-inset-top))}.vfxi svg{width:44px;height:44px;color:#ffc862}.vfx h2{margin:0;font-size:1.25rem;line-height:1.3}
 .vfx ol{margin:0;padding-left:1.3em;display:grid;gap:8px;font-size:1rem;line-height:1.45}.vfxb{display:grid;gap:10px;margin-top:6px}.vfxb .btn{width:100%;text-align:center;text-decoration:none}
 .vfxn{justify-self:center;margin-top:4px;border:0;background:none;color:#a9bab3;text-decoration:underline;font:inherit;font-size:.85rem;padding:10px;cursor:pointer}
-.vf.blocked .vft,.vf.blocked .vfb{visibility:hidden}
+.vf.blocked .vfhud,.vf.blocked .vfarrow,.vf.blocked .lvl{visibility:hidden}
+.vfhud{position:absolute;inset:0;display:flex;flex-direction:column;pointer-events:none}.vfhud .vft,.vfhud .vfd,.vfhud .vfb{pointer-events:auto}
+.vfhud .vft{position:static}.vfhud .vfs{font-size:.92rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vfd{align-self:center;max-width:min(92%,560px);margin:0 12px 8px;padding:7px 12px;border:0;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font:500 .82rem/1.35 inherit;font-family:inherit;text-align:center;cursor:pointer;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vfd[aria-expanded=true]{display:block}.vfd:empty{display:none}
+.vfhud .pills{position:static;padding:0 12px}.vfhud .pills .bad{box-shadow:inset 0 0 0 1.5px #ff745e;color:#ffb4a6}
+.vfdock{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:8px;padding:0 12px 6px}
+.vfhud .vfq{position:static;transform:none}.vfhud .vfmsg{position:static;max-width:560px;padding:6px 14px;border-radius:12px;background:rgba(0,0,0,.55);font-size:.92rem;line-height:1.35}.vfhud .vfmsg:empty{display:none}
+.vfhud .vfb{position:static}.vfhud .vfb>span:first-child{grid-area:1/1}.vfhud .vfb .shutter{grid-area:1/2}.vfhud .vfb .vfr{grid-area:1/3}
+.vfx>*{width:100%;max-width:480px;align-self:center}.vf .vfg{inset:calc(150px + env(safe-area-inset-top)) 5% calc(250px + env(safe-area-inset-bottom))}
 .vfb{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:14px 16px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.7))}
 .vfb .alt{justify-self:start;min-height:44px;border:0;background:rgba(0,0,0,.45);color:#fff;border-radius:99px;padding:9px 12px;font-weight:600;font-size:.8rem;font-family:inherit;cursor:pointer}
 .shutter{width:78px;height:78px;border-radius:50%;border:4px solid #ffc862;background:transparent;padding:5px;cursor:pointer;transition:border-color .2s}
@@ -300,10 +309,11 @@ document.body.insertAdjacentHTML('beforeend',`<div class="modal" id="mTour" hidd
 <div class="modal" id="mHelp" hidden role="dialog" aria-modal="true" aria-labelledby="helpT"><div class="sheet"></div></div>
 <div class="vf" id="vf" hidden role="dialog" aria-modal="true" aria-label="Camera with framing guide"><video playsinline muted autoplay></video>
 <div class="vfg" data-frame="full"><i class="h1"></i><i class="h2"></i><i class="v1"></i><i class="v2"></i><div class="band top">Top of the slope (scarp)</div><div class="band bot">Bottom (toe / deposit)</div></div>
-<div class="lvl" aria-hidden="true"></div>
-<div class="vft"><button type="button" data-a="close" aria-label="Close camera">&#10005;</button><span class="vfs"></span><button type="button" data-a="voice" aria-label="Voice guidance"></button></div>
-<div class="pills" aria-hidden="true"></div><div class="vfarrow" aria-hidden="true"></div><div class="vfq" aria-hidden="true"></div><div class="vfmsg" aria-live="polite"></div>
-<div class="vfb"><span></span><button type="button" class="shutter" data-a="shoot" aria-label="Take photo"><span></span></button><span class="vfr"></span></div></div>`);
+<div class="lvl" aria-hidden="true"></div><div class="vfarrow" aria-hidden="true"></div>
+<div class="vfhud"><div class="vft"><button type="button" data-a="close" aria-label="Close camera">&#10005;</button><span class="vfs"></span><button type="button" data-a="voice" aria-label="Voice guidance"></button></div>
+<button type="button" class="vfd" data-a="task" aria-expanded="false"></button><div class="pills" aria-hidden="true"></div>
+<div class="vfdock"><div class="vfq" aria-hidden="true"></div><div class="vfmsg" aria-live="polite"></div></div>
+<div class="vfb"><span></span><button type="button" class="shutter" data-a="shoot" aria-label="Take photo"><span></span></button><span class="vfr"></span></div></div></div>`);
 let lastFocus=null;
 function openM(id,html){const m=$('#'+id);m.firstElementChild.innerHTML=html;m.hidden=false;lastFocus=document.activeElement;
  (m.querySelector('[data-f]')||m.querySelector('button,input'))?.focus();return m}
@@ -323,10 +333,10 @@ function safety(then){
  openM('mSafe',`<div class="kicker">Before you photograph</div><h2 id="safeT">${ICO('alert')} Are you in a safe spot?</h2>
  ${G.safety.map((s,k)=>`<label class="chk"><input type="checkbox" data-s="${k}"><span>${esc(s)}</span></label>`).join('')}
  <p class="hungr">If any of these is not true, move back first. If the slope is moving, leave and report it; no photo is worth it.</p>
- <div class="row"><button type="button" class="minibtn" data-a="cancel">Not now</button><button type="button" class="minibtn pri" data-a="ok" disabled>I am safe, continue</button></div>`);
+ <div class="row"><button type="button" class="minibtn" data-a="cancel">Not now</button><button type="button" class="minibtn" data-a="anyway">Continue anyway</button><button type="button" class="minibtn pri" data-a="ok" disabled>I am safe, continue</button></div>`);
  const m=$('#mSafe'),ok=m.querySelector('[data-a=ok]');
  m.onchange=()=>{ok.disabled=![...m.querySelectorAll('input')].every(c=>c.checked)};
- m.onclick=e=>{const a=e.target.dataset.a;if(a==='cancel'||e.target===m)closeM('mSafe');if(a==='ok'){sess.set('safe','1');closeM('mSafe');step(1);buzz(15);then()}}}
+ m.onclick=e=>{const a=e.target.dataset.a;if(a==='cancel'||e.target===m)closeM('mSafe');if(a==='ok'||a==='anyway'){sess.set('safe',a==='ok'?'1':'skip');closeM('mSafe');step(1);buzz(15);then()}}}
 
 function help(){const g=G.glossary;
  openM('mHelp',`<div class="row u-m0"><h2 id="helpT" class="u-m0">Help &amp; guide</h2><button type="button" class="minibtn" data-a="x" data-f aria-label="Close help">Close</button></div>
@@ -365,6 +375,7 @@ function autoGps(){if(store.get('gpsAsked',0)||!navigator.geolocation||!window.i
 function openCamera(){autoGps();openFinder()}
 camIn.addEventListener('click',()=>autoGps());
 $('#camBtn').addEventListener('click',()=>{if(!sess.get('safe')){safety(openCamera);return}openCamera()});
+camIn.parentElement.addEventListener('click',e=>{if(e.target===camIn||sess.get('safe'))return;e.preventDefault();safety(()=>camIn.click())});
 galIn.parentElement.addEventListener('click',()=>{if(sess.get('safe'))step(1)});
 
 /* ---------- photo metrics (same as tools/calibrate_photo_check.py) ---------- */
@@ -430,17 +441,32 @@ document.querySelectorAll('.btn').forEach(b=>b.addEventListener('click',listenOr
 /* ---------- live viewfinder ---------- */
 let stream=null,loop=null,wasReady=false,lastSay=0,cap=null;
 const vf=$('#vf'),vid=vf.querySelector('video');
-async function openFinder(){listenOri();step(1);vf.hidden=false;const s=curShot(),pz=mode==='pano'&&A.pano;
+let camPerm=null,wake=null,navBack=false,popOwn=false;
+// camera permission state ('granted' | 'prompt' | 'denied' | 'unknown'). The browser decides when it may ask: while the
+// state is 'prompt' every open asks again; after 'denied' only the site settings can change it, so the screen shows
+// those steps and starts the camera by itself as soon as the permission turns to granted.
+async function camState(){try{if(!camPerm&&navigator.permissions){camPerm=await navigator.permissions.query({name:'camera'});
+  camPerm.onchange=()=>{if(camPerm.state==='granted'&&!vf.hidden&&vf.classList.contains('blocked'))openFinder(true)}}
+ return camPerm?camPerm.state:'unknown'}catch(_){return 'unknown'}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!vf.hidden&&vf.classList.contains('blocked'))camState().then(s=>{if(s==='granted')openFinder(true)})});
+// our own history.back() (camera closed by its button) must not close a camera reopened right after it
+window.addEventListener('popstate',()=>{if(popOwn){popOwn=false;return}navBack=true;if(!vf.hidden)closeFinder();navBack=false});
+async function openFinder(go){listenOri();step(1);vf.hidden=false;const s=curShot(),pz=mode==='pano'&&A.pano;
  vf.querySelector('.vfg').dataset.frame=s?s.frame:pz?'pano':'full';// title plus the task right now (where to stand, what to fit), shown the whole time the camera is open
  const todo=s?s.d:pz?A.pano.hint():'Stand at the foot of the slope or across the road, facing up. Fit the top (scarp) and the bottom (deposit), hold level, shoot when the ring turns green.';
- vf.querySelector('.vfs').innerHTML=esc(tr(s?'Shot '+(shot+1)+': '+s.t:pz?A.pano.label():'Frame the whole slope'))+`<small>${esc(tr(todo))}</small>`;
+ vf.querySelector('.vfs').textContent=tr(s?'Shot '+(shot+1)+': '+s.t:pz?A.pano.label():'Frame the whole slope');
+ const vd=vf.querySelector('.vfd');vd.textContent=tr(todo);vd.setAttribute('aria-expanded','false');
+ if(!history.state||!history.state.vf)history.pushState({vf:1},'');   // the phone's Back button closes the camera, not the site
  if(pz)A.pano.finder(true);
  vf.querySelector('[data-a=voice]').textContent=voice?'\u{1F50A}':'\u{1F507}';camFix(null);
  if(!LIVE){camFix({name:'Insecure'});return}
+ const ps=await camState();if(ps==='denied'){camFix({name:'NotAllowedError'});return}
+ if(ps==='prompt'&&!store.get('camOk',0)&&!go){camFix({name:'Ask'});return}
  try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:3840},height:{ideal:2160}},audio:false});
   vid.srcObject=stream;await vid.play();
   try{const tr=stream.getVideoTracks()[0];cap=window.ImageCapture?new ImageCapture(tr):null}catch(_){cap=null}
   prevG=null;wasReady=false;loop=setInterval(liveTick,450);say(s?s.d:pz?A.pano.hint():'Frame the whole slope from below, top to bottom.');
+  store.set('camOk',1);try{wake=navigator.wakeLock?await navigator.wakeLock.request('screen'):null}catch(_){wake=null}   // screen stays on
   vf.querySelector('[data-a=shoot]').focus()}
  catch(err){if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;camFix(err)}}
 // the live camera could not start: stay on the camera screen and say exactly why and what to do (never jump to the
@@ -452,24 +478,26 @@ function camFix(e){let x=vf.querySelector('.vfx');if(!e){if(x)x.hidden=true;vf.c
  const https=location.protocol==='http:'&&!local?`https://${location.hostname}:8443${location.pathname}${location.search}`:'';
  const [t,steps]=INAPP?['This app\'s built-in browser blocks the live camera',['Tap the ⋮ or ↗ menu at the top.','Choose "Open in Chrome" (or Safari / your browser).','Tap Take photo again there.']]
   :insecure?['The live camera needs the secure (https) link',https?['Tap "Open secure link" below.','If the phone warns about the certificate: Advanced > Proceed (once).','Tap Take photo again there.']:['Open this page with an https:// address.','Ask whoever runs the app for the secure link.']]
-  :n==='NotAllowedError'||n==='SecurityError'?['Camera permission is blocked for this page',['Tap the lock or ⓘ icon left of the address.','Permissions > Camera > Allow.','Tap Try again.']]
+  :n==='Ask'?['Allow the camera for the live guide',['The guide uses the camera to check light, sharpness, level and overlap while you aim.','Your browser asks next: tap Allow.','Nothing is recorded until you press the shutter.']]
+  :n==='NotAllowedError'||n==='SecurityError'?['Camera permission is blocked for this page',['Tap the lock or ⓘ icon left of the address.','Permissions > Camera > Allow.','Come back here: the camera starts by itself (or tap Try again).']]
   :n==='NotReadableError'||n==='AbortError'?['Another app is using the camera',['Close the other camera, video-call or scanner app.','Tap Try again.']]
   :n==='NotFoundError'||n==='OverconstrainedError'?['No camera was found on this device',['Use a phone with a rear camera, or choose photos from the gallery.']]
   :['The live camera could not start',['Close other apps that may use the camera.','Tap Try again. If it still fails, reload the page.']];
  x.innerHTML=`<div class="vfxi" aria-hidden="true">${ICO('camera')}</div><h2 id="vfxT">${esc(tr(t))}</h2><ol>${steps.map(s=>`<li>${esc(tr(s))}</li>`).join('')}</ol>
   <div class="vfxb">${https?`<a class="btn primary" href="${esc(https)}">${esc(tr('Open secure link'))}</a>`:''}${INAPP||(insecure&&!https)?`<button type="button" class="btn primary" data-x="copy">${esc(tr('Copy link'))}</button>`:''}
-  ${!insecure&&!INAPP?`<button type="button" class="btn primary" data-x="retry">${esc(tr('Try again'))}</button>`:''}
+  ${!insecure&&!INAPP?`<button type="button" class="btn primary" data-x="retry">${esc(tr(n==='Ask'?'Continue':'Try again'))}</button>`:''}
   <button type="button" class="btn ghost" data-x="close">${esc(tr('Back'))}</button></div>
   <button type="button" class="vfxn" data-x="native">${esc(tr('Use the phone camera app instead (no live guide)'))}</button>`;
- x.hidden=false;vf.classList.add('blocked');say(tr(t));
+ x.hidden=false;vf.classList.add('blocked');if(n!=='Ask')say(tr(t));
  x.onclick=ev=>{const a=ev.target.closest('[data-x]')?.dataset.x;if(!a)return;
-  if(a==='retry')openFinder();if(a==='close')closeFinder();if(a==='native'){closeFinder();camIn.click()}
+  if(a==='retry')openFinder(true);if(a==='close')closeFinder();if(a==='native'){closeFinder();camIn.click()}
   if(a==='copy'){const u=https||location.href;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast(tr('Link copied. Paste it in Chrome.')),()=>toast(u))}}}
 // the camera stops when the page is hidden (screen off, app switch) and the shutter answers the space bar
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&stream)closeFinder()});window.addEventListener('pagehide',()=>{if(stream)closeFinder()});
 document.addEventListener('keydown',e=>{if(e.code!=='Space'||e.repeat||vf.hidden||!stream)return;const tg=document.activeElement&&document.activeElement.tagName;
  if(['BUTTON','INPUT','TEXTAREA','SELECT'].includes(tg))return;e.preventDefault();shoot()});
-function closeFinder(){clearInterval(loop);loop=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;vf.hidden=true;camFix(null);A.pano&&A.pano.finder(false)}
+function closeFinder(){clearInterval(loop);loop=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;vf.hidden=true;camFix(null);A.pano&&A.pano.finder(false);
+ if(wake){wake.release().catch(()=>{});wake=null}if(!navBack&&history.state&&history.state.vf){popOwn=true;history.back()}}
 function liveTick(){if(!vid.videoWidth)return;liveShow(metrics(vid,true),ori,mode==='pano'&&A.pano?A.pano.tick(vid,ori):null)}
 // one live reading -> pills (coloured by severity), quality meter, one instruction with a direction arrow, shutter
 // ring. Level and instruction change only after 2 readings in a row agree. The shutter always works.
@@ -479,9 +507,9 @@ function liveShow(m,t,px){const c=judge(m,t).filter(x=>x[0]!=='Resolution'&&!(mo
  const bad=(px?px.bad.map(b=>[b[0],b[1],1]):[]).concat(own);
  const lvl=vf.querySelector('.lvl');if(t){lvl.style.display='';lvl.style.transform=`translate(-50%,-50%) rotate(${-t.roll}deg)`;lvl.classList.toggle('ok',Math.abs(t.roll)<=3)}else lvl.style.display='none';
  const cls=s=>s===2?'bad':s?'warn':'ok';
- for(const [k,v,s] of c)pills.push(`<span class="${cls(v?s:0)}">${k}</span>`);pills.push(`<span class="${steady?'ok':'warn'}">Steady</span>`);
- if(t)pills.push(`<span class="${t.elev>=-10&&t.elev<=45?'ok':'warn'}">Aim ${Math.round(t.elev)}°</span>`);
- if(px)pills.unshift(...px.pills);
+ for(const [k,v,s] of c)if(v)pills.push(`<span class="${cls(s)}">${esc(tr(k))}</span>`);if(!steady)pills.push(`<span class="warn">${esc(tr('Steady'))}</span>`);
+ if(t&&!(t.elev>=-10&&t.elev<=45))pills.push(`<span class="warn">${esc(tr('Aim'))} ${Math.round(t.elev)}°</span>`);
+ if(px)pills.unshift(...px.pills);if(!pills.length)pills.push(`<span class="ok">${esc(tr('All checks good'))}</span>`);
  vf.querySelector('.pills').innerHTML=pills.join('');
  const q=hold(lv.q,grade(c.concat(steady?[]:[['Steady','',1]]),false)),top=hold(lv.m,bad.length?bad[0][0]:''),hit=bad.find(x=>x[0]===top)||bad[0],ready=!top;
  const vq=vf.querySelector('.vfq');vq.className='vfq q'+q;vq.innerHTML=esc(tr('Photo quality'))+': '+esc(tr(QL[q]))+qmeter(q);
@@ -500,7 +528,7 @@ async function shoot(){const t=ori;let blob=null;buzz([20,40,20]);
  if(mode==='pano'&&A.pano){gstate.live=true;A.pano.shot(blob,t,vid);return}
  closeFinder();start(blob,true,t,true)}
 vf.addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='close')closeFinder();if(a==='shoot')shoot();
- if(a==='native'){closeFinder();camIn.click()}if(a==='voice'){voice=!voice;store.set('voice',voice);e.target.textContent=voice?'\u{1F50A}':'\u{1F507}';say('Voice guidance on')}});
+ if(a==='task'){const d=vf.querySelector('.vfd');d.setAttribute('aria-expanded',d.getAttribute('aria-expanded')!=='true')}if(a==='native'){closeFinder();camIn.click()}if(a==='voice'){voice=!voice;store.set('voice',voice);e.target.textContent=voice?'\u{1F50A}':'\u{1F507}';say('Voice guidance on')}});
 
 /* ---------- language: English / Hindi (text nodes are translated as they appear) ---------- */
 const HI=G.hi||{};

@@ -86,6 +86,15 @@ QUIZ = [
 
 # ---------------------------------------------------------------- Hindi (machine-drafted; needs a native-speaker review)
 HI = {
+    "Guided camera": "गाइडेड कैमरा",
+    "Continue anyway": "फिर भी जारी रखें",
+    "Continue": "जारी रखें",
+    "All checks good": "सभी जाँच ठीक",
+    "Allow the camera for the live guide": "लाइव मार्गदर्शन के लिए कैमरा की अनुमति दें",
+    "The guide uses the camera to check light, sharpness, level and overlap while you aim.": "निशाना लगाते समय रोशनी, साफ़पन, समतल और ओवरलैप जाँचने के लिए मार्गदर्शक कैमरा इस्तेमाल करता है।",
+    "Your browser asks next: tap Allow.": "अब ब्राउज़र पूछेगा: अनुमति दें पर टैप करें।",
+    "Nothing is recorded until you press the shutter.": "शटर दबाने तक कुछ भी रिकॉर्ड नहीं होता।",
+    "Come back here: the camera starts by itself (or tap Try again).": "यहाँ लौटें: कैमरा अपने-आप शुरू होगा (या फिर से कोशिश करें पर टैप करें)।",
     "Stand at the foot of the slope or across the road, facing up. Fit the top (scarp) and the bottom (deposit), hold level, shoot when the ring turns green.": "ढलान के नीचे या सड़क के पार खड़े होकर ऊपर की ओर देखें। ऊपर (स्कार्प) और नीचे (मलबा) दोनों फ़्रेम में लें, फ़ोन सीधा रखें, घेरा हरा होते ही फ़ोटो लें।",
     "This app's built-in browser blocks the live camera": "इस ऐप का अंदरूनी ब्राउज़र लाइव कैमरा रोकता है",
     "Tap the ⋮ or ↗ menu at the top.": "ऊपर ⋮ या ↗ मेनू पर टैप करें।",

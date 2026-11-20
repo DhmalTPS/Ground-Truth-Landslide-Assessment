@@ -124,10 +124,13 @@ the window stays open. `cloudflared.exe` is a general tool and lives outside the
 ## User guidance in the app
 
 `src/guide.py` adds:
-- a first-run tour and a per-session safety checklist;
+- a first-run tour and a per-session safety checklist (with "Continue anyway");
 - single-photo or 4-shot site-survey mode;
-- a live framing and level viewfinder with a photo-quality meter (Good / Fair / Poor / Very poor), one
-  instruction at a time and a direction arrow;
+- a live framing and level viewfinder with a photo-quality meter (Good / Fair / Poor / Very poor), the current task,
+  only the failing checks as pills, one instruction at a time and a big arrow: up/down from aim, left/right with
+  degrees (compass) or steps (walk-along, from the typed distance); for overlapping sets the live overlap with the last
+  photo as a number against the ideal band (turn 30-60 %, walk 60-80 %) and up/down alignment with the last photo;
+  the phone's Back button closes the camera and the screen stays on while it is open;
 - an instant on-phone photo check, each problem graded minor or serious;
 - results that are always shown, even for a photo that fails the photo check: a quality band above the
   result says how reliable it is, and nothing is adjusted to look better;
@@ -145,7 +148,13 @@ It also adds:
 
 Details and tests are in `report.md` §5.1–5.2.
 - **Measuring whether the guidance helps:** `python tools/guidance_report.py` (after field use without `--no-save`).
-- **Live camera guide on phones** needs https: `python src/app.py --https`. This makes a self-signed certificate once in `.cache/tls`; accept the browser's warning on the phone. Without it the phone's camera app is used.
+- **Live camera guide on phones** needs https, which `python src/app.py` now serves by default on port 8443 next to
+  http on 8000 (self-signed certificate made once in `.cache/tls`; tap Advanced > Proceed once on the phone). Phones that
+  open the http address are redirected to https; this laptop keeps `http://localhost:8000`. `--no-https` turns it off.
+- **Three ways to add a photo:** *Guided camera* (the live camera inside the page, never the camera app), *Phone camera*
+  (the phone's own camera app, no live guide) and *From gallery*. If the guided camera cannot start, the page says why
+  and how to fix it (https link, camera permission steps, in-app browser, camera busy) and starts the camera by itself
+  once the permission is allowed; a blocked permission can only be re-enabled in the browser's site settings.
 - **Photo-check thresholds:** recalibrate after the dataset changes with `python tools/calibrate_photo_check.py` (train split only).
 
 ## Photo sets and video (too big for one photo)

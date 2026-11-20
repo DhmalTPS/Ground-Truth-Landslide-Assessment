@@ -173,7 +173,7 @@ h2{font:600 1.42rem/1.2 var(--f-disp);margin:0 0 var(--s3);letter-spacing:-.005e
 .tips li::before{content:counter(tp);font:italic 500 1.6rem/1 var(--f-disp);color:var(--link);text-align:right}
 .tips li,.hist small,.foot{font-variant-numeric:oldstyle-nums proportional-nums}
 .tips .ico{display:none}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}.btns .wide{grid-column:1/-1}
 .btn{position:relative;display:flex;align-items:center;justify-content:center;gap:var(--s2);min-height:54px;padding:var(--s3) var(--s5);border-radius:999px;border:0;
 font-weight:650;font-size:1rem;line-height:1.2;font-family:inherit;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .15s ease,transform .08s ease,box-shadow .15s ease}
 .btn.primary{color:var(--on-brand);background:var(--brand);box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 -3px 0 rgba(0,0,0,.14) inset,0 10px 22px -12px var(--brand),0 2px 4px -2px rgba(0,0,0,.25)}
@@ -419,7 +419,8 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
 <li>__I_frame__<span>Fit the whole slope: the top (scarp or source) and the bottom (deposit).</span></li>
 <li>__I_sun__<span>Hold the phone level, in daylight. One slope per photo.</span></li></ul>
 <div class="btns">
-<button type="button" class="btn primary" id="camBtn">__I_camera__Take photo</button><input id="cam" type="file" accept="image/*" capture="environment" hidden>
+<button type="button" class="btn primary wide" id="camBtn">__I_camera__Guided camera</button>
+<label class="btn ghost" id="camNat">__I_camera__Phone camera<input id="cam" type="file" accept="image/*" capture="environment"></label>
 <label class="btn ghost">__I_image__From gallery<input id="gal" type="file" accept="image/*"></label>
 </div>
 <label class="dist"><span class="dl">Distance to the slope (optional)</span>
