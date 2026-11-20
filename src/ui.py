@@ -615,7 +615,7 @@ kbd{font-size:.85em}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);border:0}.sr-only *{white-space:normal}
 h2.title{margin-top:4px}h2.kicker{margin-top:0}
 .ctype{font:600 1.42rem/1.2 var(--f-disp);margin:0 0 var(--s3)}
-#dimslot{min-height:320px}main>.layout{min-height:100vh}@media (max-width:1099px){body.has-res #out:not(:empty),body.busy #out:not(:empty){min-height:100vh}}@media (min-width:1100px){body.m-survey:not(.has-res) .stage>#shots:empty{display:grid;min-height:96px}}.card.result[aria-busy=true]{min-height:340px}#fig img:not([width]){aspect-ratio:auto 4/3}#fig img{height:auto}
+#dimslot{min-height:320px}#dimslot:has(#dany){min-height:0}main>.layout{min-height:100vh}@media (max-width:1099px){body.has-res #out:not(:empty),body.busy #out:not(:empty){min-height:100vh}}@media (min-width:1100px){body.m-survey:not(.has-res) .stage>#shots:empty{display:grid;min-height:96px}}.card.result[aria-busy=true]{min-height:340px}#fig img:not([width]){aspect-ratio:auto 4/3}#fig img{height:auto}
 #safeT .ico{display:inline-block;vertical-align:-3px;margin-right:6px}
 #sLang{min-height:44px;min-width:96px}#weather,.vfxn{min-height:44px}.vfb .pdir{min-width:44px}
 .olinks li{grid-template-columns:52px 1fr minmax(84px,auto)}
