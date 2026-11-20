@@ -151,6 +151,15 @@ Details and tests are in `report.md` §5.1–5.2.
 - **Live camera guide on phones** needs https, which `python src/app.py` now serves by default on port 8443 next to
   http on 8000 (self-signed certificate made once in `.cache/tls`; tap Advanced > Proceed once on the phone). Phones that
   open the http address are redirected to https; this laptop keeps `http://localhost:8000`. `--no-https` turns it off.
+- **Phone on the same Wi-Fi cannot open the app?** Windows makes inbound *Block* rules for python.exe when its first
+  "Allow access?" popup is cancelled, and they apply on Public networks (hostel/campus Wi-Fi, a new hotspot). Run
+  `python src/app.py --lan`: one UAC popup, then an elevated guardian pauses those Block rules and adds one Allow rule
+  (only the app's ports, only from the local subnet, only for the Python that listens - the base Python311
+  `python.exe`, because the venv's `python.exe` is just a launcher). The guardian watches the app and restores the
+  firewall exactly on Ctrl+C, a crash or a closed window, and the app prints the confirmation. After a power loss a
+  normal start warns and `python src/app.py --lan-restore` undoes it. Log: `.cache/lan/guardian.log`. If the phone
+  still times out, the Wi-Fi isolates devices from each other (common on hostel Wi-Fi): use a phone hotspot or
+  `python tools/serve_public.py`. On shared Wi-Fi add `--token <word>`.
 - **Three ways to add a photo:** *Guided camera* (the live camera inside the page, never the camera app), *Phone camera*
   (the phone's own camera app, no live guide) and *From gallery*. If the guided camera cannot start, the page says why
   and how to fix it (https link, camera permission steps, in-app browser, camera busy) and starts the camera by itself

@@ -537,7 +537,21 @@ def main():
                          "warning to accept)")
     ap.add_argument("--no-https", action="store_true", help="plain http only (phones then use the phone camera app)")
     ap.add_argument("--cert", nargs=2, metavar=("CERT", "KEY"), help="use your own certificate (e.g. from mkcert)")
+    ap.add_argument("--lan", action="store_true",
+                    help="Windows: open the firewall for phones on the same Wi-Fi while the app runs (one UAC popup); "
+                         "restored automatically when the app stops - Ctrl+C, crash or closed window")
+    ap.add_argument("--lan-restore", action="store_true",
+                    help="undo a --lan run that could not restore the firewall (e.g. power loss), then exit")
+    ap.add_argument("--lan-dry", action="store_true", help=argparse.SUPPRESS)   # tests: run the guardian, change nothing
     args = ap.parse_args()
+
+    import lan
+    if args.lan_restore:
+        lan.restore_now()
+        return
+    if lan.leftover() and not args.lan:
+        print("  NOTE: an earlier --lan run did not restore the firewall (laptop shut down?). "
+              "Run: python src/app.py --lan-restore")
 
     pred = Predictor(args.model)
     vlm = VLM() if args.vlm else None
@@ -566,12 +580,19 @@ def main():
              "   plain http links redirect here, and the in-page live camera guide then works)\n" if secure else
              "  (the live camera guide on phones needs https; otherwise the phone camera app is used)\n")
           + ("  uploads are NOT saved\n" if args.no_save else f"  uploads saved to {UPLOADS} (max {args.max_saved})\n")
-          + "  (if the phone cannot connect, allow Python through Windows Firewall for private networks)")
+          + ("" if args.lan or args.lan_dry else
+             "  (if the phone cannot connect on the same Wi-Fi: python src/app.py --lan)"))
+    # --lan: the guardian restores the firewall on Ctrl+C, and on its own if this process dies any other way
+    fw = lan.open_lan([args.port] + ([args.https_port] if secure else []), dry=args.lan_dry) \
+        if args.lan or args.lan_dry else None
     try:
         server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nstopping (Ctrl+C)")
     finally:
         if secure:
             secure.shutdown()
+        lan.close_lan(fw)
 
 
 if __name__ == "__main__":
