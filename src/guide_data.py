@@ -86,6 +86,14 @@ QUIZ = [
 
 # ---------------------------------------------------------------- Hindi (machine-drafted; needs a native-speaker review)
 HI = {
+    "Labels used to train the model were made by AI and the sizes are not yet checked against field measurements; treat sizes as estimates. Always confirm with a geologist or geotechnical engineer before acting.": "मॉडल को सिखाने वाले लेबल AI से बनाए गए थे और आकार अभी फ़ील्ड माप से जाँचे नहीं गए हैं; आकारों को अनुमान मानें। कोई कदम उठाने से पहले हमेशा भूविज्ञानी या भू-तकनीकी इंजीनियर से पुष्टि करें।",
+    "Confidence says how sure the type is. Sizes are estimates from the photo. Below each result, 'Next steps' tells you what extra photo or detail would make it better.": "विश्वास बताता है कि प्रकार कितना निश्चित है। आकार फ़ोटो से लगाए गए अनुमान हैं। हर परिणाम के नीचे 'अगले कदम' बताते हैं कि कौन सी अतिरिक्त फ़ोटो या जानकारी इसे बेहतर बनाएगी।",
+    "estimated size": "अनुमानित आकार",
+    "The sizes were checked on usable photos; with this photo they can be further off.": "आकार उपयोगी फ़ोटो पर जाँचे गए थे; इस फ़ोटो के साथ वे और ग़लत हो सकते हैं।",
+    "Add the distance to the slope and re-measure: sizes become much more accurate.": "ढलान तक की दूरी जोड़ें और फिर से मापें: आकार कहीं अधिक सटीक होंगे।",
+    "Sizes: median of the whole-slope shots.": "आकार: पूरी-ढलान शॉट्स की माध्यिका।",
+    "Median of the whole-slope shots.": "पूरी-ढलान शॉट्स की माध्यिका।",
+    "Measuring sizes": "आकार माप रहे हैं",
     "Notes kept from the last observation.": "पिछले अवलोकन के नोट्स रखे गए हैं।",
     ", rough photo": ", कमज़ोर फ़ोटो",
     "(full notes in the web page report)": "(पूरे नोट्स वेब पेज रिपोर्ट में)",

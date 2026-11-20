@@ -42,7 +42,6 @@ GLOSSARY = {
     "Toe / deposit": "The bottom of the landslide, where the moved material piled up.",
     "Confidence": "How sure the model is about the type (0-100%). Below the 'confident' mark, the app says Uncertain.",
     "Uncertain / family": "Unsure about the exact type. 'Family' means it is sure of the group (flow or slide), not which member.",
-    "90% range": "The size lies in this range with about 90% probability, given the photo. Wide range = rough estimate.",
     "Depth trust": "How well the 3-D depth checks agreed (high / medium / low). Low: treat sizes as order-of-magnitude.",
     "Grain size D16/D50/D84": "Block or boulder sizes: 16%, 50% and 84% of the counted pieces are smaller than these.",
     "Travel angle (H/L)": "Drop height over run-out length. A low angle means the material travelled far (mobile, dangerous).",
@@ -96,8 +95,8 @@ ILLUS = [
     '<text x="20" y="112" font-size="10" fill="currentColor">two hands, hold still</text></svg>',
     f'<svg {_IL}><rect x="20" y="18" width="200" height="12" rx="6" fill="currentColor" opacity=".12"/><rect x="20" y="18" width="160" height="12" rx="6" fill="url(#g-ground)"/>'
     '<text x="20" y="48" font-size="10" fill="currentColor">confidence: how sure the type is</text>'
-    '<path d="M40 86H200" stroke="currentColor" stroke-width="2" opacity=".35"/><path d="M70 86H170" stroke="url(#g-signal)" stroke-width="6" stroke-linecap="round"/>'
-    '<circle cx="112" cy="86" r="6" fill="currentColor"/><text x="20" y="112" font-size="10" fill="currentColor">size and its 90% range (wide = rough)</text></svg>',
+    '<path d="M40 86H200" stroke="currentColor" stroke-width="2" opacity=".35"/>'
+    '<circle cx="112" cy="86" r="6" fill="currentColor"/><text x="20" y="112" font-size="10" fill="currentColor">estimated size</text></svg>',
 ]
 TOUR = [
     ("What this app does", "Photograph a landslide from the ground. The app names its type, shows the on-site signs "
@@ -108,7 +107,7 @@ TOUR = [
      "of soil, not mostly sky."),
     ("Light, level, steady", "Daylight with the sun behind or beside you. Hold the phone level with two hands. The live "
      "guide turns green when the shot is good."),
-    ("Read the answer", "Confidence says how sure the type is. Sizes come with a 90% range. Below each result, "
+    ("Read the answer", "Confidence says how sure the type is. Sizes are estimates from the photo. Below each result, "
      "'Next steps' tells you what extra photo or detail would make it better."),
 ]
 
@@ -353,7 +352,7 @@ function help(){const g=G.glossary;
  <li>Daylight, sun behind or beside you. Wipe the lens. Hold level with two hands, tap the slope to focus.</li><li>Unsure result? Take more photos from other spots, or use the Site survey mode.</li><li>Type the distance (or pace it) for better sizes; a person or car near the toe also helps.</li></ol>
  <h3>Safety</h3><ul class="steps">${G.safety.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
  <h3>Reading the result</h3><dl class="gloss">${Object.entries(g).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
- <h3>Limits</h3><p>Labels used to train the model were made by AI and the sizes are not yet checked against field measurements; treat sizes as estimates within their ranges. Always confirm with a geologist or geotechnical engineer before acting.</p>
+ <h3>Limits</h3><p>Labels used to train the model were made by AI and the sizes are not yet checked against field measurements; treat sizes as estimates. Always confirm with a geologist or geotechnical engineer before acting.</p>
  <h3>Settings</h3><label class="switch">Voice guidance (camera and results)<input type="checkbox" id="sVoice" ${voice?'checked':''}></label><label class="switch">Keyboard shortcuts (U, C, ?)<input type="checkbox" id="sKeys" ${store.get('keys',true)?'checked':''}></label>
  <label class="switch">Sun mode (high contrast, bigger text)<input type="checkbox" id="sSun" ${document.body.classList.contains('sun')?'checked':''}></label>
  <label class="switch">Language / भाषा<select id="sLang"><option value="en" ${lang==='en'?'selected':''}>English</option><option value="hi" ${lang==='hi'?'selected':''}>हिन्दी</option></select></label>
@@ -706,7 +705,7 @@ function sizes(r){if(!job){finish(r);return}if(r.status!=='bad_photo'){measure()
  const m=out.querySelector('.meta');m?out.insertBefore(slot,m):out.appendChild(slot);$('#dany').onclick=()=>measure();finish(r)}
 function findDims(){return $('#dimcard')||[...out.querySelectorAll('.card')].find(c=>/^Estimated (size|dimensions)|^अनुमानित (आकार|आयाम)/.test((c.querySelector('.kicker')?.textContent||'').trim())&&c.id!=='dimslot')}
 function placeDims(r){const w=document.createElement('div');w.innerHTML=A.dims(r.dimensions);const c=w.firstElementChild;c.id='dimcard';
- if(qLevel(r)>=2&&r.dimensions.available)c.insertAdjacentHTML('afterbegin',`<p class="note u-b3"><b>${esc(tr('Photo quality'))}: ${esc(tr(QL[qLevel(r)]))}.</b> <span>The 90% ranges were checked on usable photos; with this photo the real error can be larger than shown.</span></p>`);const s=$('#dimslot')||$('#dimcard');s?s.replaceWith(c):out.appendChild(c);typeChip(r)}
+ if(qLevel(r)>=2&&r.dimensions.available)c.insertAdjacentHTML('afterbegin',`<p class="note u-b3"><b>${esc(tr('Photo quality'))}: ${esc(tr(QL[qLevel(r)]))}.</b> <span>The sizes were checked on usable photos; with this photo they can be further off.</span></p>`);const s=$('#dimslot')||$('#dimcard');s?s.replaceWith(c):out.appendChild(c);typeChip(r)}
 function fail(msg,net){A.fail(msg);const c=out.firstElementChild;
  c.insertAdjacentHTML('beforeend',`<div class="btns u-t3"><button type="button" class="btn primary" data-a="retry">Try again</button>${net?'<button type="button" class="btn ghost" data-a="later">Send later</button>':'<button type="button" class="btn ghost" data-a="new">New photo</button>'}</div>`);
  c.querySelector('[data-a=retry]').onclick=()=>lastBlob&&send();
@@ -729,7 +728,7 @@ function afterType(r,replay){step(4);if(!(history.state&&history.state.res))try{
 function afterDims(r,replay){const d=r.dimensions;if(!d)return;locLine();const c=findDims();if(c)c.id='dimcard';
  if(!d.available){if(r.status!=='bad_photo')addAct(esc(d.reason||'No size estimate for this photo.'),'','');return}
  const ce=d.cut_edges||[];if(ce.length)addAct(cutMsg(ce),'Retake','retake');
- if(!replay&&!lastDist&&!/object|person|car|calibrat/i.test(d.scale_source||''))addAct('Add the distance to the slope and re-measure: sizes get much tighter ranges.','Add distance','dist');
+ if(!replay&&!lastDist&&!/object|person|car|calibrat/i.test(d.scale_source||''))addAct('Add the distance to the slope and re-measure: sizes become much more accurate.','Add distance','dist');
  if(!replay&&lastDist)addAct(`Measured with your distance of ${lastDist} m.`,'Change','dist');
  if(d.depth_trust==='low')addAct('Sizes are rough here. A person, car or pole near the toe lets the app check its scale.','Scale shot','scale');
  if(d.grains&&!d.grains.reliable&&['debris_flow','fall_topple','earth_mud_flow'].includes(d.label))addAct('Grain size not readable. A close-up of the deposit (5–15 m) gives it.','Close-up','deposit');
@@ -809,9 +808,9 @@ const num=v=>{v=+v;if(!isFinite(v))return v;const r=Number(v.toPrecision(2));ret
 function siteCard(s){const N=D.names,t=s.type.ranked,d=s.dimensions,old=$('#sitecard');
  let h=`<section class="card" id="sitecard"><h2 class="kicker">Site result, ${s.n} shots combined</h2><h3 class="ctype"><span>${esc(N[t[0][0]])}</span>, ${Math.round(t[0][1]*100)}%</h3>
  <div class="probs">${t.slice(0,3).map(([c,v],k)=>`<div class="prob ${k?'':'top'}">${D.glyphs[c]}<div class="nm">${esc(N[c])}<div class="tr"><div class="fl" style="width:${(v*100).toFixed(1)}%"></div></div></div><div class="pc">${Math.round(v*100)}%</div></div>`).join('')}</div>`;
- if(d&&d.available)h+=d.measures.map(m=>`<div class="drow"><span>${esc(m.name)}</span><b>${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small></b></div>`).join('')+
+ if(d&&d.available)h+=d.measures.map(m=>`<div class="drow"><span>${esc(m.name)}</span><b>${num(m.value)} ${m.unit}</b></div>`).join('')+
   (d.measures.some(m=>m.between_photo_log_sd>.7)?`<p class="note">${esc(tr('The shots disagree strongly on size (more than 2x). Check that they show the same landslide, or retake the whole-slope shot with the distance typed in.'))}</p>`:'')+
-  `<p class="hungr u-t2">${esc(tr('Sizes: median of the whole-slope shots, with the spread between photos added to the range.'))} (${s.size_shots.map(k=>esc((G.shots.find(x=>x.id===k)||{}).t||k)).join(', ')})</p>`;
+  `<p class="hungr u-t2">${esc(tr('Sizes: median of the whole-slope shots.'))} (${s.size_shots.map(k=>esc((G.shots.find(x=>x.id===k)||{}).t||k)).join(', ')})</p>`;
  if(s.grains)h+=`<div class="drow"><span>Grain size D16 / D50 / D84</span><b>${s.grains.D16_m} / ${s.grains.D50_m} / ${s.grains.D84_m} m</b></div>`;
  h+=`<div class="u-t3"><button type="button" class="minibtn pri" data-a="sitereport">Save site report</button></div></section>`;
  const w=document.createElement('div');w.innerHTML=h;const c=w.firstElementChild,first=out.querySelector('.card.safety')||out.querySelector('.card.result');if(old)old.replaceWith(c);else if(first)first.after(c);else return;c.querySelector('[data-a]').onclick=siteReport}
@@ -920,13 +919,13 @@ async function reportImage(r,mt,photo,blob,tiles){
    else one(T('No location recorded')+', '+when,X+16,y+h-16,w-32,20,400,'#fff');
    c.y+=h+8;if(d&&d.available&&d.overlay){one(T('Outlined area = the measured landslide'),c.x,c.y+18,c.w,18,400,ink2);c.y+=26}}
   else miss.push('photo')}
- // LEFT 2: sizes, one row per measure (name | value | 90 % range)
+ // LEFT 2: sizes, one row per measure (name | value | note)
  part(cols.l,'sizes',c=>{if(!d)return;sec(c,'Estimated dimensions');
   if(!d.available){one(d.reason||T('No size estimate for this photo.'),c.x,c.y+22,c.w,20,400,ink2);c.y+=34;return}
   const C=[c.x,c.x+c.w*.52,c.x+c.w*.74],cw=[c.w*.5,c.w*.21,c.w*.26];
   const row=(a,b,e,head)=>{const wt=head?600:400,cl=head?ink2:ink;one(a,C[0],c.y+24,cw[0],head?18:20,wt,cl);one(b,C[1],c.y+24,cw[1],head?18:20,head?600:700,cl);if(e)one(e,C[2],c.y+24,cw[2],head?18:19,wt,head?ink2:'#3a4c50');c.y+=36;x.fillStyle=line;x.fillRect(c.x,c.y-5,c.w,1)};
-  row(T('Measure'),T('Value'),T('90% range'),true);
-  for(const m of d.measures||[])row(T(m.name),`${num(m.value)} ${m.unit}`,m.range?`${num(m.range[0])} – ${num(m.range[1])}`:'');
+  row(T('Measure'),T('Value'),'',true);
+  for(const m of d.measures||[])row(T(m.name),`${num(m.value)} ${m.unit}`,'');
   if(d.size_class)row(T('Size class'),T(d.size_class),'');if(d.slope_angle_deg!=null)row(T('Slope angle'),d.slope_angle_deg+'°','');
   if(d.distance_m)row(T('Distance to the slope'),(mt.dist||d.distance_m)+' m',mt.dist?T('your distance'):T('model depth'));
   if(d.grains&&d.grains.reliable)row(T('Grain size D16 / D50 / D84'),`${d.grains.D16_m} / ${d.grains.D50_m} / ${d.grains.D84_m} m`,'');
@@ -1042,7 +1041,7 @@ function resultHTML(r,photo,mt){const N=D.names,d=r.dimensions;let h=photo?`<img
  h+=partH('type',()=>`<h2>Type</h2><p><b>${esc(N[r.label]||r.label)}</b>, ${Math.round((r.confidence||0)*100)}% (${esc(r.status)}${r.family?', '+esc(r.family)+' family':''})</p><table>${(r.ranked||[]).map(([c,p])=>`<tr><td>${esc(N[c]||c)}</td><td>${Math.round(p*100)}%</td></tr>`).join('')}</table>`);
  if(r.answers&&r.answers.length)h+=partH('field questions',()=>`<h2>Field questions</h2><table>${r.answers.map(a=>`<tr><td>${esc(a.q)}</td><td>${esc(a.a)}</td></tr>`).join('')}</table>${r.fieldRanked?`<p>With these answers: <b>${esc(N[r.fieldRanked[0][0]])}</b> ${Math.round(r.fieldRanked[0][1]*100)}%</p>`:''}`);
  if(r.signs)h+=partH('signs',()=>`<h2>Signs checked on site</h2><table>${Object.entries(r.signs).map(([c,v])=>v.map((on,i)=>`<tr><td>${esc(((D.info[c]||{}).check||[])[i]||'sign '+(i+1))}</td><td>${on?'seen':'not seen'}</td></tr>`).join('')).join('')}</table>`);
- if(d&&d.available)h+=partH('dimensions',()=>`<h2>Estimated dimensions</h2>${d.overlay?`<img src="${d.overlay}" alt="measured outline">`:''}<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${(d.measures||[]).map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td><td>${m.range?esc(num(m.range[0]))+' – '+esc(num(m.range[1])):''}</td></tr>`).join('')}
+ if(d&&d.available)h+=partH('dimensions',()=>`<h2>Estimated dimensions</h2>${d.overlay?`<img src="${d.overlay}" alt="measured outline">`:''}<table><tr><th>Measure</th><th>Value</th></tr>${(d.measures||[]).map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td></tr>`).join('')}
   ${d.size_class?`<tr><td>Size class (Fell 1994)</td><td colspan="2">${esc(d.size_class)}</td></tr>`:''}${d.slope_angle_deg!=null?`<tr><td>Slope angle</td><td colspan="2">${esc(d.slope_angle_deg)}°</td></tr>`:''}${d.distance_m?`<tr><td>Distance to the slope</td><td colspan="2">${esc(d.distance_m)} m</td></tr>`:''}${d.grains&&d.grains.reliable?`<tr><td>Grain size D16 / D50 / D84</td><td colspan="2">${esc(d.grains.D16_m)} / ${esc(d.grains.D50_m)} / ${esc(d.grains.D84_m)} m</td></tr>`:''}</table>
   <p class="m">Scale: ${esc(d.scale_source)}. Depth trust: ${esc(d.depth_trust)}. ${esc([...(d.notes||[]),...((d.cut_edges||[]).length?['Runs off the '+d.cut_edges.join(', ')+' edge of the photo.']:[])].join(' '))}</p>`);
  else if(d&&d.reason)h+=`<h2>Estimated dimensions</h2><p>${esc(d.reason)}</p>`;
@@ -1057,13 +1056,13 @@ async function siteReport(){let s=null;try{s=JSON.parse(sess.get('site')||'null'
  const ids=hs.filter(o=>o.site===siteId()).map(o=>o.id),rs=(await Promise.all(ids.map(id=>safe(()=>DB.get('results',id),null)))).filter(Boolean).reverse();
  let h=`<h1>Landslide site survey</h1>${metaHTML(mt)}`;
  if(s)h+=partH('site result',()=>{const t=s.type.ranked,d=s.dimensions;let q=`<h2>Site result (${s.n} shots combined)</h2><p><b>${esc(N[t[0][0]])}</b>, ${Math.round(t[0][1]*100)}%</p>`;
-  if(d&&d.available)q+=`<table><tr><th>Measure</th><th>Value</th><th>90% range</th></tr>${d.measures.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td><td>${esc(num(m.range[0]))} – ${esc(num(m.range[1]))}</td></tr>`).join('')}</table><p class="m">Median of the whole-slope shots; the spread between photos is added to the range.</p>`;
+  if(d&&d.available)q+=`<table><tr><th>Measure</th><th>Value</th></tr>${d.measures.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(num(m.value))} ${esc(m.unit)}</td></tr>`).join('')}</table><p class="m">Median of the whole-slope shots.</p>`;
   if(s.grains)q+=`<p>Grain size D16 / D50 / D84: ${esc(s.grains.D16_m)} / ${esc(s.grains.D50_m)} / ${esc(s.grains.D84_m)} m</p>`;return q});
  for(const x of rs)h+=partH('photo',()=>`<hr><h2>${esc(x.meta&&x.meta.shot||'Photo')}</h2>${metaHTML(x.meta)}${resultHTML(x.r,x.photo,x.meta)}`);
  download(fname('site',mt.t),page('Landslide site survey',h+foot('')))}
 function shareText(){const r=cur,mt=curMeta||meta(),N=D.names,d=r.dimensions,L=locOf(mt,r);
  return [`Landslide observation, ${new Date(mt.t||Date.now()).toLocaleString()}`,`${N[r.label]||r.label} (${Math.round((r.confidence||0)*100)}%, ${r.status})`,`Photo quality: ${QL[qLevel(r)]}${r.status==='bad_photo'?' (not reliable)':''}`,
-  ...(d&&d.available?(d.measures||[]).slice(0,4).map(m=>`${m.name}: ${num(m.value)} ${m.unit} (90%: ${num(m.range[0])}-${num(m.range[1])})`):[]),
+  ...(d&&d.available?(d.measures||[]).slice(0,4).map(m=>`${m.name}: ${num(m.value)} ${m.unit}`):[]),
   L?`Camera position: ${ll(L.cam)}${pm(L.cam.acc)} ${osm(L.cam)}`:'',L&&L.tgt?`Landslide about: ${ll(L.tgt)}${pm(L.tgt.acc)} ${osm(L.tgt)}`:'',
   mt.weather?'Weather: '+mt.weather:'',mt.notes?'Notes: '+mt.notes:'','Decision support only; confirm with a geologist.'].filter(Boolean).join('\n')}
 async function share(){if(!cur)return;const txt=shareText();
@@ -1139,4 +1138,4 @@ def data():
             # expected times are learned on the phone from past requests (moving average)
             "stagesType": [[0, "Checking it is a usable slope photo"], [0.4, "Identifying the landslide type"]],
             "stagesDims": [[0, "Outlining the landslide (CLIPSeg, SAM, outline head)"],
-                           [0.4, "Estimating depth and scale"], [0.75, "Measuring sizes and their ranges"]]}
+                           [0.4, "Estimating depth and scale"], [0.75, "Measuring sizes"]]}

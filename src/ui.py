@@ -373,10 +373,10 @@ function dims(d){
  const num=v=>{v=+v;if(!isFinite(v))return v;const r=Number(v.toPrecision(2));return r>=1000?r.toLocaleString():r}, row=(k,v)=>`<div class="drow"><span>${esc(k)}</span><b>${v}</b></div>`;
  let h=`<section class="card" id="dimcard"><h2 class="kicker"><span>Estimated size</span> <span class="dtrust t-${esc(d.depth_trust)}"><span>Depth trust:</span> ${esc(d.depth_trust)}</span></h2>`,more='';
  if(d.overlay)h+=`<img class="dimg" src="${d.overlay}" alt="Measured area outlined">`;
- h+=d.measures.map(m=>row(m.name,`${num(m.value)} ${m.unit} <small>(90%: ${num(m.range[0])}–${num(m.range[1])})</small>`)).join('');
+ h+=d.measures.map(m=>row(m.name,`${num(m.value)} ${m.unit}`)).join('');
  if(d.size_class){const sp=d.size_class_prob||{};h+=row('Size class (Fell 1994)',esc(d.size_class)+(Object.keys(sp).length>1?' <small>('+Object.entries(sp).map(([k,v])=>esc(k)+' '+Math.round(v*100)+'%').join(', ')+')</small>':''));}
  h+=row('Slope angle',d.slope_angle_deg+'°'+(d.tilt==='phone sensor'?' (phone tilt)':''));
- if(d.grains&&d.grains.reliable)h+=row('Grain size D16 / D50 / D84',`${d.grains.D16_m} / ${d.grains.D50_m} / ${d.grains.D84_m} m <small>(D50 90%: ${d.grains.D50_90ci_m.join('–')})</small>`);
+ if(d.grains&&d.grains.reliable)h+=row('Grain size D16 / D50 / D84',`${d.grains.D16_m} / ${d.grains.D50_m} / ${d.grains.D84_m} m`);
  else if(d.grains)more+=row('Grain size','not resolvable in this photo (take a closer photo of the deposit)');
  if(d.block_count!=null)more+=row('Blocks counted',d.block_count+(d.block_size_class?', largest: '+esc(d.block_size_class):''));
  if(d.travel_angle_deg!=null)more+=row('Travel angle (H/L)',`${d.travel_angle_deg}° (${d.H_over_L})`);
@@ -384,7 +384,7 @@ function dims(d){
  if(d.alternative){const a=d.alternative;more+=`<p class="hungr u-t2">If it is <b>${esc(D.names[a.label]||a.label)}</b> (${Math.round(a.prob*100)}%): ${a.measures.slice(0,3).map(m=>esc(m.name)+' '+num(m.value)+' '+m.unit).join(', ')}</p>`;}
  h+=`<details class="more"><summary>More measurements</summary>${more}</details>`;
  const notes=[...d.notes,...d.depth_issues.map(x=>'Depth check: '+x)];
- h+=`<details class="more"><summary>How the sizes were measured</summary><p class="hungr u-t1">Scale: ${esc(d.scale_source)}. ${notes.map(esc).join(' ')}</p></details></section>`;
+ h+=`<details class="more"><summary>How the sizes were measured</summary><p class="hungr u-t1">Scale: ${esc(d.scale_source)}. ${notes.map(x=>esc(String(x).replace(/;\s*range widened/i,''))).join(' ')}</p></details></section>`;
  return h}
 function render(r){
  const n=D.names;let h='',ann='';
