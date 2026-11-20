@@ -462,6 +462,15 @@ document.addEventListener('DOMContentLoaded',()=>{const $=q=>document.querySelec
  const mo=new MutationObserver(state);
  [['#out',{childList:true}],['#fig',{attributes:true,attributeFilter:['style']}],['#mode',{childList:true,subtree:true,attributes:true}],['#capH',{childList:true,characterData:true,subtree:true}]]
   .forEach(([q,o])=>{const n=$(q);if(n)mo.observe(n,o)});
+ // desktop lanes: each card spans as many 4px grid rows as it is tall, so lanes stack with no holes and no overlap
+ {const cb=document.querySelector('.colB'),ob=document.getElementById('out');
+  if(cb&&ob&&window.ResizeObserver){const R=4,G=24,on=()=>getComputedStyle(cb).getPropertyValue('--mas').trim()==='1',
+   fit=el=>{if(!on()){el.style.gridRowEnd='';return}const h=el.getBoundingClientRect().height;el.style.gridRowEnd=h>0?'span '+Math.ceil((h+G)/R):''},
+   kids=()=>[...cb.children,...ob.children].filter(k=>k!==ob),
+   ro=new ResizeObserver(es=>{for(const e of es)fit(e.target)}),
+   scan=ms=>{if(ms)for(const m of ms)m.removedNodes.forEach(n=>{if(n.nodeType===1)ro.unobserve(n)});kids().forEach(k=>ro.observe(k))};
+   new MutationObserver(scan).observe(cb,{childList:true});new MutationObserver(scan).observe(ob,{childList:true});scan();
+   matchMedia('(min-width:1100px)').addEventListener('change',()=>kids().forEach(fit))}}
  {let op=[];addEventListener('beforeprint',()=>{op=[...document.querySelectorAll('#out details:not([open])')];op.forEach(d=>d.open=true)});
   addEventListener('afterprint',()=>{op.forEach(d=>d.open=false);op=[]})}
  plate.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&b.dataset.a==='cam'){$('#camBtn').click();return}$('#gal').click()});
@@ -529,19 +538,8 @@ body.has-res.m-single .stage{display:none}
 .stage .pgide>*{grid-column:2}.stage .pgide>.pk,.stage .pgide>.pintro{grid-column:1/-1}.stage .pgide>.pdiag{grid-column:1;grid-row:3/span 6}
 .stage .pgide .pdiag svg{max-width:100%}
 /* result: photo and verdict side by side, the evidence in columns */
-#fig{grid-column:1/span 7;grid-row:span 4;align-self:stretch;max-height:max(480px,calc(100vh - 40px));position:sticky;top:14px}
-#fig img{height:100%;max-height:none;object-fit:contain;background:#05080d}
 #out>.qband .btns{max-width:460px}
-#out>.qband{order:-1;position:relative;z-index:1;background:color-mix(in srgb,var(--qc,#d2452b) 12%,var(--surface))}
-#out>.card.result{grid-column:span 5;order:1}
-#out>#repsec{grid-column:span 5;order:2}
-#out>#askcard,#out>#nextcard{grid-column:span 5;order:3}
-#out>.safety{order:4}
-#out>#ovcard{order:1}
-#out>#dimcard{grid-column:span 6;order:6}#out>#checkcard{grid-column:span 6;order:7}#out>#typescard{grid-column:span 6;order:8}
-#out>.meta{order:20}
-.colB:not(:has(#fig[style*="block"])) #out>.card.result{grid-column:span 7}
-.colB:not(:has(#fig[style*="block"])) #out>#askcard,.colB:not(:has(#fig[style*="block"])) #out>#nextcard{grid-column:span 6}
+#out>.qband{position:relative;z-index:1;background:color-mix(in srgb,var(--qc,#d2452b) 12%,var(--surface))}
 #out>.card:not(.result):not(.safety):not(.bad):not(.qband){padding-top:24px}
 #out>.card.result .title{font-size:clamp(1.55rem,.9rem + 1.1vw,2.2rem)}#out>.card.result .summit{width:92px;height:92px}
 /* the mode switch is a vertical list in the rail (three labels do not fit side by side in 320 px) */
@@ -561,8 +559,6 @@ body.has-res.m-single .stage{display:none}
 #mHelp .sheet h3{break-after:avoid}#mHelp .sheet ol,#mHelp .sheet ul,#mHelp .sheet dl{break-inside:avoid-column}
 #mHelp .sheet b{display:inline}
 }
-@media (min-width:1600px){#out>#dimcard,#out>#checkcard,#out>#typescard{grid-column:span 4}}
-@media (min-width:1100px){#out:not(:has(#dimcard))>#checkcard,#out:not(:has(#dimcard))>#typescard{grid-column:span 6}}
 @media (min-width:1100px){body.m-pano .frameart{display:none}body.m-pano .dropplate{min-height:220px}
 .stage #pano .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.stage #pano .row .btn{min-width:180px}
 .stage .pgide .pdiag{max-width:520px}}
@@ -584,7 +580,6 @@ body.has-res.m-single .stage{display:none}
 .vfhud>.vfb{grid-column:1;grid-row:5}
 .vfhud>.vfkeys{display:block;grid-column:2;grid-row:5;align-self:end;margin:0;padding:0 18px 22px;color:#a9b6c4;font-size:.85rem}
 }
-@media (min-width:1100px) and (max-width:1399px){#fig{grid-column:1/span 6}#out>.card.result,#out>#repsec,#out>#askcard,#out>#nextcard{grid-column:span 6}}
 @media (min-width:1100px) and (max-height:760px){:root{--hero-h:150px}header{padding:12px 0 18px}.brand span{display:none}}
 /* mouse and keyboard: denser controls, hover states, the camera-app option hidden (a file picker on a computer) */
 @media (hover:hover) and (pointer:fine){
@@ -603,13 +598,7 @@ body.has-res.m-single .stage{display:none}
 
 /* ===== audit pass: desktop ===== */
 @media (min-width:1100px){
-#out>.safety{grid-column:span 5;order:2}
-#out>#repsec{order:3}
-#out>#askcard,#out>#nextcard{order:4}
-.colB:not(:has(#fig[style*="block"])) #out>.safety{grid-column:span 5}
-.colB:not(:has(#fig[style*="block"])) #out>#askcard,.colB:not(:has(#fig[style*="block"])) #out>#nextcard{grid-column:1/-1}
 #fig img{background:var(--surface-2)}
-.colB:has(#fig[style*="block"]) #fig{align-self:start;height:auto}.colB:has(#fig[style*="block"]) #fig img{height:auto;max-height:calc(100vh - 60px)}
 .dropplate{min-height:clamp(300px,50vh,440px)}
 .stage>#shots{order:0}.stage>.dropplate{order:1}.stage>#pano{order:2}.stage>.pgide{order:3}
 body.m-survey .panel .tips{display:none}
@@ -619,11 +608,6 @@ kbd{font-size:.85em}
 .vfhud{grid-template-rows:auto auto auto 1fr auto auto}
 .vf .vfg{bottom:40px}.vf .ptarget{bottom:40px}
 }
-/* with a photo: verdict, safety, save and size stack beside it; the checklist and all types share the row below */
-@media (min-width:1100px){.colB:has(#fig[style*="block"]) #fig{grid-row:span 5}
-.colB:has(#fig[style*="block"]) #out>#dimcard{grid-column:span 5}
-.colB:has(#fig[style*="block"]) #out>#checkcard{grid-column:1/span 6}.colB:has(#fig[style*="block"]) #out>#typescard{grid-column:7/span 6}}
-@media (min-width:1100px) and (max-width:1399px){.colB:has(#fig[style*="block"]) #out>#dimcard,#out>.safety{grid-column:span 6}}
 @media (min-width:1100px) and (max-height:760px){.colA{position:static;max-height:none;overflow:visible}body.has-res .colA{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto}}
 
 /* ===== final audit ===== */
@@ -650,18 +634,8 @@ body.has-res.m-pano .pgide :is(.pintro,.pdiag,.prules,.pvid){display:none}}
 /* the task text: a clean two-line clamp, no clipped third line */
 .vfd{padding-block:0!important;border-top:7px solid transparent!important;border-bottom:7px solid transparent!important}
 @media (min-width:1100px){
-#out>#sitecard{order:2;grid-column:span 5}#out>#percard{order:9;grid-column:1/-1}
-.colB:has(#sitecard) #fig{grid-row:span 6}
-.colB:not(:has(#fig[style*="block"])) #out>#sitecard{grid-column:span 7}
-.colB:has(#fig[style*="block"]) #out>.card.bad{grid-column:span 5;order:1}
 #out>.card.bad .btns{max-width:460px}
-/* reading and tab order match: verdict, safety, next steps, save, sizes */
-#out>#askcard,#out>#nextcard{order:3}#out>#repsec{order:4}
 }
-/* 1100-1399: the photo gives up width so the verdict column is readable */
-@media (min-width:1100px) and (max-width:1399px){
-.colB:has(#fig[style*="block"]) #fig{grid-column:1/span 5}
-.colB:has(#fig[style*="block"]) #out>:is(.card.result,#repsec,#askcard,#nextcard,.safety,#dimcard,#sitecard,.card.bad){grid-column:span 7}}
 /* Windows high contrast: meters drawn with backgrounds stay visible */
 @media (forced-colors:active){.cscale i,.fill,.fl,.obar .v,.qm i.on,.dots i.on,.cscale::after{forced-color-adjust:none;background:Highlight}.cscale::before,.track,.tr,.obar{border:1px solid CanvasText}}
 
@@ -670,7 +644,7 @@ body.has-res.m-pano .pgide :is(.pintro,.pdiag,.prules,.pvid){display:none}}
 .safe1 .ico{color:var(--warn);margin-top:2px}.safe1>span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media (min-width:1100px){.safe1{display:none}}
 .rhead{grid-template-columns:auto minmax(0,1fr)!important}@media (max-width:340px){.rhead{grid-template-columns:1fr!important}}
-.drow{flex-wrap:wrap}.drow>span{flex:1 0 auto;min-width:min(11em,100%)}.drow b{margin-left:auto}
+.drow>span{flex:1 1 auto;min-width:min(7em,40%)}.drow b{flex:0 1 auto;max-width:62%}.drow b small{white-space:nowrap}
 :root:not([data-theme=dark]) .card.safety h2{color:#7a2a0c}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]) .card.safety h2{color:var(--warn)}}
 body.sun{--bg:#fff;--surface:#fff;--surface-2:#f1f3f2;--ink:#000;--ink-2:#151515;--mute:#2b2b2b;--line:#8a948f;--link:#0b4a3e;--brand:#155e51;--on-brand:#fff;--warn:#6b1f00;--warn-bg:#fff0e6;--caution:#5c3d00;--ruby:#8f1d0a;--focus:#0b57d0;color-scheme:light;background:#fff;color:#000}
@@ -679,13 +653,27 @@ body.sun .hero{display:none}body.sun .card.safety h2{color:#6b1f00}
 /* short screens (laptop at 200 % zoom, landscape phones): every camera control reachable */
 @media (orientation:landscape) and (max-height:500px){.vfhud{grid-template-rows:auto auto auto minmax(0,1fr) auto;height:100%}.vfhud>.vfdock{min-height:0;overflow:hidden auto}}
 @media (max-height:360px){.vfdock .ostrip{display:none}}
-/* the size placeholder (before sizes are measured) takes the size card's place */
-@media (min-width:1100px){#out>#dimslot{order:6;grid-column:span 6}.colB:has(#fig[style*="block"]) #out>#dimslot{grid-column:span 5}}
-@media (min-width:1100px) and (max-width:1399px){.colB:has(#fig[style*="block"]) #out>#dimslot{grid-column:span 7}}
-/* desktop, photo shown: the quality band heads the right column instead of pushing the photo down */
-@media (min-width:1100px){.colB:has(#fig[style*="block"]) #out>.qband{order:0;grid-column:span 5}
-.colB:has(#fig[style*="block"]):has(#out>.qband) #fig{grid-row:span 7}}
-@media (min-width:1100px) and (max-width:1399px){.colB:has(#fig[style*="block"]) #out>.qband{grid-column:span 7}}
+/* ===== desktop result: one system instead of per-card patches =====
+   Cards stack in lanes. Each card spans as many 4px grid rows as it is tall (set by a ResizeObserver in the page script),
+   so a lane never leaves holes and nothing scrolls over anything (no sticky photo).
+   1100-1199: one lane, photo kept short so the verdict is on screen. 1200-1399: two equal lanes. 1400+: evidence lane (photo, questions, size, checklist) | decision lane (verdict, safety, types, next steps, save). */
+@media (min-width:1100px){
+.colB{--mas:1;grid-template-columns:minmax(0,1fr);grid-auto-rows:4px;row-gap:0;grid-auto-flow:row dense}
+.colB>*,#out>*{align-self:start}
+#fig{position:relative;max-height:none;justify-self:start;width:fit-content;max-width:100%}
+#fig img{width:auto;max-width:100%;height:auto;max-height:45vh;object-fit:contain;background:var(--surface-2)}
+.colB>.stage{order:-2}#out>*{order:12}
+#out>.qband{order:0}#fig{order:1}#out>.card.result,#out>.card.bad{order:2}#out>.safety{order:3}#out>#sitecard{order:4}#out>#askcard{order:5}
+#out>#ovcard{order:6}#out>#percard{order:7}#out>#nextcard{order:8}#out>#dimslot,#out>#dimcard{order:9}#out>#checkcard{order:10}#out>#typescard{order:11}
+#out>#repsec{order:13}#out>.meta{order:14}}
+@media (min-width:1200px){
+.colB{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+#fig{justify-self:stretch;width:auto}#fig img{width:100%}
+#out>*{grid-column:2}
+#fig,#out>#askcard,#out>#ovcard,#out>#percard,#out>#dimslot,#out>#dimcard,#out>#checkcard,#out>.meta{grid-column:1}
+.colB>.stage,.colB>#history{grid-column:1/-1}
+#fig img{max-height:min(68vh,640px)}}
+@media (min-width:1400px){.colB{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}}
 /* Windows high-contrast themes: keep every control and region outlined */
 @media (forced-colors:active){
 .btn,.iconbtn,.seg,.card.result,.panel,#repsec,#askcard,.dropplate,.sheet,.vfd,.vfmsg{border:1px solid CanvasText}
