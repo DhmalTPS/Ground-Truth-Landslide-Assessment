@@ -222,7 +222,10 @@ details.what{margin-top:10px;font-size:.88rem}details.what summary{cursor:pointe
 .vfq{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(152px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;background:rgba(0,0,0,.6);font-size:.8rem;font-weight:700;white-space:nowrap;color:var(--qc)}
 .vfq.q0{--qc:#5fd1a8}.vfq.q1{--qc:#ffc862}.vfq.q2{--qc:#ff9a52}.vfq.q3{--qc:#ff745e}.vfq:empty{display:none}
 .vfarrow{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-size:68px;line-height:1;color:#ffc862;text-shadow:0 2px 10px #000;pointer-events:none;animation:nudge 1.2s ease-in-out infinite}
-.vfarrow:empty{display:none}@keyframes nudge{50%{transform:translate(-50%,-62%)}}@media (prefers-reduced-motion:reduce){.vfarrow{animation:none}}
+.vfarrow:empty{display:none}@keyframes nudge{50%{transform:translate(-50%,-62%)}}
+.vfarrow small{display:block;font-size:20px;font-weight:800;text-align:center;margin-top:-6px}
+.vfarrow.h{animation-name:nudgeR}.vfarrow.h.l{animation-name:nudgeL}@keyframes nudgeR{50%{transform:translate(-38%,-50%)}}@keyframes nudgeL{50%{transform:translate(-62%,-50%)}}
+@media (prefers-reduced-motion:reduce){.vfarrow,.vfarrow.h,.vfarrow.h.l{animation:none}}
 .pills .bad{box-shadow:inset 0 0 0 1.5px #ff745e;color:#ffb3a3}.shutter.poor{border-color:#ff745e}.netbar.sync{background:#0e4d45}
 .qa{display:flex;gap:8px;flex-wrap:wrap}.qa .minibtn{min-width:84px;min-height:44px}
 .quiz{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0}.quiz button{border:2px solid var(--edge);border-radius:14px;background:var(--surface-2);padding:6px;cursor:pointer;color:var(--ink-2);font-weight:700;font-size:.9rem;font-family:inherit}
@@ -431,7 +434,17 @@ async function openFinder(){listenOri();step(1);vf.hidden=false;const s=curShot(
   try{const tr=stream.getVideoTracks()[0];cap=window.ImageCapture?new ImageCapture(tr):null}catch(_){cap=null}
   prevG=null;wasReady=false;loop=setInterval(liveTick,450);say(s?s.d:pz?A.pano.hint():'Frame the whole slope from below, top to bottom.');
   vf.querySelector('[data-a=shoot]').focus()}
- catch(err){closeFinder();camIn.click()}}
+ catch(err){closeFinder();toast(camErr(err));camIn.click()}}
+// why the live camera did not start, in plain words; the phone's own camera app opens instead
+function camErr(e){const n=e&&e.name;if(!window.isSecureContext||!navigator.mediaDevices)return 'The live camera needs a secure (https) link. Opening the phone camera app instead.';
+ return n==='NotAllowedError'||n==='SecurityError'?'Camera blocked: allow camera access for this site in the browser settings. Opening the phone camera app instead.'
+  :n==='NotFoundError'||n==='OverconstrainedError'?'No camera found on this device. Opening the photo picker instead.'
+  :n==='NotReadableError'||n==='AbortError'?'The camera is busy in another app. Close it and try again. Opening the phone camera app instead.'
+  :'Could not start the live camera. Opening the phone camera app instead.'}
+// the camera stops when the page is hidden (screen off, app switch) and the shutter answers the space bar
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&stream)closeFinder()});window.addEventListener('pagehide',()=>{if(stream)closeFinder()});
+document.addEventListener('keydown',e=>{if(e.code!=='Space'||e.repeat||vf.hidden||!stream)return;const tg=document.activeElement&&document.activeElement.tagName;
+ if(['BUTTON','INPUT','TEXTAREA','SELECT'].includes(tg))return;e.preventDefault();shoot()});
 function closeFinder(){clearInterval(loop);loop=null;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;vf.hidden=true;A.pano&&A.pano.finder(false)}
 function liveTick(){if(!vid.videoWidth)return;liveShow(metrics(vid,true),ori,mode==='pano'&&A.pano?A.pano.tick(vid,ori):null)}
 // one live reading -> pills (coloured by severity), quality meter, one instruction with a direction arrow, shutter
@@ -449,7 +462,9 @@ function liveShow(m,t,px){const c=judge(m,t).filter(x=>x[0]!=='Resolution'&&!(mo
  const q=hold(lv.q,grade(c.concat(steady?[]:[['Steady','',1]]),false)),top=hold(lv.m,bad.length?bad[0][0]:''),hit=bad.find(x=>x[0]===top)||bad[0],ready=!top;
  const vq=vf.querySelector('.vfq');vq.className='vfq q'+q;vq.innerHTML=esc(tr('Photo quality'))+': '+esc(tr(QL[q]))+qmeter(q);
  const msg=ready||!hit?(px&&px.good)||'Good. Take the photo.':hit[1];vf.querySelector('.vfmsg').textContent=msg;
- const k=ready?'':top;vf.querySelector('.vfarrow').textContent=k==='Framing'||(k==='Aim'&&t&&t.elev>60)?'\u2193':k==='Aim'?'\u2191':'';
+ // big arrow for the top instruction: up/down from framing and aim, left/right (with degrees from the compass) from the set guide
+ const k=ready?'':top,va=vf.querySelector('.vfarrow'),pa=px&&px.arrow&&px.arrow[k],ch=pa?pa[0]:k==='Framing'||(k==='Aim'&&t&&t.elev>60)?'\u2193':k==='Aim'?'\u2191':'';
+ va.className='vfarrow'+(ch==='\u2190'?' h l':ch==='\u2192'?' h':'');va.innerHTML=ch?esc(ch)+(pa&&pa[1]?`<small>${pa[1]}\u00b0</small>`:''):'';
  const sh=vf.querySelector('.shutter');sh.classList.toggle('ready',ready&&q===0);sh.classList.toggle('poor',q>=2);
  sh.setAttribute('aria-label',tr('Take photo')+', '+tr('Photo quality')+': '+tr(QL[q]));
  vf.querySelector('.vfr').textContent=ready&&q===0?'Ready':q===1?'OK to shoot':q>=2?'Can still shoot':'';
@@ -1013,7 +1028,7 @@ function runSet(r,blob,g,label){lastBlob=blob;lastPGps=null;lastHead=null;lastSr
  curMeta=meta();curMeta.set=label||'';cur=r;job=r.job||null;const fig=$('#fig');$('#prev').src=URL.createObjectURL(blob);fig.style.display='block';
  if(r.ms)store.set('etaT',ema('etaT',r.ms,4000));photoQ={level:0,issues:[]};withQ(r);A.render(r);afterType(r);sizes(r)}
 A._g={say,buzz,toast,tr,store,sess,step,safety,openFinder,closeFinder,openCamera,ICO,LIVE,prog,post,busy,cancelled,params,gx,runSet,fail,RX,out,vf,vid,
- ori:()=>ori,mode:()=>mode,shoot:()=>shoot(),setMode:m=>{mode=m;store.set('mode',m);drawMode()},abort:()=>xhr&&xhr.abort(),camIn,galIn,ema};
+ ori:()=>ori,head:()=>head&&Date.now()-head.t<3000?head:null,mode:()=>mode,shoot:()=>shoot(),setMode:m=>{mode=m;store.set('mode',m);drawMode()},abort:()=>xhr&&xhr.abort(),camIn,galIn,ema};
 A.pano&&A.pano.init();
 const demo=new URLSearchParams(location.search).get('demo');   // demo pages show the guidance too (nothing saved)
 if(demo&&D.samples[demo]&&out.firstElementChild){cur=D.samples[demo];afterType(cur,true);if(cur.dimensions)afterDims(cur,true)}

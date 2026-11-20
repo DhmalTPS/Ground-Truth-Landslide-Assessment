@@ -86,6 +86,11 @@ QUIZ = [
 
 # ---------------------------------------------------------------- Hindi (machine-drafted; needs a native-speaker review)
 HI = {
+    "The live camera needs a secure (https) link. Opening the phone camera app instead.": "लाइव कैमरा के लिए सुरक्षित (https) लिंक चाहिए। इसके बदले फ़ोन का कैमरा ऐप खुल रहा है।",
+    "Camera blocked: allow camera access for this site in the browser settings. Opening the phone camera app instead.": "कैमरा रोका गया: ब्राउज़र सेटिंग में इस साइट को कैमरा की अनुमति दें। इसके बदले फ़ोन का कैमरा ऐप खुल रहा है।",
+    "No camera found on this device. Opening the photo picker instead.": "इस डिवाइस पर कैमरा नहीं मिला। इसके बदले फ़ोटो चुनने का विकल्प खुल रहा है।",
+    "The camera is busy in another app. Close it and try again. Opening the phone camera app instead.": "कैमरा किसी दूसरे ऐप में चल रहा है। उसे बंद करके फिर कोशिश करें। इसके बदले फ़ोन का कैमरा ऐप खुल रहा है।",
+    "Could not start the live camera. Opening the phone camera app instead.": "लाइव कैमरा शुरू नहीं हो सका। इसके बदले फ़ोन का कैमरा ऐप खुल रहा है।",
     # page and result cards
     "Landslide Type Check": "भूस्खलन प्रकार जाँच", "Field classifier after Hungr 2014": "हंगर 2014 के अनुसार फ़ील्ड वर्गीकरण",
     "New observation": "नया अवलोकन", "Photograph the slope from below": "ढलान की फ़ोटो नीचे से लें",

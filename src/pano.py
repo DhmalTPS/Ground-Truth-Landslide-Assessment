@@ -176,6 +176,13 @@ TEXT = {
     "ex_light": ["Light changed (cloud): take the set quickly", "रोशनी बदली (बादल): जल्दी फ़ोटो लें"],
     "ex_ends": ["Both ends of the landslide plus stable ground beyond", "भूस्खलन के दोनों छोर और उनके आगे स्थिर ज़मीन"],
     "close": ["Close", "बंद करें"],
+    "n_min": ["{n} of at least {m} photos", "कम से कम {m} में से {n} फ़ोटो"],
+    "save_zip": ["Save photos (.zip)", "फ़ोटो सहेजें (.zip)"],
+    "saved_zip": ["{n} photos saved on this phone as one .zip file.", "{n} फ़ोटो इस फ़ोन में एक .zip फ़ाइल के रूप में सहेजी गईं।"],
+    "pill_turned": ["Turned {a}° of ~{b}°", "~{b}° में से {a}° घूमे"],
+    "c_more": ["Compass: turn {d} about {x}° more.", "कम्पास: लगभग {x}° और {d} घुमाएँ।"],
+    "c_back": ["Compass: turned too far. Turn back {d} about {x}°.", "कम्पास: बहुत ज़्यादा घूमे। लगभग {x}° वापस {d} घुमाएँ।"],
+    "c_on": ["Compass: the angle is about right. Hold steady and take the photo.", "कम्पास: कोण लगभग सही है। स्थिर रखें और फ़ोटो लें।"],
     "add_hint": ["Add 2 to 8 photos: Take photo (the camera guides each one) or From gallery (choose several at once).",
                  "2 से 8 फ़ोटो जोड़ें: फ़ोटो लें (कैमरा हर फ़ोटो में मदद करेगा) या गैलरी से (एक साथ कई चुनें)।"],
     "n_photos": ["{n} photos", "{n} फ़ोटो"],
@@ -206,6 +213,9 @@ TEXT = {
     "tilt_same": ["Aim as high as photo 1 ({a}°, now {b}°).", "फ़ोटो 1 जितना ऊपर रखें ({a}°, अभी {b}°)।"],
     "pill_ov": ["Overlap {p} %", "ओवरलैप {p} %"], "pill_ovq": ["Overlap ?", "ओवरलैप ?"], "pill_n": ["{n} taken", "{n} ली गईं"],
     "pill_tilt": ["Same tilt", "समान झुकाव"],
+    "pill_nm": ["{n} of {m} taken", "{m} में से {n} ली गईं"],
+    "pill_face": ["Same facing", "समान दिशा"],
+    "face_same": ["Face the same way as photo 1 (turned {x}°). Step sideways, do not turn.", "फ़ोटो 1 की दिशा में ही रखें ({x}° घूमे)। बगल में कदम लें, घूमें नहीं।"],
     "target": ["edge of the last photo here", "पिछली फ़ोटो का किनारा यहाँ"],
     "done": ["Done ({n})", "पूरा ({n})"], "dir": ["Direction", "दिशा"],
     "checking": ["Checking how the photos overlap", "फ़ोटो का ओवरलैप जाँच रहे हैं"],
@@ -283,6 +293,7 @@ CSS = """
 .pit img{width:100%;height:100%;object-fit:cover;display:block}
 .pit .pn{position:absolute;left:4px;top:4px;min-width:20px;height:20px;border-radius:10px;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:.72rem;line-height:20px;font-family:inherit;text-align:center}
 .pit .px{position:absolute;right:2px;top:2px;width:32px;height:32px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-weight:700;font-size:.9rem;line-height:1;font-family:inherit;cursor:pointer}
+.pit.empty{border:1.5px dashed var(--line);background:transparent}.pit.empty .pn{opacity:.6}
 .pit.cam::after{content:"";position:absolute;right:5px;bottom:5px;width:7px;height:7px;border-radius:50%;background:#5fd1a8}
 .plink{flex:0 0 auto;min-width:46px;margin:0 2px;text-align:center;font-size:.7rem;font-weight:700;color:var(--mute)}
 .plink i{display:block;height:4px;border-radius:2px;margin:3px 4px 0;background:var(--line)}
@@ -394,7 +405,7 @@ async function urlBlob(u){const s=atob(u.split(',')[1]),a=new Uint8Array(s.lengt
 
 /* ---------- the set ---------- */
 async function add(file,t,src,live){if(S.items.length>=P.max){g.toast(L('max',{n:P.max}));return null}
- const it={id:nid++,src,g:t?t.g:null,elev:t?t.elev:null,f35:null,blob:null,thumb:'',sig:null,ready:null};S.items.push(it);S.rep=null;
+ const hd=src==='cam'&&g.head?g.head():null;const it={id:nid++,src,g:t?t.g:null,elev:t?t.elev:null,head:hd?hd.deg:null,f35:null,blob:null,thumb:'',sig:null,ready:null};S.items.push(it);S.rep=null;
  if(live){it.sig=sig(live);it.thumb=thumbOf(live,240)}
  it.ready=(async()=>{it.f35=await f35Of(file);try{const bmp=await bitmapOf(file);if(!it.sig)it.sig=sig(bmp);if(!it.thumb)it.thumb=thumbOf(bmp,240);bmp.close&&bmp.close()}catch(_){}
   it.blob=await A.shrink(file)})();
@@ -457,13 +468,13 @@ function build(){const card=$('#capH').closest('.card');
   <p class="pvid hungr u-b2">${esc(L('vid_hint'))}</p><label class="psteps hungr u-blk u-b2"><span class="pstq">${esc(L('steps_q'))}</span> <input type="number" inputmode="numeric" min="1" max="50" step="1" style="width:4.5em"></label>
   <button type="button" class="minibtn" data-a="examples">${esc(L('examples'))}</button></div>`);
  card.querySelector('.btns').insertAdjacentHTML('afterend',`<div id="pano" hidden><div class="tray" aria-live="polite"></div><p class="pstat"></p>
-  <div class="row u-b2"><button type="button" class="btn primary" data-a="check" disabled>${esc(L('check'))}</button><button type="button" class="minibtn" data-a="clear">${esc(L('clear'))}</button></div></div>`);
+  <div class="row u-b2"><button type="button" class="btn primary" data-a="check" disabled>${esc(L('check'))}</button><button type="button" class="minibtn" data-a="zip" disabled>${esc(L('save_zip'))}</button><button type="button" class="minibtn" data-a="clear">${esc(L('clear'))}</button></div></div>`);
  const gd=card.querySelector('.pgide');
  gd.addEventListener('click',e=>{const k=e.target.closest('[data-k]')?.dataset.k;if(k){S.kind=k;g.store.set('pkind',k);S.rep=null;$('#ovcard')?.remove();drawGuide();render()}
   if(e.target.dataset.a==='examples')examples()});
  const si=gd.querySelector('.psteps input');si.value=g.store.get('psteps','');si.addEventListener('change',()=>g.store.set('psteps',si.value));
  $('#pano').addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a,x=e.target.closest('.px');
-  if(x){remove(+x.dataset.id);return}if(a==='check')check();if(a==='clear')clearSet()})}
+  if(x){remove(+x.dataset.id);return}if(a==='check')check();if(a==='zip')saveZip();if(a==='clear')clearSet()})}
 function drawGuide(){const gd=$('.pgide');gd.querySelectorAll('[data-k]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===S.kind));
  gd.querySelector('.pintro').textContent=L('intro_'+S.kind);
  gd.querySelector('.pdiag').innerHTML=S.kind==='turn'?P.svg.turn+P.svg.strip:P.svg.walk;
@@ -483,15 +494,34 @@ function examples(){const m=$('#mTour');m.firstElementChild.innerHTML=`<div clas
 function render(){const tr=$('#pano .tray');if(!tr)return;
  tr.innerHTML=S.items.map((it,k)=>{let link='';if(k<S.items.length-1){const e=S.est[k];
    link=!e?'<div class="plink"><i></i></div>':e.orient?`<div class="plink gap" title="${esc(L('est_orient'))}">&ne;<i></i></div>`:e.score<.3?`<div class="plink" title="${esc(L('est_q'))}">?<i></i></div>`:`<div class="plink ${band(e.ov)}">~${pct(e.ov)}%<i></i></div>`}
-  return `<div class="pit ${it.src==='cam'?'cam':''}"><img src="${it.thumb}" alt=""><span class="pn">${k+1}</span><button type="button" class="px" data-id="${it.id}" aria-label="${esc(L('remove',{k:k+1}))}">&times;</button></div>${link}`}).join('');
- const n=S.items.length;$('#pano .pstat').textContent=n?L('n_photos',{n})+', '+L('est_note'):L('add_hint');
- $('#pano [data-a=check]').disabled=n<2}
+  return `<div class="pit ${it.src==='cam'?'cam':''}"><img src="${it.thumb}" alt=""><span class="pn">${k+1}</span><button type="button" class="px" data-id="${it.id}" aria-label="${esc(L('remove',{k:k+1}))}">&times;</button></div>${link}`}).join('')
+  +Array.from({length:Math.max(0,MINS-S.items.length)},(_,k)=>`<div class="pit empty" aria-hidden="true"><span class="pn">${S.items.length+k+1}</span></div>`).join('');
+ const n=S.items.length;$('#pano .pstat').textContent=n?L('n_min',{n,m:MINS})+'. '+L('est_note'):L('add_hint');
+ $('#pano [data-a=check]').disabled=n<2;$('#pano [data-a=zip]').disabled=!n}
+// suggested minimum for a set (the rules say 3 to 6 photos); 2 are enough to check, so this only guides
+const MINS=3;
+/* ---------- save the set on the phone as one .zip (stored, no compression: JPEGs do not shrink) ---------- */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=a=>{let c=0xffffffff;for(let i=0;i<a.length;i++)c=CRC[(c^a[i])&255]^(c>>>8);return (c^0xffffffff)>>>0};
+async function saveZip(){const its=S.items;if(!its.length)return;await Promise.all(its.map(i=>i.ready));
+ const d=new Date(),p2=v=>String(v).padStart(2,'0'),stamp=`${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}`;
+ const enc=new TextEncoder(),parts=[],dir=[];let off=0;
+ const dt=(d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1),dd=((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate();
+ for(let k=0;k<its.length;k++){const nm=enc.encode(`landslide-set-${stamp}-${S.kind}-${p2(k+1)}.jpg`),b=its[k].blob||await urlBlob(its[k].thumb),data=new Uint8Array(await b.arrayBuffer()),c=crc32(data);
+  const h=new Uint8Array(30+nm.length),v=new DataView(h.buffer);v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(10,dt,true);v.setUint16(12,dd,true);
+  v.setUint32(14,c,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);v.setUint16(26,nm.length,true);h.set(nm,30);parts.push(h,data);
+  const e=new Uint8Array(46+nm.length),w=new DataView(e.buffer);w.setUint32(0,0x02014b50,true);w.setUint16(4,20,true);w.setUint16(6,20,true);w.setUint16(12,dt,true);w.setUint16(14,dd,true);
+  w.setUint32(16,c,true);w.setUint32(20,data.length,true);w.setUint32(24,data.length,true);w.setUint16(28,nm.length,true);w.setUint32(42,off,true);e.set(nm,46);dir.push(e);off+=h.length+data.length}
+ const dl=dir.reduce((a,e)=>a+e.length,0),end=new Uint8Array(22),v=new DataView(end.buffer);v.setUint32(0,0x06054b50,true);v.setUint16(8,dir.length,true);v.setUint16(10,dir.length,true);v.setUint32(12,dl,true);v.setUint32(16,off,true);
+ const blob=new Blob([...parts,...dir,end],{type:'application/zip'});S.lastZip=blob;
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`landslide-set-${stamp}.zip`;document.body.append(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),4000);g.toast(L('saved_zip',{n:its.length}))}
 function apply(){const on=want;$('.pgide').hidden=!on;$('#pano').hidden=!on;g.galIn.multiple=on;g.galIn.accept=on?'image/*,video/*':'image/*';
  const tips=$('#capH').closest('.card').querySelector('.tips');if(tips)tips.hidden=on;if(on){drawGuide();render()}}
 
 /* ---------- live camera: ghost of the last photo, target line, overlap meter ---------- */
 let ghost=null,tgt=null,meter=null,strip=null,flash=null,last=null;
-function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelectorAll('.pghost,.ptarget,.pmeter,.pstrip,.pflash,.pdone,.pdir,.pauto').forEach(e=>e.remove());last=null;if(!on){render();return}
+function finder(on){const vf=g.vf;vf.classList.toggle('pano',on);vf.querySelectorAll('.pghost,.ptarget,.pmeter,.pstrip,.pflash,.pdone,.pdir,.pauto').forEach(e=>e.remove());last=null;if(!on){ghost=null;render();return}
  vf.querySelector('video').insertAdjacentHTML('afterend','<div class="pghost"><img alt=""></div>');
  vf.insertAdjacentHTML('beforeend',`<div class="ptarget"><span>${esc(L('target'))}</span></div><div class="pmeter"><div class="z"></div><div class="v"></div></div><div class="pstrip"></div><div class="pflash"></div>`);
  vf.querySelector('.vfb').insertAdjacentHTML('beforeend',`<button type="button" class="pdir" aria-label="${esc(L('dir'))}"></button><button type="button" class="pdone"></button><button type="button" class="pauto" aria-pressed="false"></button>`);
@@ -521,21 +551,39 @@ function autoShot(e,shv,fast){const B=P.bands[S.kind],now=Date.now();
  const med=live.sh.slice().sort((a,b)=>a-b)[Math.floor(live.sh.length/2)]||0;
  if(e.ov<B.ideal[0]||e.ov>B.ideal[1]||live.sh.length<3||shv<.6*med)return false;
  live.at=now;live.busy=true;Promise.resolve(g.shoot()).finally(()=>{live.busy=false});return true}
+// compass turn since the last photo vs the turn that gives the ideal overlap: (1 - overlap) x horizontal field of view.
+// Typical phone main camera (26 mm equivalent): ~69 deg across the long side, ~50 deg across the short side. Only a
+// guide: the visual overlap estimate wins whenever it has a match.
+function compass(vid,prev){const h=g.head?g.head():null;if(!h||prev.head==null)return null;
+ const B=P.bands.turn,mid=(B.ideal[0]+B.ideal[1])/2,fov=(vid.videoWidth||1)>=(vid.videoHeight||1)?69:50,tg=Math.round((1-mid)*fov);
+ const d=((h.deg-prev.head+540)%360)-180;if(!S.dir&&Math.abs(d)>6)S.dir=Math.sign(d);const a=Math.round(d*(S.dir||1));
+ const lo=Math.round((1-B.ideal[1])*fov),hi=Math.round((1-B.ideal[0])*fov);
+ return {a:Math.max(0,a),b:tg,ok:a>=lo&&a<=hi,more:a<lo,x:Math.max(1,Math.abs(a<lo?tg-a:a-tg))}}
 function tick(vid,t){const n=S.items.length,first=S.items[0],turn=S.kind==='turn',dir=S.dir||1,dw=L(dir<0?'left':'right'),back=L(dir<0?'right':'left');
- const out={bad:[],pills:[`<span class="ok">${esc(L('pill_n',{n}))}</span>`],good:null};
+ const R=dir<0?'←':'→',K=dir<0?'→':'←';
+ // out.arrow[key]: the big on-screen arrow (and degrees when the compass knows them) for that instruction
+ const out={arrow:{},bad:[],pills:[`<span class="ok">${esc(n<MINS?L('pill_nm',{n,m:MINS}):L('pill_n',{n}))}</span>`],good:null};
  if(S.auto)out.pills.push(`<span class="ok">${esc(L('pill_auto'))}</span>`);
  if(!n){out.good=L(turn?'hint_first_turn':'hint_first_walk');layout();return out}
  const e=match(S.items[n-1].sig,sig(vid));last=e;layout(e);
- if(!e||e.orient||e.score<.3){out.pills.unshift(`<span class="warn">${esc(L('pill_ovq'))}</span>`);out.bad.push(['Overlap',turn?L('lost_turn',{k:n,d:back}):L('lost_walk',{k:n})])}
+ const cq=turn?compass(vid,S.items[n-1]):null;if(cq)out.pills.push(`<span class="${cq.ok?'ok':'warn'}">${esc(L('pill_turned',{a:cq.a,b:cq.b}))}</span>`);
+ if(!e||e.orient||e.score<.3){out.pills.unshift(`<span class="warn">${esc(L('pill_ovq'))}</span>`);
+  // no visual match (bare slope, fog, fast turn): the compass still says how far to turn
+  if(cq){if(cq.ok)out.good=L('c_on');else{out.bad.push(['Overlap',cq.more?L('c_more',{d:dw,x:cq.x}):L('c_back',{d:back,x:cq.x})]);out.arrow.Overlap=[cq.more?R:K,cq.x]}}
+  else{out.bad.push(['Overlap',turn?L('lost_turn',{k:n,d:back}):L('lost_walk',{k:n})]);out.arrow.Overlap=[K]}}
  else{const B=P.bands[S.kind],p=pct(e.ov),ok=e.ov>=B.ideal[0]&&e.ov<=B.ideal[1]+.08;out.pills.unshift(`<span class="${ok?'ok':'warn'}">${esc(L('pill_ov',{p}))}</span>`);
-  if(e.ov>B.ideal[1]+.08)out.bad.push(['Overlap',turn?L('more_turn',{d:dw,p}):L('more_walk',{p})]);
-  else if(e.ov<B.ideal[0])out.bad.push(['Overlap',turn?L('less_turn',{d:back,p}):L('less_walk',{p})]);
+  if(e.ov>B.ideal[1]+.08){out.bad.push(['Overlap',turn?L('more_turn',{d:dw,p}):L('more_walk',{p})]);out.arrow.Overlap=[R,cq&&!cq.ok&&cq.more?cq.x:null]}
+  else if(e.ov<B.ideal[0]){out.bad.push(['Overlap',turn?L('less_turn',{d:back,p}):L('less_walk',{p})]);out.arrow.Overlap=[K,cq&&!cq.ok&&!cq.more?cq.x:null]}
   else out.good=L('good_ov',{p})}
  // pan speed: change of the estimated shift between ticks (fraction of the width per second)
  const now=Date.now(),shv=sharp(vid);live.sh.push(shv);if(live.sh.length>8)live.sh.shift();let fast=false;
  if(e&&!e.orient&&e.score>.3){if(live.dx!=null&&live.t){const sp=Math.abs(e.dx-live.dx)/Math.max(.05,(now-live.t)/1000);fast=sp>.35?++live.fastN>=2:(live.fastN=0,false)}live.dx=e.dx}else live.dx=null;
  live.t=now;if(fast)out.bad.unshift(['Speed',L('pan_fast')]);
  out.auto=autoShot(e,shv,fast);
+ // walk-along sets need parallel views (the walked baseline assumes the camera keeps facing the slope): warn when the
+ // compass says the facing drifted from photo 1 by more than the usual phone compass error (~15 deg)
+ const hd=!turn&&first.head!=null&&g.head?g.head():null;
+ if(hd&&!(hd.acc>20)){const sd=((hd.deg-first.head+540)%360)-180,d=Math.abs(sd);if(d>15){out.arrow['Same facing']=[sd>0?'←':'→',Math.round(d)];out.pills.push(`<span class="warn">${esc(L('pill_face'))}</span>`);out.bad.push(['Same facing',L('face_same',{x:Math.round(d)})])}}
  if(first&&first.elev!=null&&t&&Math.abs(t.elev-first.elev)>6){out.pills.push(`<span class="warn">${esc(L('pill_tilt'))}</span>`);out.bad.push(['Same tilt',L('tilt_same',{a:Math.round(first.elev),b:Math.round(t.elev)})])}
  return out}
 async function shot(blob,t,vid){flash.classList.add('on');setTimeout(()=>flash.classList.remove('on'),60);g.buzz([20,40,20]);
@@ -626,7 +674,7 @@ A.pano={show(on){want=on;if(ready)apply()},init(){g=A._g;D=A.D;P=D.pano;esc=A.es
   A.onPicks=(f,c)=>g.mode()==='pano'?onPicks(f,c):false},
  label(){return L('label_turn',{k:S.items.length+1})},hint(){return S.items.length?(S.kind==='turn'?L('next_turn',{d:L((S.dir||1)<0?'left':'right')}):L('next_walk')):L(S.kind==='turn'?'hint_first_turn':'hint_first_walk')},
  finder,tick,shot,gx(){return `${S.kind}:${S.items.length}:${S.rep?S.rep.verdict:'-'}:${S.items.filter(i=>i.src==='cam').length}`},
- _S:S,_match:match,_sig:sig,_add:add,_check:check,_join:join,_pick:pickKeys,_sharp:sharp,_video:fromVideo,_steps:steps};
+ _S:S,_zip:saveZip,_compass:compass,_match:match,_sig:sig,_add:add,_check:check,_join:join,_pick:pickKeys,_sharp:sharp,_video:fromVideo,_steps:steps};
 })();
 """
 
