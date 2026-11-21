@@ -3,50 +3,199 @@
 **Use case:** a junior engineer standing on a road or in a valley takes a phone photo looking up
 at a slope. The app tells them which landslide type it is (Varnes classification, Hungr et al.
 2014), how confident it is, what to verify on site and what to stay away from. Aerial, satellite,
-map or close-up photos are rejected with tips for retaking the photo.
+map or close-up photos are flagged with tips for retaking the photo. After the type, it estimates
+the landslide's size.
 
-```
-.venv\Scripts\python src/app.py          # then open the printed http://<laptop-ip>:8000 on a phone
-```
+## Results
 
-Results and caveats: **`report.md`**. Everything else in this repo builds and tests that app:
-a training set of ground-level photos, labels, trained models, and a comparison with a
-zero-shot vision-language model (Qwen-VL).
+Untouched test split: 263 usable photos from 152 sites, no site shared with train/val
+(95% CI: site bootstrap).
 
-**Status: working prototype on this laptop, not a public website.** The phone opens the laptop's
-address, so it must be on the same Wi-Fi, or the laptop on the phone's hotspot (works in the
-field without internet). Use `--token SECRET` on shared networks (phones then open
-`http://<laptop-ip>:8000/?t=SECRET`). Uploads are saved to `data/app_uploads/` for later
-labeling (`--no-save` to disable; capped by `--max-saved`).
-For real use the app would be hosted on a server reachable from anywhere. It runs on CPU
-(three backbones + linear heads, a few seconds per photo, ~3 GB RAM; the backbones download from
-Hugging Face on first start; the trained heads are in `models/`, under 1 MB). Copy `src/` and `models/`,
-install `requirements.txt` (CPU torch), run `python src/app.py --port 8000 --token ...` behind
-HTTPS. Hosting is a deliberate decision for the team: it publishes the service and its uploads.
+| Model | Accuracy | Macro-F1 [95% CI] |
+|---|---|---|
+| **App model** (DINOv2-base + DINOv2-large + SigLIP2 linear probes) | **0.806** | **0.784** [0.688, 0.857] |
+| Fine-tuned ConvNeXt-Tiny | 0.722 | 0.665 |
+| Qwen2.5-VL zero-shot | 0.555 | 0.327 |
 
-Classes: `fall_topple`, `rotational_slide`, `translational_slide`, `debris_flow`,
-`earth_mud_flow`, `no_landslide` (+ `reject` for unusable photos). Definitions and Hungr 2014
-types: `src/common.py` / `labeling_guide.md`. Background: `research_notes.md`, `papers/README.md` (paper links)
-(`design.md` is the original plan).
+End to end on all 1,008 test photos (including unusable ones), the app answers 69% of usable
+photos confidently, and those answers are right 86% of the time; below 60% confidence it says
+*uncertain* and shows the top two types. Method, all results and caveats: **`report.md`**.
 
-**One GPU job at a time.** Qwen-VL uses ~6 GB of the 8 GB; running DINOv2 or ConvNeXt
-alongside it fails (the probe falls back to CPU; CNN training does not). With little free RAM,
-run long GPU jobs in the foreground in chunks (`train_cnn.py --max-minutes 8 --resume`).
-
-## Setup (done once)
+## Quick start
 
 ```
 py -3.11 -m venv .venv
 .venv\Scripts\python -m pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
 .venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python src/app.py          # then open the printed http://<laptop-ip>:8000 on a phone
 ```
-Models download to `.cache/huggingface/` in this folder (C: is too full).
-All commands below run from the project folder with `.venv\Scripts\python`.
 
-## Scenarios
+The trained heads are in `models/` (under 1 MB); the backbones download from Hugging Face on first
+start into `.cache/huggingface/` in this folder (C: is too full). All commands below run from the
+project folder with `.venv\Scripts\python`. `src/predict.py photo.jpg` gives the same answer on
+the command line.
 
-- **Scenario B (default, what was done): we build the dataset** with steps 1–5 below.
-- **Scenario A: a labeled dataset is given.** Instead of steps 1–5:
+The app runs on this laptop and phones open its address, so they must be on the same Wi-Fi, or the
+laptop on the phone's hotspot (this works in the field without internet). To reach it from
+anywhere, see [Sharing beyond this laptop](#sharing-beyond-this-laptop).
+
+## Documents
+
+| File | Read it for |
+|---|---|
+| `README.md` | running, using and reproducing the app (this file) |
+| `report.md` | the project report: data, models, results, limitations |
+| `TECHNICAL_REPORT.md` | every component in full detail (architecture, maths, UI design, audits) |
+| `research_notes.md` | literature background and early findings; paper links in `papers/README.md` |
+| `labeling_guide.md` | how photos were labelled (also the AI annotator's instructions) |
+| `design.md` | the original plan from before the build (history only) |
+
+## Using the app
+
+**Phones.** The live camera guide needs https, which `src/app.py` serves by default on port 8443
+next to http on 8000 (self-signed certificate made once in `.cache/tls`; tap Advanced > Proceed
+once on the phone). Phones that open the http address are redirected to https; this laptop keeps
+`http://localhost:8000`. `--no-https` turns it off. On shared networks add `--token SECRET`
+(phones then open `http://<laptop-ip>:8000/?t=SECRET`). Uploads are saved to `data/app_uploads/`
+for later labelling (`--no-save` to disable; capped by `--max-saved`).
+
+**Phone on the same Wi-Fi cannot open the app?** Windows makes inbound *Block* rules for
+python.exe when its first "Allow access?" popup is cancelled, and they apply on Public networks
+(hostel/campus Wi-Fi, a new hotspot). Run `src/app.py --lan`: one UAC popup, then an elevated
+guardian pauses those Block rules and adds one Allow rule (only the app's ports, only from the
+local subnet, only for the Python that listens: the base Python311 `python.exe`, because the venv's
+`python.exe` is just a launcher). The guardian restores the firewall exactly on Ctrl+C, a crash
+or a closed window, and the app prints the confirmation. After a power loss a normal start warns
+and `src/app.py --lan-restore` undoes it. Log: `.cache/lan/guardian.log`. If the phone still times
+out, the Wi-Fi isolates devices from each other (common on hostel Wi-Fi): use a phone hotspot or
+`tools/serve_public.py`.
+
+**Three ways to add a photo:** *Guided camera* (the live camera inside the page), *Phone camera*
+(the phone's own camera app, no live guide) and *From gallery* (*Upload a photo* on a computer).
+If the guided camera cannot start, the page says why and how to fix it (https link, camera
+permission, in-app browser, camera busy) and starts by itself once permission is allowed.
+
+**Computers.** At 1100 CSS px and wider (a 1920x1080 laptop at 150 % Windows scaling is 1280 px)
+the page becomes a work area: a left rail for set-up (mode, how to shoot, distance, notes) and,
+before a result, a large drop zone (click, drag a photo in, or Ctrl+V). From 1200 px a result is
+laid out in two independent columns: the photo, size and on-site checklist on the left; the
+verdict, safety, all types, next steps and save on the right (one column at 1100-1199 px, with
+the photo kept short so the verdict is on screen). Keys: U upload, C camera, ? help, Space shoots
+and Esc closes in the viewfinder. Ctrl+P prints the result on white; Windows high-contrast themes
+keep every control outlined. The page is sent gzipped (~110 KB instead of ~400 KB).
+
+**What the guidance adds** (`src/guide.py`; details and tests in `report.md` §5.1-5.2):
+- a first-run tour, a per-session safety checklist (with "Continue anyway") and a help sheet with
+  a glossary;
+- single-photo, 4-shot site-survey and overlapping-set modes;
+- a live framing and level viewfinder with a photo-quality meter (Good / Fair / Poor / Very poor),
+  one instruction at a time and a big arrow (up/down from aim; left/right from the compass or from
+  steps); for overlapping sets the live overlap with the last photo against the ideal band;
+- an instant on-phone photo check, each problem graded minor or serious, plus cut-off-edge and
+  mostly-sky warnings;
+- results that are always shown, even for a photo that fails the photo check: a quality band says
+  how reliable the result is, and nothing is adjusted to look better;
+- type first, then sizes; yes/no questions when the model is unsure; a combined site result for
+  surveys; next steps and tickable on-site signs;
+- notes, a GPS marker (the camera position plus compass bearing and distance give an estimated
+  position of the landslide), and saved or shared reports, including one JPEG with the photo, a
+  map and every result, with GPS in its EXIF (`TECHNICAL_REPORT.md` §10.3);
+- an offline queue, a practice quiz and Hindi.
+
+Measuring whether the guidance helps: `tools/guidance_report.py` (after field use without
+`--no-save`). Photo-check thresholds: recalibrate after the dataset changes with
+`tools/calibrate_photo_check.py` (train split only).
+
+## Photo sets and video (too big for one photo)
+
+In the app, choose **Overlapping set**, then:
+- **Turn on the spot:** the photos are joined into one picture.
+- **Walk along:** the photos are analysed together. Type the normal steps between photos to get
+  real sizes from triangulation.
+- **Auto sweep:** switch "Auto" on in the camera view, take the first photo, then turn or walk
+  slowly. The next photos are taken by themselves.
+- **Video:** pick one slow sweep from the gallery, and the phone picks sharp, overlapping frames
+  from it. For a walk video, type the total steps walked during it.
+
+The tools behind this (simulated sets from train photos; the test split is never read):
+`tools/overlap_eval.py` (thresholds and the joined-picture weight, `src/overlap_check.json`),
+`tools/stereo_eval.py` (walk-along scale), `tools/focal_eval.py` (focal length of a joined picture,
+`src/focal_check.json`), `tools/accuracy_eval.py` (out-of-fold accuracy experiments) and
+`tools/object_prior_eval.py` (the known-object scale prior, `models/dimension_object_prior.json`).
+All run in resumable chunks (`--budget 540`); results in `report.md` §4.6 and §5.3.
+
+## Size estimation
+
+`src/dimension.py` (deep-learning models and orchestration) and `src/dim_stats.py` (pixel
+statistics) measure the landslide once it is classified. The app does this automatically; skip
+it with `--no-dims`. From the command line:
+`src/dimension.py photo.jpg [--label debris_flow] [--distance 40] [--save-overlay] [--json]`.
+The architecture table and the assumed values are in `report.md` §6b. In short:
+
+- **Outline:** CLIPSeg, the self-trained head and the jittered SAM soft mask are fused, damped by
+  a vegetation/sky prior, and cut by a graph cut with colour and depth edges.
+- **Depth:** Depth Anything V2 and Depth Pro, each with test-time augmentation, fused per pixel by
+  inverse variance, then guided-filtered. ZoeDepth was tested and dropped (`report.md` §6b).
+- **Scale**, best first: your typed distance; OWLv2 known-height objects (weighted median); the
+  field calibration; the ensemble, corrected by the known-object prior.
+- **Measurement:** RANSAC plane geometry and per-class measures. Volume comes from published laws
+  combined with a reconstructed pre-failure surface. Grains are SAM instances at two zooms,
+  fitted with a truncated log-normal.
+- **Uncertainty:** Monte Carlo P5-P95 ranges and size-class probabilities. The ranges are computed
+  and evaluated (`tools/dimension_eval.py`) but not shown in the app or its saved reports, which
+  show the estimate only.
+- **Class doubt:** when the classifier is unsure, the landslide is also measured as the runner-up
+  class.
+
+Training and calibration (both leakage-free): `tools/train_outline_head.py` self-trains the
+outline head on the train split and selects it on val (test is never used);
+`tools/calibrate_dimensions.py` fits the scale from field measurements in
+`data/field/measurements.csv`, validated leave-one-site-out.
+
+`src/dimension.py a.jpg b.jpg c.jpg --site` fuses several photos of ONE landslide: the median of
+the photos, with the between-photo spread added to the uncertainty. Different photos of one site
+typically differ by about 1.5-2x, so use this for important sites.
+
+`tools/dimension_eval.py [--tag v4] [--budget-min 3]` is resumable: on low-RAM machines run it in
+chunks; exit code 3 means rerun to continue. It reports availability, stability under phone-like
+edits, the depth checks, interval widths and same-site consistency, and writes the known-object
+scale evidence.
+
+## Sharing beyond this laptop
+
+**Public link from this laptop (free, with sizes).** `tools/serve_public.py` starts the app on
+127.0.0.1 and opens a Cloudflare quick tunnel; it prints `https://<random words>.trycloudflare.com`,
+which works on any phone (https, so the live camera guide works) while the window stays open.
+`cloudflared.exe` lives outside the project in `E:\cloudflared\` (or set `CLOUDFLARED`); the tunnel
+uses HTTP/2 because this network blocks QUIC. Options: `--save` keeps uploads, `--no-dims` drops
+sizes. Checked through the public link: page 2.4 s, full result with sizes 40 s (one train photo).
+
+**Hugging Face Space (no sizes).** `tools/build_hf_space.py --push USER/landslide-classifier`
+stages `deploy/hf_space/` (Dockerfile, Space README), `src/` and the trained heads from `models/`,
+then uploads them as a Docker Space (needs `hf auth login` once with a write token). Note (Nov
+2026): Hugging Face now requires a PRO subscription for Docker Spaces. The Space has 2 CPU cores
+and 16 GB RAM and serves over https. Timing on this laptop with CUDA off and 2 threads (the Space
+CPU may differ): startup 27-46 s, landslide type 6-19 s per photo, one size estimate ~8 min, so the
+Space runs with `--no-dims` and `--no-save`. Behind a hosting proxy the app does not redirect to
+its own https port, `--port` defaults to `$PORT`, and the Dockerfile runs with `--no-https`.
+
+**Your own server.** It runs on CPU (three backbones + linear heads, a few seconds per photo,
+~3 GB RAM). Copy `src/` and `models/`, install `requirements.txt` (CPU torch) and run
+`src/app.py --port 8000 --token ...` behind HTTPS. Hosting is a deliberate decision for the team:
+it publishes the service and its uploads.
+
+## Reproducing the model
+
+Classes: `fall_topple`, `rotational_slide`, `translational_slide`, `debris_flow`,
+`earth_mud_flow`, `no_landslide` (+ `reject` for unusable photos). Definitions and Hungr 2014
+types: `src/common.py` and `labeling_guide.md`.
+
+**One GPU job at a time.** Qwen-VL uses ~6 GB of the 8 GB; running DINOv2 or ConvNeXt alongside
+it fails (the probe falls back to CPU; CNN training does not). With little free RAM, run long GPU
+jobs in the foreground in chunks (`train_cnn.py --max-minutes 8 --resume`).
+
+- **Scenario B (default, what was done): we build the dataset** with steps 1-5 below.
+- **Scenario A: a labeled dataset is given.** Instead of steps 1-5:
   ```
   .venv\Scripts\python src/import_dataset.py <dataset_folder> --name given
   ```
@@ -58,8 +207,6 @@ All commands below run from the project folder with `.venv\Scripts\python`.
   `--group-col` at import if there is a site/event column, otherwise photos of one site may land
   in different splits). A dataset without `reject` labels trains no photo check (every upload is
   treated as usable). Then continue at step 6.
-
-## Workflow (Scenario B)
 
 | Step | Command | What it does |
 |---|---|---|
@@ -77,16 +224,16 @@ All commands below run from the project folder with `.venv\Scripts\python`.
 | 5. Features | `tools/precompute_embeddings.py --backbone <bb>` for `facebook/dinov2-base`, `facebook/dinov2-large`, `google/siglip2-base-patch16-224` | caches features of every photo + phone-style copies (resumable) |
 | 6a. Probes | `src/probe.py --backbone <bb> --name probe_base` (and `probe_large`, `probe_siglip`) | photo-check head + type head per backbone; C by grouped CV on train+val |
 | 6b. Choose | `tools/robustness_eval.py` | train+val only: site-grouped CV + 3 unseen-source tests for every backbone/ensemble -> `models/selected.json` (the app's model + threshold), `results/robustness.md` |
-| 6c. CNN | `src/train_cnn.py --epochs 25 --max-minutes 8 --resume` (repeat until done) | fine-tuned ConvNeXt-Tiny, for comparison |
+| 6c. CNN | `src/train_cnn.py --epochs 25 --max-minutes 8 --resume` (repeat until done) | fine-tuned ConvNeXt-Tiny, for comparison (its 106 MB checkpoint is not in the repository) |
 | 7a. Evaluate | `src/eval.py` | every model on the untouched test split (+ phone-degraded copies, uphill views, South Asia, phone photos) -> `results/summary.md`; writes `pred_selected*.csv` |
 | 7b. System test | `tools/system_test.py` | the real app pipeline on every test photo (photo check + type + uncertain) -> `results/system_test.md` |
 | 7c. Hard cases | `tools/hard_case_eval.py` | app behaviour on ambiguous photos the labels rejected -> `results/hard_cases.md` |
 | 8. Check | `tools/check_integrity.py` | everything complete and consistent, no train/test leakage |
 | Credits | `tools/credits.py` | per-photo attribution `data/credits.csv`, licence summary `results/licences.md` |
-| App / CLI | `src/app.py`, `src/predict.py photo.jpg` | phone web app / command line, same model |
 
 Collection results change over time (Commons/Openverse are live); `data/` is the frozen dataset
-to share (with `data/credits.csv`).
+to share (with `data/credits.csv`). `data/`, `results/` and the CNN checkpoint are not in the
+repository.
 
 ### Labeling rules (details: `labeling_guide.md`)
 - Label what is **visible**. Unusable photo (aerial, map, close-up, no slope, …): **R**.
@@ -105,143 +252,11 @@ for this course project, but credit every photo you show ("Title" by Author, Lic
 publish modified versions of ND photos, and remove NC photos before any commercial use.
 See `results/licences.md`.
 
-## Online demo (Hugging Face Space, free)
-`tools/build_hf_space.py --push USER/landslide-classifier` stages `deploy/hf_space/` (Dockerfile, Space header),
-`src/` and the trained heads from `models/`, then uploads them as a Docker Space (needs `hf auth login` once with a
-write token). The free Space has 2 CPU cores and 16 GB RAM and serves over https, so the phone's live camera
-guide works. Timing on this laptop with CUDA off and 2 threads (3 train photos; the Space CPU may differ): startup
-27-46 s, landslide type 6-19 s per photo, one size estimate ~8 min. So the Space runs with `--no-dims` (no sizes)
-and `--no-save` (photos are not kept). For sizes, run the app on a GPU laptop. Accuracy is the same model as above.
-Note (Nov 2026): Hugging Face now requires a PRO subscription for Docker Spaces, so the free route is the one below.
-
-## Public link from this laptop (free, with sizes)
-`python tools/serve_public.py` starts the app on 127.0.0.1 and opens a Cloudflare quick tunnel; it prints
-`https://<random words>.trycloudflare.com`, which works on any phone (https, so the live camera guide works) while
-the window stays open. `cloudflared.exe` is a general tool and lives outside the project in `E:\cloudflared\`
-(or set `CLOUDFLARED`); the tunnel uses HTTP/2 because this network blocks QUIC. Options: `--save` keeps uploads,
-`--no-dims` drops sizes. Checked through the public link: page 2.4 s, full result with sizes 40 s (one train photo).
-
-## User guidance in the app
-
-One page works on phones and on laptops/desktops. At 1100 CSS px and wider (a 1920x1080 laptop at 150 % Windows
-scaling is 1280 px) it becomes a work area: a left rail for set-up (mode, how to shoot, distance, notes) and, before a
-result, a large drop zone with a framing sketch (click, drag a photo in, or Ctrl+V); survey shots show as four slots
-and the overlapping-set tray and how-to sit in the work area. A result shows the photo in a viewer beside the verdict
-and Save/Share, the safety strip under them, then dimensions, site checks and all types in columns; history is a grid.
-With a mouse, upload is the main button and the phone-only camera-app option is hidden; keys: U upload, C camera,
-? help, Space shoots and Esc closes in the viewfinder. The live viewfinder letterboxes the webcam and puts the
-guidance in a side panel. Help is a two-column dialog; Ctrl+P prints the result on white; Windows high-contrast
-themes keep every control outlined.
-The page is sent gzipped (~110 KB instead of ~400 KB). Behind a hosting proxy (Hugging Face, Render, a tunnel) the
-app does not redirect to its own https port, and `--port` defaults to `$PORT` when the host sets it; the Space
-Dockerfile runs with `--no-https` because the host already serves https.
-
-`src/guide.py` adds:
-- a first-run tour and a per-session safety checklist (with "Continue anyway");
-- single-photo or 4-shot site-survey mode;
-- a live framing and level viewfinder with a photo-quality meter (Good / Fair / Poor / Very poor), the current task,
-  only the failing checks as pills, one instruction at a time and a big arrow: up/down from aim, left/right with
-  degrees (compass) or steps (walk-along, from the typed distance); for overlapping sets the live overlap with the last
-  photo as a number against the ideal band (turn 30-60 %, walk 60-80 %) and up/down alignment with the last photo;
-  the phone's Back button closes the camera and the screen stays on while it is open;
-- an instant on-phone photo check, each problem graded minor or serious;
-- results that are always shown, even for a photo that fails the photo check: a quality band above the
-  result says how reliable it is, and nothing is adjusted to look better;
-- staged progress, "next steps" after each result, tickable on-site signs and a help sheet with a glossary.
-
-It also adds:
-- type first, then sizes;
-- a cut-off-edge warning and a mostly-sky check;
-- yes/no decision questions when the model is unsure;
-- a combined site result for surveys;
-- notes and saved or shared reports;
-- a GPS marker. The camera position comes from the photo's own GPS or the phone, and the compass bearing plus the distance give an estimated position of the landslide itself.
-- an image report: one JPEG with a location stamp on the photo, a map with markers and every metric, and GPS written into its EXIF so maps and GIS can place it (TECHNICAL_REPORT.md §10.3);
-- an offline queue, a practice quiz and Hindi.
-
-Details and tests are in `report.md` §5.1–5.2.
-- **Measuring whether the guidance helps:** `python tools/guidance_report.py` (after field use without `--no-save`).
-- **Live camera guide on phones** needs https, which `python src/app.py` now serves by default on port 8443 next to
-  http on 8000 (self-signed certificate made once in `.cache/tls`; tap Advanced > Proceed once on the phone). Phones that
-  open the http address are redirected to https; this laptop keeps `http://localhost:8000`. `--no-https` turns it off.
-- **Phone on the same Wi-Fi cannot open the app?** Windows makes inbound *Block* rules for python.exe when its first
-  "Allow access?" popup is cancelled, and they apply on Public networks (hostel/campus Wi-Fi, a new hotspot). Run
-  `python src/app.py --lan`: one UAC popup, then an elevated guardian pauses those Block rules and adds one Allow rule
-  (only the app's ports, only from the local subnet, only for the Python that listens - the base Python311
-  `python.exe`, because the venv's `python.exe` is just a launcher). The guardian watches the app and restores the
-  firewall exactly on Ctrl+C, a crash or a closed window, and the app prints the confirmation. After a power loss a
-  normal start warns and `python src/app.py --lan-restore` undoes it. Log: `.cache/lan/guardian.log`. If the phone
-  still times out, the Wi-Fi isolates devices from each other (common on hostel Wi-Fi): use a phone hotspot or
-  `python tools/serve_public.py`. On shared Wi-Fi add `--token <word>`.
-- **Three ways to add a photo:** *Guided camera* (the live camera inside the page, never the camera app), *Phone camera*
-  (the phone's own camera app, no live guide) and *From gallery*. If the guided camera cannot start, the page says why
-  and how to fix it (https link, camera permission steps, in-app browser, camera busy) and starts the camera by itself
-  once the permission is allowed; a blocked permission can only be re-enabled in the browser's site settings.
-- **Photo-check thresholds:** recalibrate after the dataset changes with `python tools/calibrate_photo_check.py` (train split only).
-
-## Photo sets and video (too big for one photo)
-
-In the app, choose **photo set**, then:
-- **Turn on the spot:** the photos are joined into one picture.
-- **Walk along:** the photos are analysed together. Type the normal steps between photos to get real
-  sizes from triangulation.
-- **Auto sweep:** switch "Auto" on in the camera view, take the first photo, then turn or walk slowly.
-  The next photos are taken by themselves.
-- **Video:** pick one slow sweep from the gallery, and the phone picks sharp, overlapping frames from it.
-  For a walk video, type the total steps walked during it.
-
-The tools behind this (simulated sets from train photos; the test split is never read):
-- `tools/overlap_eval.py`: thresholds and the joined-picture weight (`src/overlap_check.json`).
-- `tools/stereo_eval.py`: the walk-along scale.
-- `tools/focal_eval.py`: the focal length of a joined picture (`src/focal_check.json`).
-- `tools/accuracy_eval.py`: out-of-fold accuracy experiments.
-- `tools/object_prior_eval.py`: refits the known-object scale prior (`models/dimension_object_prior.json`).
-
-All of them run in resumable chunks (`--budget 540`). The results are in report.md §4.6 and §5.3.
-
-## Dimensions (after classification)
-
-`src/dimension.py` (deep-learning models and orchestration) and `src/dim_stats.py` (pixel statistics)
-measure the landslide once it is classified. The app does this automatically; skip it with
-`--no-dims`. From the command line:
-`python src/dimension.py photo.jpg [--label debris_flow] [--distance 40] [--save-overlay] [--json]`.
-The architecture table and the assumed values are in report.md, section 6b. In short:
-
-- **Outline:** CLIPSeg, the self-trained head and the jittered SAM soft mask are fused, damped by a
-  vegetation/sky prior, and cut by a graph cut with colour and depth edges.
-- **Depth:** Depth Anything V2 and Depth Pro, each with test-time augmentation, fused per
-  pixel by inverse variance, then guided-filtered. ZoeDepth was tested and dropped; the evidence
-  is in report.md, section 6b.
-- **Scale**, best first: your typed distance; OWLv2 known-height objects (weighted median); the
-  field calibration; the ensemble, corrected by the known-object prior
-  (`models/dimension_object_prior.json`).
-- **Measurement:** RANSAC plane geometry and per-class measures. Volume comes from published laws
-  combined with a reconstructed pre-failure surface. Grains are SAM instances at two zooms, fitted
-  with a truncated log-normal.
-- **Ranges:** Monte Carlo P5-P95 ranges and size-class probabilities.
-- **Class doubt:** when the classifier is unsure, the landslide is also measured as the runner-up
-  class.
-
-Training and calibration (both leakage-free):
-- `python tools/train_outline_head.py` self-trains the outline head on the train split and selects
-  it on val. Test is never used.
-- `python tools/calibrate_dimensions.py` fits the scale from field measurements in
-  `data/field/measurements.csv`, validated leave-one-site-out.
-
-`python src/dimension.py a.jpg b.jpg c.jpg --site` fuses several photos of ONE landslide: the
-median of the photos, with the between-photo spread added to the range. Different photos of one
-site typically differ by about 1.5-2x, so use this for important sites.
-
-`python tools/dimension_eval.py [--tag v4] [--budget-min 3]` is resumable: on low-RAM machines,
-run it in chunks, and exit code 3 means rerun to continue. It reports availability, stability under phone-like edits,
-the depth checks, interval widths and same-site consistency. It also writes the known-object
-scale evidence.
-
-## Why these choices (for the report)
+## Why these choices
 - **Zero-shot VLM is a baseline, not the main model.** LandslideBench (2026, overhead imagery)
   measured Qwen3-VL-8B zero-shot at 19% vs 79% for a fine-tuned ConvNeXt; on our ground photos
-  Qwen2.5-VL is similarly far behind the trained models (report.md).
-- **Frozen features + linear heads:** with ~40–400 photos per class, frozen foundation-model
+  Qwen2.5-VL is similarly far behind the trained models (`report.md`).
+- **Frozen features + linear heads:** with ~40-400 photos per class, frozen foundation-model
   features (DINOv2, SigLIP2) + logistic regression generalise better than fine-tuning a whole
   network (confirmed: the fine-tuned ConvNeXt scores lower).
 - **Split by site, and sites linked across categories:** photos of the same landslide in train
