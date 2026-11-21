@@ -2,6 +2,16 @@ data/
 .venv/
 .cache/
 results/
-models/
+# trained models: only the small files the app needs are in the repository (< 1 MB);
+# the ConvNeXt baseline checkpoint (106 MB, over GitHub's 100 MB limit) and anything else stay local
+models/*
+!models/probe_base.joblib
+!models/probe_large.joblib
+!models/probe_siglip.joblib
+!models/selected.json
+!models/outline_head.joblib
+!models/dimension_object_prior.json
+# research PDFs stay local (copyright, size); links are in papers/README.md
+papers/*.pdf
 __pycache__/
 *.pyc

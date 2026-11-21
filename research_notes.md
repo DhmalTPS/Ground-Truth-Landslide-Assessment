@@ -86,6 +86,8 @@ No public ground-level landslide-type dataset found -> Scenario B (build our own
 
 ## Papers in `papers/`
 
+The PDFs are kept locally, not in the repository (copyright and size); links and citations: `papers/README.md`.
+
 | File | What it is |
 |---|---|
 | Hungr2014_Varnes_classification_update.pdf | The terminology standard (32 types) |

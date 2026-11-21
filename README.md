@@ -20,13 +20,13 @@ field without internet). Use `--token SECRET` on shared networks (phones then op
 labeling (`--no-save` to disable; capped by `--max-saved`).
 For real use the app would be hosted on a server reachable from anywhere. It runs on CPU
 (three backbones + linear heads, a few seconds per photo, ~3 GB RAM; the backbones download from
-Hugging Face on first start). Copy `src/`, `models/probe_*.joblib`, `models/selected.json`,
+Hugging Face on first start; the trained heads are in `models/`, under 1 MB). Copy `src/` and `models/`,
 install `requirements.txt` (CPU torch), run `python src/app.py --port 8000 --token ...` behind
 HTTPS. Hosting is a deliberate decision for the team: it publishes the service and its uploads.
 
 Classes: `fall_topple`, `rotational_slide`, `translational_slide`, `debris_flow`,
 `earth_mud_flow`, `no_landslide` (+ `reject` for unusable photos). Definitions and Hungr 2014
-types: `src/common.py` / `labeling_guide.md`. Background: `research_notes.md`, `papers/`
+types: `src/common.py` / `labeling_guide.md`. Background: `research_notes.md`, `papers/README.md` (paper links)
 (`design.md` is the original plan).
 
 **One GPU job at a time.** Qwen-VL uses ~6 GB of the 8 GB; running DINOv2 or ConvNeXt

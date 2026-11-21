@@ -1,0 +1,13 @@
+{
+ "factor": 1.829,
+ "n": 83,
+ "sites": 43,
+ "tau": 0.503,
+ "predictive_log_sd": 0.536,
+ "lso_coverage_90": 0.94,
+ "old_prior_coverage_90": 0.627,
+ "source": "tools/object_prior_eval.py",
+ "note": "factor relative to the UNCORRECTED depth ensemble; train+val photos with person/car/motorcycle/bus/door scales; sd and coverage from leave-one-site-out CV",
+ "log_depth_slope": -0.1983,
+ "depth_ref_m": 8.33
+}
