@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this code, the dataset or the results, please cite it as below."
+title: "Ground Truth Landslide Assessment: landslide type and size from a ground-level phone photo"
+type: software
+authors:
+  - alias: DhmalTPS
+repository-code: "https://github.com/DhmalTPS/Ground-Truth-Landslide-Assessment"
+url: "https://huggingface.co/datasets/dhmaltps/ground-truth-landslide-data"
+abstract: >-
+  Field web app and research code that classifies the landslide type (Hungr, Leroueil and
+  Picarelli 2014) from a ground-level photo with linear heads on frozen DINOv2 and SigLIP2
+  features, estimates the landslide's size, and gives on-site guidance. Test split: 263 usable
+  photos from 152 sites, accuracy 0.806, macro-F1 0.784 (agreement with AI-made labels).
+keywords:
+  - landslides
+  - image classification
+  - geotechnical engineering
+  - DINOv2
+  - field app
+date-released: "2026-11-22"
+references:
+  - type: article
+    authors:
+      - family-names: Hungr
+        given-names: Oldrich
+      - family-names: Leroueil
+        given-names: Serge
+      - family-names: Picarelli
+        given-names: Luciano
+    title: "The Varnes classification of landslide types, an update"
+    journal: Landslides
+    volume: 11
+    start: 167
+    end: 194
+    year: 2014
+    doi: "10.1007/s10346-013-0436-y"

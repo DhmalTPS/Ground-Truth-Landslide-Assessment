@@ -24,6 +24,16 @@ End to end on all 1,008 test photos (including unusable ones), the app answers 6
 photos confidently, and those answers are right 86% of the time; below 60% confidence it says
 *uncertain* and shows the top two types. Method, all results and caveats: **`report.md`**.
 
+**Read these numbers as agreement with AI-made labels.** Every label, test split included, was
+made by an AI annotator following `labeling_guide.md` (two manual spot checks judged about
+80-90% consistent with the guide); none was verified by a geologist, and photos the annotator
+was unsure about were left out (`report.md`, "Label caveat").
+
+**Reproducible:** from the published data (see [Large files](#large-files-dataset-and-baseline-checkpoint)),
+`src/probe.py` (three heads), `src/eval.py` and `tools/system_test.py` regenerate
+`results/summary.md` and `results/system_test.md` byte for byte (checked on 2026-11-22: about
+15 minutes on an 8 GB laptop GPU).
+
 ## Quick start
 
 Needs Python 3.11 and git. About 5 GB of disk for the Python packages and the backbones; an NVIDIA
@@ -69,6 +79,7 @@ phone's hotspot (this works in the field without internet). To reach it from any
 | `research_notes.md` | literature background and early findings; paper links in `papers/README.md` |
 | `labeling_guide.md` | how photos were labelled (also the AI annotator's instructions) |
 | `design.md` | the original plan from before the build (history only) |
+| `CITATION.cff` | how to cite the code and dataset (GitHub shows it as "Cite this repository") |
 
 ## Using the app
 

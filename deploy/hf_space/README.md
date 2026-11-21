@@ -37,7 +37,8 @@ flagged as not reliable.
 ## How accurate it is
 
 On an untouched test set of 263 usable photos from 152 sites, none shared with training:
-accuracy **0.81**, macro-F1 **0.78**. Below 60% confidence the app says *uncertain* and shows
+accuracy **0.81**, macro-F1 **0.78**. The labels were made by an AI annotator following a written
+guide and were not verified by a geologist, so these numbers measure agreement with those labels. Below 60% confidence the app says *uncertain* and shows
 the two most likely types instead of guessing. Full method and evaluation: `report.md` in the
 GitHub repository.
 

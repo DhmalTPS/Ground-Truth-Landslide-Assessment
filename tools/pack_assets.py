@@ -24,38 +24,112 @@ STORED = {".jpg", ".jpeg", ".png", ".webp", ".pt", ".npz", ".zip"}   # already c
 
 CARD = """---
 license: other
-license_name: mixed-cc
+license_name: mixed-per-photo
 license_link: LICENSE.md
 pretty_name: Ground Truth Landslide Assessment (photos and baseline)
 size_categories:
 - 1K<n<10K
 task_categories:
 - image-classification
+tags:
+- landslides
+- geology
+- geotechnical-engineering
+- field-photos
 ---
 
 # Ground Truth Landslide Assessment: photos and baseline checkpoint
 
-Large files for https://github.com/DhmalTPS/Ground-Truth-Landslide-Assessment that are not stored in git:
+Ground-level photos of slopes, labelled with a landslide type (Hungr, Leroueil & Picarelli 2014,
+the update of the Varnes classification), for the course project
+https://github.com/DhmalTPS/Ground-Truth-Landslide-Assessment. The questions below follow
+*Datasheets for Datasets* (Gebru et al. 2021).
 
-- `data/raw/`: ground-level photos of slopes, labelled with a landslide type (Hungr et al. 2014);
-- `data/labels/`, `data/*.csv`: labels, site-grouped splits, credits and metadata;
-- `data/cache/`: cached backbone embeddings (so evaluation runs without recomputing them);
-- `data/field/`: the field photo set;
-- `models/cnn_*.pt`: the fine-tuned ConvNeXt-Tiny baseline (the app does not use it).
-
-Get them into a clone of the repository, at the paths the code expects:
+## Get it into a clone of the code
 
     pip install -r requirements.txt
-    python tools/fetch_assets.py
+    python tools/fetch_assets.py          # checks every file against tools/assets_manifest.json (SHA-256)
+
+## Motivation
+
+A junior engineer at a road or in a valley photographs a slope with a phone; the app says which
+landslide type it is, how sure it is, and what to check. Public landslide datasets are almost all
+aerial or satellite images, so this set collects photos taken from the ground.
+
+## Composition
+
+4,954 photos (`data/raw/images/`), each with one final label. `reject` = not usable for the task
+(aerial, satellite, map, diagram, close-up, no slope visible, or unsure between two types).
+
+| Label | train | val | test | total |
+|---|---|---|---|---|
+| fall_topple | 194 | 25 | 58 | 277 |
+| rotational_slide | 67 | 6 | 11 | 84 |
+| translational_slide | 99 | 22 | 32 | 153 |
+| debris_flow | 180 | 13 | 29 | 222 |
+| earth_mud_flow | 39 | 4 | 8 | 51 |
+| no_landslide | 329 | 84 | 125 | 538 |
+| reject | 2,406 | 478 | 745 | 3,629 |
+| **all** | 3,314 | 632 | 1,008 | 4,954 |
+
+- **Sites:** photos of the same place or event are linked into one site (2,062 sites; the 1,325
+  usable photos come from 738). Splits are by site, so no site is in two splits; the test split
+  has 263 usable photos from 152 sites.
+- **Sources:** Wikimedia Commons 3,684 (many Geograph field photos), Flickr via Openverse 1,267,
+  other 3. 322 usable photos are from South Asia (48 in test). 237 usable photos have a phone
+  camera in their EXIF.
+- **Other files:** `data/metadata.csv` (source URL, title, author, licence, categories, camera,
+  site), `data/splits.csv`, `data/labels/claude_ai.csv` and its audit trail
+  `data/labels/ai_annotation/`, `data/credits.csv`, `data/vlm_predictions.csv` (Qwen2.5-VL-7B
+  zero-shot probabilities, the baseline), `data/site_merge_moves.csv`, `data/cache/` (cached
+  DINOv2-base, DINOv2-large and SigLIP2 embeddings of every photo and of fixed phone-style copies,
+  so training and evaluation run without recomputing them), `data/field/measurements.csv`
+  (empty template for field size measurements).
+- **`models/cnn_convnext_tiny.fb_in22k_ft_in1k.pt`:** ConvNeXt-Tiny fine-tuned on train (best epoch
+  chosen on val), the comparison baseline (the app uses linear heads on frozen features instead).
+
+## Collection
+
+Title and category searches on Wikimedia Commons and Openverse (scripts `src/collect_commons.py`,
+`src/collect_openverse.py`), October 2026. Only openly licensed photos were kept; duplicates were
+removed by perceptual hash. The searches favour photos people chose to upload and describe, so the
+set is not a random sample of landslides: 1,132 photos are Geograph imports (Britain and Ireland),
+and clearly visible, well-described landslides are more likely to be included.
+
+## Labelling (read before using the labels)
+
+- **Every label was made by an AI annotator** (Claude, reviewer `claude_ai`) following the
+  repository's `labeling_guide.md` and `tools/ai_labeling_prompt.md`; the test split was
+  labelled without model suggestions visible. The labels are not verified by a geologist.
+  Two manual spot checks (48 + 24 photos) judged about 80-90% consistent with the guide.
+- When the annotator was unsure between two types, the photo was labelled `reject`, so the
+  hardest photos are not in the scored test set.
+- Accuracy measured on this test split is agreement with these labels, not with verified
+  ground truth.
+
+## Uses
+
+Intended: training and evaluating landslide-type classifiers on ground photos, reproducing the
+project's results (`src/probe.py`, `src/eval.py`, `tools/system_test.py`; these reproduce the
+published `results/summary.md` and `results/system_test.md` byte for byte from this data).
+Not suitable as the only basis for safety decisions, for mapping, or for estimating landslide
+frequency (the collection is not a random sample).
 
 ## Licences
 
-There is no single licence. Every photo keeps the licence it was published under (CC BY, CC BY-SA,
-CC BY-NC, CC BY-NC-SA, CC BY-NC-ND, CC BY-ND, CC0 or public domain); `data/credits.csv` gives the title,
-author, licence and source of each photo. Respect the licence of each photo you reuse: some forbid
-commercial use (NC) or changes (ND), and SA photos must be shared under the same licence. The cached
-embeddings and the checkpoint are derived from these photos. Labels, splits and the checkpoint were made
-by the repository author for the IC202P course project; cite the repository when you use them.
+There is no single licence: every photo keeps the licence it was published under, listed with
+title, author and source URL in `data/credits.csv`. 2,863 photos are CC BY-SA (any version),
+762 CC BY, 753 non-commercial (CC BY-NC, -NC-SA, -NC-ND), 22 CC BY-ND, 407 public domain, 89 CC0,
+and 58 under other open terms (GODL-India, OGL 3, GFDL 1.2, Apache 2.0, "no restrictions" and
+similar). Credit each photo you show; NC photos may not be used commercially; ND photos may not
+be shared modified; SA photos must be shared under the same licence. The labels, splits,
+embeddings and checkpoint were made for the course project; cite the repository when you use them.
+
+## Maintenance
+
+Files are versioned in this repository; `tools/assets_manifest.json` in the code repository
+pins the exact files (path, size, SHA-256). To report a problem with a photo or a label, open an
+issue on the code repository.
 """
 
 LICENSE_MD = """# Licences

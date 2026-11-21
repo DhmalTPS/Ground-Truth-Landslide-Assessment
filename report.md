@@ -279,7 +279,8 @@ column is a paired site bootstrap with a 90 % interval.
 Multi-crop averaging (the full photo plus 5 crops at 0.85 scale) adds about one point. Its interval still
 includes 0, and accuracy among confident answers drops slightly, so the shipped models were not changed.
 With about 590 sites, a 1-point gain is within noise; more labelled sites would settle it.
-Nine cheap levers tried on the frozen features all land within ±1.2 points of the shipped system. On
+Of nine cheap levers tried on the frozen features, eight land within ±1.2 points of the shipped
+system and stacking is worse (-4.5 points). On
 these features, accuracy has plateaued, and the next gain has to come from more labelled sites (above
 all translational_slide and earth_mud_flow) or human-checked labels (§2).
 
@@ -396,7 +397,8 @@ The pipeline:
   the size scale. `tools/stereo_eval.py` tests it on simulated pairs with known depth, with the step
   length (log-sd 0.15) and the focal also simulated as uncertain:
   - median |log error| 0.120 and 90th percentile 0.272;
-  - stated sd 0.150, against 0.345 for the known-object prior;
+  - stated sd 0.150, against 0.536 for the current known-object prior (0.345 before its refit in
+    `results/object_prior_eval.md`; `results/stereo_eval.md` still prints the old value);
   - 90 % coverage 87.6 %;
   - a scale was found for 71 % of pairs; pairs that are too far away for the baseline are refused.
 
@@ -503,7 +505,7 @@ network sets a number on its own.
 |---|---|---|
 | Outline | CLIPSeg (class prompts); self-trained DINOv2 head; SAM with 6 jittered prompt sets | Excess-Green + sky prior; graph cut (max-flow) with colour and depth-edge terms; lambda by stability selection |
 | Depth | Depth Anything V2 and Depth Pro, each with test-time augmentation (TTA); ZoeDepth was tested and dropped (see below) | Shape from both models, scale = consensus of the models; per-pixel inverse-variance fusion; guided filter |
-| Scale | OWLv2 known-height objects (person, car, ..., trees weak) | Weighted median, 3-MAD outlier removal; known-object prior (x1.53, n=4); field calibration (leave-one-site-out) |
+| Scale | OWLv2 known-height objects (person, car, ..., trees weak) | Weighted median, 3-MAD outlier removal; known-object prior (x1.83 at 8.3 m, 83 photos / 43 sites, `models/dimension_object_prior.json`); field calibration (leave-one-site-out) |
 | Geometry | - | RANSAC plane; percentile extents; view-angle-corrected area; contour perimeter |
 | Volume | - | Area-volume laws combined with a thin-plate-spline pre-failure surface (CV-chosen smoothing), weighted by inverse variance |
 | Grains | SAM instances at zoom 1 and zoom 2 | Convex-hull b-axis; Kellerhals-Bray grid-by-number; truncated log-normal MLE; bootstrap CI; zoom agreement |
@@ -519,7 +521,7 @@ network sets a number on its own.
 - texture-depth slope: 0.98 against an expected 1 (for textures above about 0.06 cycles/px; lower
   frequencies are biased low, so the check only flags slopes outside 0.3-2.0).
 
-**Evaluation history (40 photos x 9 versions, plus 12 multi-photo sites; `results/dimension_eval_v1..v4.md`).**
+**Evaluation history (40 photos under 7 photo edits, plus 11 multi-photo sites; `results/dimension_eval_v1..v4.md`).**
 Stability is the median |log change| under each photo edit (0.10 is about a 10 % change); lower is better.
 
 | | v1 (CLIPSeg+SAM) | v2 (3 depth models, median scale) | v3 (ZoeDepth dropped) | v4 (final) |
@@ -530,12 +532,12 @@ Stability is the median |log change| under each photo edit (0.10 is about a 10 %
 | Trust high / medium / low | 12 / 75 / 12 % | 0 / 72 / 28 % | 30 / 42 / 28 % | 30 / 42 / 28 % |
 | Camera distance 2-300 m | 100 % | 80 % | 100 % | 100 % |
 | Same-site log-sd: length / width / area | - | 0.50 / 0.32 / 0.77 | 0.40 / 0.52 / 0.86 | 0.40 / 0.45 / 0.80 |
-| 90 % interval width, log(P95/P5), length | - | - | 1.3-3.1 | 1.37-1.44 |
-| Seconds per photo (RTX 4060) | ~20 | 30 | 23 | 25 |
+| 90 % interval width, log(P95/P5), length | - | 1.3-3.1 | 1.5-2.7 | 1.37-1.44 |
+| Seconds per photo (RTX 4060) | 7 | 30 | 23 | 25 |
 
 **Decisions, each backed by evidence:**
 - **ZoeDepth dropped (v3).** It read 4-6x closer than the other two models (median largest-pair ratio 6.25 on 40 photos), was contradicted by the known-size objects, and the empirical "depth error" it produced (log-sd 1.9) was bias, not noise.
-- **Known-object scale prior x1.53 (v4).** All 9 photos where OWLv2 found an object of known height said the ensemble reads too close (factors 1.04-4.36; p about 1/512 if unbiased). Only the 4 tight-height objects set the factor (person x1.27 and x1.85, motorcycle x1.92, car x1.04); its predictive log-sd is 0.345. It is applied only when a photo has no typed distance, no object of its own and no field calibration (`models/dimension_object_prior.json`). Caveat: it is estimated on the same evaluation photos, but it is one global number and does not affect the stability metrics, which do not depend on the overall scale.
+- **Known-object scale prior x1.53 (v4).** All 9 photos where OWLv2 found an object of known height said the ensemble reads too close (factors 1.04-4.36; p about 1/512 if unbiased). Only the 4 tight-height objects set the factor (person x1.27 and x1.85, motorcycle x1.92, car x1.04); its predictive log-sd was 0.345 (since refit on 83 photos: 0.536, see §5.3). It is applied only when a photo has no typed distance, no object of its own and no field calibration (`models/dimension_object_prior.json`). Caveat: it is estimated on the same evaluation photos, but it is one global number and does not affect the stability metrics, which do not depend on the overall scale.
 - **On/off switches replaced by smooth weights (v3-v4).** These are the pre-failure surface weight (relief-to-noise ratio) and the grain-size floor on thickness, which was removed. Volume stability improved, e.g. blur 0.60 -> 0.35 and downscale 0.31 -> 0.22.
 - **Remaining weak spots.** Heavy JPEG and noise still move the area by 25-42 %; volume under noise (0.44) is worse than v1 (0.30), because v1 had no surface-based volume. Same-site spread (width about 1.6x, area about 2.2x) is partly real: each photo sees a different part from a different distance. **Report ranges, and fuse several photos of an important site (`--site`).**
 

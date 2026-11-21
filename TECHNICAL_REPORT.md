@@ -75,7 +75,7 @@ come from monocular depth and are unverified against field tape measurements. La
 | Walk-along stereo scale (simulated) | median abs log error 0.120, stated sd 0.150, coverage 87.6 %, success 71 % | stereo_eval.md |
 | Photo-set link false-positive rate (simulated) | 0.0 % at 30 inliers | overlap_eval.md |
 | Client photo check false flags | train 3.6 %, val 3.9 %; detects blur/dark/sky 100 %, haze 96 %, overexposure 86 % | photo_check.json |
-| Latency (RTX 4060 laptop) | type ≈ 2–5 s; sizes ≈ 25 s; full ≈ 40 s via public link | dimension_eval_v4.md, README |
+| Latency (RTX 4060 laptop) | type ≈ 3–5 s; sizes ≈ 25 s; full ≈ 40 s via public link | dimension_eval_v4.md, README |
 | Latency (CPU, 2 threads) | type 6–19 s; sizes ≈ 8 min | README |
 
 ---
