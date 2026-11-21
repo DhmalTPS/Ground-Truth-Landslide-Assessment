@@ -1,7 +1,7 @@
 """Assemble the Hugging Face Space (Docker) for the web app and optionally push it.
 
     python tools/build_hf_space.py                          # stage into .cache/hf_space and list it
-    python tools/build_hf_space.py --push USER/landslide    # stage, create the Space if needed, upload
+    python tools/build_hf_space.py --push USER/ground-truth-landslide    # stage, create the Space if needed, upload
 
 The Space gets: deploy/hf_space/* (Dockerfile, README header, requirements, prefetch), src/*.py and src/*.json,
 and the trained heads from models/ (the CNN checkpoint is not used by the app and stays out). Pushing needs a
@@ -55,7 +55,7 @@ def push(repo):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--push", metavar="REPO", help="Space id, e.g. USER/landslide-classifier (or just the name)")
+    ap.add_argument("--push", metavar="REPO", help="Space id, e.g. USER/ground-truth-landslide (or just the name)")
     a = ap.parse_args()
     for f in stage():
         print("  " + f.relative_to(STAGE).as_posix())

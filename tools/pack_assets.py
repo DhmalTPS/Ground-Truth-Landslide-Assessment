@@ -11,6 +11,7 @@ data/app_uploads/ (photos people sent to the app). Commit the manifest after cha
 can check its download.
 """
 import argparse
+import hashlib
 import json
 import sys
 import zipfile
@@ -25,16 +26,16 @@ CARD = """---
 license: other
 license_name: mixed-cc
 license_link: LICENSE.md
-pretty_name: Landslide type photos and ConvNeXt baseline
+pretty_name: Ground Truth Landslide Assessment (photos and baseline)
 size_categories:
 - 1K<n<10K
 task_categories:
 - image-classification
 ---
 
-# Landslide type photos (data and baseline checkpoint)
+# Ground Truth Landslide Assessment: photos and baseline checkpoint
 
-Large files for https://github.com/DhmalTPS/Landslide-Category-Classifier that are not stored in git:
+Large files for https://github.com/DhmalTPS/Ground-Truth-Landslide-Assessment that are not stored in git:
 
 - `data/raw/`: ground-level photos of slopes, labelled with a landslide type (Hungr et al. 2014);
 - `data/labels/`, `data/*.csv`: labels, site-grouped splits, credits and metadata;
@@ -52,15 +53,17 @@ Get them into a clone of the repository, at the paths the code expects:
 There is no single licence. Every photo keeps the licence it was published under (CC BY, CC BY-SA,
 CC BY-NC, CC BY-NC-SA, CC BY-NC-ND, CC BY-ND, CC0 or public domain); `data/credits.csv` gives the title,
 author, licence and source of each photo. Respect the licence of each photo you reuse: some forbid
-commercial use (NC) or changes (ND), and SA photos must be shared under the same licence. Labels, splits,
-embeddings and the checkpoint: same licence as the code repository.
+commercial use (NC) or changes (ND), and SA photos must be shared under the same licence. The cached
+embeddings and the checkpoint are derived from these photos. Labels, splits and the checkpoint were made
+by the repository author for the IC202P course project; cite the repository when you use them.
 """
 
 LICENSE_MD = """# Licences
 
 Photos in `data/raw/`: each photo keeps its own licence; see `data/credits.csv` (title, author,
-licence, source for every photo). Everything else: the licence of
-https://github.com/DhmalTPS/Landslide-Category-Classifier.
+licence, source for every photo). Labels, splits, embeddings and the ConvNeXt checkpoint: made for
+https://github.com/DhmalTPS/Ground-Truth-Landslide-Assessment (IC202P course project); cite it when
+you use them.
 """
 
 
@@ -80,7 +83,8 @@ def write_manifest(files, repo):
     entries = []
     for i, rel in enumerate(files, 1):
         p = ROOT / rel
-        entries.append({"path": rel, "size": p.stat().st_size, "sha256": sha256(p)})
+        st = p.stat()   # mtime: fetch_assets restores it (check_integrity compares result and model dates)
+        entries.append({"path": rel, "size": st.st_size, "sha256": sha256(p), "mtime": int(st.st_mtime)})
         if i % 500 == 0 or i == len(files):
             print(f"\r  hashed {i}/{len(files)}", end="", flush=True)
     print()
@@ -106,8 +110,20 @@ def write_zip(files, out):
     print(f"\n{out}: {out.stat().st_size / 1e9:.2f} GB")
 
 
-def push(repo):
-    from huggingface_hub import HfApi
+def git_blob_sha1(path):
+    """The id git gives a file's content (how Hugging Face identifies files not stored in LFS)."""
+    h = hashlib.sha1()
+    h.update(b"blob %d\0" % path.stat().st_size)
+    with open(path, "rb") as f:
+        while chunk := f.read(1 << 20):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def push(repo, manifest, max_files=500, max_bytes=500_000_000):
+    """Upload in batches of commits; files already on the Hub with the same content are skipped, so a rerun
+    after an interruption only sends what is missing."""
+    from huggingface_hub import CommitOperationAdd, HfApi
     api = HfApi()
     try:
         who = api.whoami()["name"]
@@ -115,13 +131,37 @@ def push(repo):
         sys.exit("Not logged in to Hugging Face: run `hf auth login` first.")
     print(f"Uploading to dataset {repo} as {who} ...")
     api.create_repo(repo, repo_type="dataset", exist_ok=True)
-    api.upload_file(path_or_fileobj=CARD.encode("utf-8"), path_in_repo="README.md", repo_id=repo,
-                    repo_type="dataset", commit_message="Dataset card")
-    api.upload_file(path_or_fileobj=LICENSE_MD.encode("utf-8"), path_in_repo="LICENSE.md", repo_id=repo,
-                    repo_type="dataset", commit_message="Licences")
-    # upload straight from the repository root, restricted to the bundle (resumable, no staging copy)
-    api.upload_large_folder(repo_id=repo, repo_type="dataset", folder_path=str(ROOT),
-                            allow_patterns=INCLUDE, ignore_patterns=EXCLUDE)
+    for name, text, msg in (("README.md", CARD, "Dataset card"), ("LICENSE.md", LICENSE_MD, "Licences")):
+        api.upload_file(path_or_fileobj=text.encode("utf-8"), path_in_repo=name, repo_id=repo,
+                        repo_type="dataset", commit_message=msg)
+    remote = {e.path: e for e in api.list_repo_tree(repo, repo_type="dataset", recursive=True)
+              if getattr(e, "blob_id", None)}
+
+    def on_hub(f):
+        r = remote.get(f["path"])
+        if r is None or r.size != f["size"]:
+            return False
+        if r.lfs is not None:
+            return r.lfs.sha256 == f["sha256"]
+        return r.blob_id == git_blob_sha1(ROOT / f["path"])
+
+    todo = [f for f in manifest["files"] if not on_hub(f)]
+    print(f"{len(manifest['files']) - len(todo)} files already there, {len(todo)} to upload "
+          f"({sum(f['size'] for f in todo) / 1e9:.2f} GB)")
+    batches, cur, cur_b = [], [], 0
+    for f in todo:
+        if cur and (len(cur) >= max_files or cur_b + f["size"] > max_bytes):
+            batches.append(cur)
+            cur, cur_b = [], 0
+        cur.append(f)
+        cur_b += f["size"]
+    if cur:
+        batches.append(cur)
+    for i, b in enumerate(batches, 1):
+        ops = [CommitOperationAdd(path_in_repo=f["path"], path_or_fileobj=str(ROOT / f["path"])) for f in b]
+        api.create_commit(repo_id=repo, repo_type="dataset", operations=ops,
+                          commit_message=f"Add {len(b)} files ({i}/{len(batches)})")
+        print(f"  commit {i}/{len(batches)}: {len(b)} files, {sum(f['size'] for f in b) / 1e6:.0f} MB", flush=True)
     print(f"Done: https://huggingface.co/datasets/{repo}")
 
 
@@ -133,11 +173,11 @@ def main():
     files = collect()
     if not files:
         sys.exit("No asset files found under models/ and data/.")
-    write_manifest(files, a.push)
+    manifest = write_manifest(files, a.push)
     if a.zip:
         write_zip(files, a.zip)
     if a.push:
-        push(a.push)
+        push(a.push, manifest)
 
 
 if __name__ == "__main__":

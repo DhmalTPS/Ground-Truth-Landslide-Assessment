@@ -1,5 +1,5 @@
 ---
-title: Landslide Type Classifier
+title: Ground Truth Landslide
 emoji: ⛰️
 colorFrom: yellow
 colorTo: green
@@ -13,7 +13,7 @@ models:
   - google/siglip2-base-patch16-224
 ---
 
-# Landslide type classifier (online demo)
+# Ground Truth Landslide Assessment (online demo)
 
 Take or upload a ground-level photo of a slope. The app checks that the photo is usable, names
 the landslide type (Hungr et al. 2014), shows how sure it is, and gives a safety note, an on-site
@@ -53,4 +53,4 @@ GitHub repository.
 - Uploaded photos are not stored.
 - Decision support only: confirm with a geologist or geotechnical engineer before acting.
 
-Code, method and evaluation: https://github.com/DhmalTPS/Landslide-Category-Classifier
+Code, method and evaluation: https://github.com/DhmalTPS/Ground-Truth-Landslide-Assessment

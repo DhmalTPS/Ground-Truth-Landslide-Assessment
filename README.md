@@ -1,4 +1,7 @@
-# IC202P: Landslide type classifier (ground photos)
+# Ground Truth Landslide Assessment
+
+Landslide type and size from a ground-level phone photo, with on-site guidance (IC202P course
+project). The web app is called *Landslide Type Check*.
 
 **Use case:** a junior engineer standing on a road or in a valley takes a phone photo looking up
 at a slope. The app tells them which landslide type it is (Varnes classification, Hungr et al.
@@ -27,8 +30,8 @@ Needs Python 3.11 and git. About 5 GB of disk for the Python packages and the ba
 GPU is optional (without one, a photo takes a few seconds longer and sizes take minutes).
 
 ```
-git clone https://github.com/DhmalTPS/Landslide-Category-Classifier
-cd Landslide-Category-Classifier
+git clone https://github.com/DhmalTPS/Ground-Truth-Landslide-Assessment
+cd Ground-Truth-Landslide-Assessment
 ```
 
 | | Windows | macOS / Linux |
@@ -189,7 +192,7 @@ set `CLOUDFLARED` to its full path. The tunnel uses HTTP/2, which also works on 
 QUIC. Options: `--save` keeps uploads, `--no-dims` drops
 sizes. Checked through the public link: page 2.4 s, full result with sizes 40 s (one train photo).
 
-**Hugging Face Space (no sizes).** `tools/build_hf_space.py --push USER/landslide-classifier`
+**Hugging Face Space (no sizes).** `tools/build_hf_space.py --push USER/ground-truth-landslide`
 stages `deploy/hf_space/` (Dockerfile, Space README), `src/` and the trained heads from `models/`,
 then uploads them as a Docker Space (needs `hf auth login` once with a write token). Note (Nov
 2026): Hugging Face now requires a PRO subscription for Docker Spaces. The Space has 2 CPU cores
@@ -293,8 +296,8 @@ python tools/fetch_assets.py --check         # verify what is on disk (sizes + S
 The files land at the paths the code expects, whatever the clone's folder is called; a rerun
 fetches only what is missing, and the script exits with an error if any file is missing or
 differs from the manifest. With them, `python tools/check_integrity.py` prints ALL OK in a fresh
-clone. *Status: the Hugging Face dataset is not published yet; until it is, the script says so
-and `--zip` works with the zip from the maintainer.* Photos people send to the app (`data/app_uploads/`) are never included.
+clone. The files are published as the Hugging Face dataset
+[dhmaltps/ground-truth-landslide-data](https://huggingface.co/datasets/dhmaltps/ground-truth-landslide-data). Photos people send to the app (`data/app_uploads/`) are never included.
 Maintainers: `tools/pack_assets.py` rewrites the manifest and `--zip OUT.zip` / `--push USER/NAME`
 publish the files (after `hf auth login`).
 

@@ -22,6 +22,7 @@ import argparse
 import fnmatch
 import hashlib
 import json
+import os
 import shutil
 import sys
 import zipfile
@@ -73,6 +74,15 @@ def verify(manifest, only=None, quick=False):
             print(f"\r  checked {i}/{len(files)} files", end="", flush=True)
     print()
     return len(files) - len(missing) - len(different), missing, different
+
+
+def restore_times(manifest, only):
+    """Give downloaded files their original modification time (a download stamps them 'now', which would make
+    the results in results/ look older than the models they were computed from, see tools/check_integrity.py)."""
+    for f in manifest["files"]:
+        p = ROOT / f["path"]
+        if "mtime" in f and wanted(f["path"], only) and p.is_file() and p.stat().st_size == f["size"]:
+            os.utime(p, (f["mtime"], f["mtime"]))
 
 
 def report(manifest, only, quick):
@@ -157,6 +167,7 @@ def main():
                 sys.exit("No Hugging Face dataset is set in tools/assets_manifest.json yet; pass --repo USER/NAME "
                          "or --zip FILE_OR_URL.")
             from_hub(repo, a.only)
+        restore_times(manifest, a.only)
     sys.exit(report(manifest, a.only, a.quick))
 
 
