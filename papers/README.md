@@ -1,8 +1,8 @@
 # Papers
 
-The PDFs used for this project are kept locally in this folder but are not stored in the
-repository: some are copyrighted journal articles, and together they are about 67 MB. Each one
-can be found from the link or citation below. What each paper was used for is in
+The PDFs used for this project are not in the repository (some are copyrighted journal
+articles, and together they are about 67 MB). Each one can be found from the link or citation
+below; saved under the file name in the first column, it is where the other documents expect it. What each paper was used for is in
 `research_notes.md` ("Papers in `papers/`").
 
 | Local file | Paper | Link |

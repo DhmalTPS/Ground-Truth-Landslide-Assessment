@@ -23,21 +23,38 @@ photos confidently, and those answers are right 86% of the time; below 60% confi
 
 ## Quick start
 
+Needs Python 3.11 and git. About 5 GB of disk for the Python packages and the backbones; an NVIDIA
+GPU is optional (without one, a photo takes a few seconds longer and sizes take minutes).
+
 ```
-py -3.11 -m venv .venv
-.venv\Scripts\python -m pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
-.venv\Scripts\python -m pip install -r requirements.txt
-.venv\Scripts\python src/app.py          # then open the printed http://<laptop-ip>:8000 on a phone
+git clone https://github.com/DhmalTPS/Landslide-Category-Classifier
+cd Landslide-Category-Classifier
 ```
 
-The trained heads are in `models/` (under 1 MB); the backbones download from Hugging Face on first
-start into `.cache/huggingface/` in this folder (C: is too full). All commands below run from the
-project folder with `.venv\Scripts\python`. `src/predict.py photo.jpg` gives the same answer on
-the command line.
+| | Windows | macOS / Linux |
+|---|---|---|
+| 1. Environment | `py -3.11 -m venv .venv` | `python3.11 -m venv .venv` |
+| 2a. PyTorch, NVIDIA GPU | `.venv\Scripts\python -m pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128` | Linux: same command with `.venv/bin/python` |
+| 2b. PyTorch, no NVIDIA GPU | same, with `.../whl/cpu` instead of `.../whl/cu128` | Linux: `.../whl/cpu`; macOS: `.venv/bin/python -m pip install torch==2.11.0 torchvision==0.26.0` |
+| 3. Packages | `.venv\Scripts\python -m pip install -r requirements.txt` | `.venv/bin/python -m pip install -r requirements.txt` |
+| 4. Run the app | `.venv\Scripts\python src/app.py` | `.venv/bin/python src/app.py` |
 
-The app runs on this laptop and phones open its address, so they must be on the same Wi-Fi, or the
-laptop on the phone's hotspot (this works in the field without internet). To reach it from
-anywhere, see [Sharing beyond this laptop](#sharing-beyond-this-laptop).
+Then open `http://localhost:8000` on the computer, or the printed `http://<computer-ip>:8000` on a
+phone. Commands below are written as `python ...`: use the venv's Python as in the table, from the
+repository folder (any folder name works; paths are found relative to the code).
+
+Nothing else to download by hand: the app's trained heads are in `models/` (under 1 MB) and the
+three backbones (about 2 GB) download from Hugging Face on first start, into `.cache/huggingface/`
+inside the repository (set `HF_HOME` to put them elsewhere). The first start therefore needs
+internet and takes a few minutes; after that the app also works offline.
+`python src/predict.py photo.jpg` gives the same answer on the command line.
+
+The dataset and the ConvNeXt baseline checkpoint are only needed to retrain or re-evaluate:
+see [Large files](#large-files-dataset-and-baseline-checkpoint).
+
+Phones open the computer's address, so they must be on the same Wi-Fi, or the computer on the
+phone's hotspot (this works in the field without internet). To reach it from anywhere, see
+[Sharing beyond this computer](#sharing-beyond-this-computer).
 
 ## Documents
 
@@ -54,17 +71,18 @@ anywhere, see [Sharing beyond this laptop](#sharing-beyond-this-laptop).
 
 **Phones.** The live camera guide needs https, which `src/app.py` serves by default on port 8443
 next to http on 8000 (self-signed certificate made once in `.cache/tls`; tap Advanced > Proceed
-once on the phone). Phones that open the http address are redirected to https; this laptop keeps
+once on the phone). Phones that open the http address are redirected to https; the computer itself keeps
 `http://localhost:8000`. `--no-https` turns it off. On shared networks add `--token SECRET`
-(phones then open `http://<laptop-ip>:8000/?t=SECRET`). Uploads are saved to `data/app_uploads/`
+(phones then open `http://<computer-ip>:8000/?t=SECRET`). Uploads are saved to `data/app_uploads/`
 for later labelling (`--no-save` to disable; capped by `--max-saved`).
 
-**Phone on the same Wi-Fi cannot open the app?** Windows makes inbound *Block* rules for
+**Phone on the same Wi-Fi cannot open the app?** (Windows; on macOS/Linux allow the ports 8000
+and 8443 in your firewall.) Windows makes inbound *Block* rules for
 python.exe when its first "Allow access?" popup is cancelled, and they apply on Public networks
-(hostel/campus Wi-Fi, a new hotspot). Run `src/app.py --lan`: one UAC popup, then an elevated
+(hostel/campus Wi-Fi, a new hotspot). Run `src/app.py --lan` (Windows only): one UAC popup, then an elevated
 guardian pauses those Block rules and adds one Allow rule (only the app's ports, only from the
-local subnet, only for the Python that listens: the base Python311 `python.exe`, because the venv's
-`python.exe` is just a launcher). The guardian restores the firewall exactly on Ctrl+C, a crash
+local subnet, only for the Python that listens: the base Python 3.11 `python.exe`, because the
+venv's `python.exe` is just a launcher). The guardian restores the firewall exactly on Ctrl+C, a crash
 or a closed window, and the app prints the confirmation. After a power loss a normal start warns
 and `src/app.py --lan-restore` undoes it. Log: `.cache/lan/guardian.log`. If the phone still times
 out, the Wi-Fi isolates devices from each other (common on hostel Wi-Fi): use a phone hotspot or
@@ -161,27 +179,29 @@ chunks; exit code 3 means rerun to continue. It reports availability, stability 
 edits, the depth checks, interval widths and same-site consistency, and writes the known-object
 scale evidence.
 
-## Sharing beyond this laptop
+## Sharing beyond this computer
 
-**Public link from this laptop (free, with sizes).** `tools/serve_public.py` starts the app on
+**Public link from this computer (free, with sizes).** `tools/serve_public.py` starts the app on
 127.0.0.1 and opens a Cloudflare quick tunnel; it prints `https://<random words>.trycloudflare.com`,
 which works on any phone (https, so the live camera guide works) while the window stays open.
-`cloudflared.exe` lives outside the project in `E:\cloudflared\` (or set `CLOUDFLARED`); the tunnel
-uses HTTP/2 because this network blocks QUIC. Options: `--save` keeps uploads, `--no-dims` drops
+It needs Cloudflare's `cloudflared` program (free, no account): install it so it is on `PATH`, or
+set `CLOUDFLARED` to its full path. The tunnel uses HTTP/2, which also works on networks that block
+QUIC. Options: `--save` keeps uploads, `--no-dims` drops
 sizes. Checked through the public link: page 2.4 s, full result with sizes 40 s (one train photo).
 
 **Hugging Face Space (no sizes).** `tools/build_hf_space.py --push USER/landslide-classifier`
 stages `deploy/hf_space/` (Dockerfile, Space README), `src/` and the trained heads from `models/`,
 then uploads them as a Docker Space (needs `hf auth login` once with a write token). Note (Nov
 2026): Hugging Face now requires a PRO subscription for Docker Spaces. The Space has 2 CPU cores
-and 16 GB RAM and serves over https. Timing on this laptop with CUDA off and 2 threads (the Space
+and 16 GB RAM and serves over https. Timing on the development laptop with CUDA off and 2 threads (the Space
 CPU may differ): startup 27-46 s, landslide type 6-19 s per photo, one size estimate ~8 min, so the
 Space runs with `--no-dims` and `--no-save`. Behind a hosting proxy the app does not redirect to
 its own https port, `--port` defaults to `$PORT`, and the Dockerfile runs with `--no-https`.
 
 **Your own server.** It runs on CPU (three backbones + linear heads, a few seconds per photo,
-~3 GB RAM). Copy `src/` and `models/`, install `requirements.txt` (CPU torch) and run
-`src/app.py --port 8000 --token ...` behind HTTPS. Hosting is a deliberate decision for the team:
+~3 GB RAM). Clone the repository (or copy `src/` and `models/`), install CPU PyTorch and
+`requirements.txt`, and run `src/app.py --port 8000 --token ... --no-dims` behind HTTPS (sizes
+need a GPU to be quick). Hosting is a deliberate decision for the team:
 it publishes the service and its uploads.
 
 ## Reproducing the model
@@ -190,14 +210,14 @@ Classes: `fall_topple`, `rotational_slide`, `translational_slide`, `debris_flow`
 `earth_mud_flow`, `no_landslide` (+ `reject` for unusable photos). Definitions and Hungr 2014
 types: `src/common.py` and `labeling_guide.md`.
 
-**One GPU job at a time.** Qwen-VL uses ~6 GB of the 8 GB; running DINOv2 or ConvNeXt alongside
+**One GPU job at a time.** Qwen-VL uses ~6 GB of an 8 GB GPU; running DINOv2 or ConvNeXt alongside
 it fails (the probe falls back to CPU; CNN training does not). With little free RAM, run long GPU
 jobs in the foreground in chunks (`train_cnn.py --max-minutes 8 --resume`).
 
 - **Scenario B (default, what was done): we build the dataset** with steps 1-5 below.
 - **Scenario A: a labeled dataset is given.** Instead of steps 1-5:
   ```
-  .venv\Scripts\python src/import_dataset.py <dataset_folder> --name given
+  python src/import_dataset.py <dataset_folder> --name given
   ```
   Folder-per-class (`<label>/*.jpg`) or `<train|val|test>/<label>/*.jpg` both work; a CSV with
   `--csv`, `--image-col`, `--label-col` (and `--group-col`, `--split-col` if present) too.
@@ -231,9 +251,10 @@ jobs in the foreground in chunks (`train_cnn.py --max-minutes 8 --resume`).
 | 8. Check | `tools/check_integrity.py` | everything complete and consistent, no train/test leakage |
 | Credits | `tools/credits.py` | per-photo attribution `data/credits.csv`, licence summary `results/licences.md` |
 
-Collection results change over time (Commons/Openverse are live); `data/` is the frozen dataset
-to share (with `data/credits.csv`). `data/`, `results/` and the CNN checkpoint are not in the
-repository.
+Collection results change over time (Commons/Openverse are live); to reproduce the numbers, use
+the frozen dataset instead (next section). Every step writes its outputs (`data/`, `models/`,
+`results/`); of `results/`, only the short write-ups (`results/*.md`) and the test predictions
+they were computed from (`results/pred_*.csv`) are in the repository.
 
 ### Labeling rules (details: `labeling_guide.md`)
 - Label what is **visible**. Unusable photo (aerial, map, close-up, no slope, …): **R**.
@@ -251,6 +272,34 @@ writes `data/credits.csv`). 753 photos are non-commercial (NC) and 411 no-deriva
 for this course project, but credit every photo you show ("Title" by Author, Licence, URL), do not
 publish modified versions of ND photos, and remove NC photos before any commercial use.
 See `results/licences.md`.
+
+## Large files (dataset and baseline checkpoint)
+
+Not in git (GitHub refuses files over 100 MB, and the data is 2.2 GB), but published separately
+with a checksum for every file in `tools/assets_manifest.json`:
+
+| Part | Size | Needed for |
+|---|---|---|
+| `data/` (photos, labels, site splits, credits, cached embeddings) | 2.07 GB, 5,086 files | retraining, `src/eval.py`, `tools/system_test.py`, `tools/check_integrity.py` |
+| `models/cnn_convnext_tiny.fb_in22k_ft_in1k.pt` (ConvNeXt baseline) | 106 MB | the ConvNeXt row of the results |
+
+```
+python tools/fetch_assets.py                 # both, from the Hugging Face dataset in the manifest
+python tools/fetch_assets.py --only models   # or --only data
+python tools/fetch_assets.py --zip FILE_OR_URL   # the same files from a zip instead
+python tools/fetch_assets.py --check         # verify what is on disk (sizes + SHA-256)
+```
+
+The files land at the paths the code expects, whatever the clone's folder is called; a rerun
+fetches only what is missing, and the script exits with an error if any file is missing or
+differs from the manifest. With them, `python tools/check_integrity.py` prints ALL OK in a fresh
+clone. *Status: the Hugging Face dataset is not published yet; until it is, the script says so
+and `--zip` works with the zip from the maintainer.* Photos people send to the app (`data/app_uploads/`) are never included.
+Maintainers: `tools/pack_assets.py` rewrites the manifest and `--zip OUT.zip` / `--push USER/NAME`
+publish the files (after `hf auth login`).
+
+Every photo keeps its own licence (see [Photo licences](#photo-licences)): reuse them only with
+the credit in `data/credits.csv` and within each licence.
 
 ## Why these choices
 - **Zero-shot VLM is a baseline, not the main model.** LandslideBench (2026, overhead imagery)

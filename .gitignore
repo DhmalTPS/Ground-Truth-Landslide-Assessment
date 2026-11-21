@@ -1,7 +1,11 @@
 data/
 .venv/
 .cache/
-results/
+# run outputs stay local, except the short write-ups report.md cites and the test predictions
+# they were computed from (check_integrity.py reads both)
+results/*
+!results/*.md
+!results/pred_*.csv
 # trained models: only the small files the app needs are in the repository (< 1 MB);
 # the ConvNeXt baseline checkpoint (106 MB, over GitHub's 100 MB limit) and anything else stay local
 models/*

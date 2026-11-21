@@ -103,7 +103,7 @@ Openverse 86%.
   them as final, a teammate or faculty member must re-label the test split blind:
 
   ```
-  .venv\Scripts\python src/review.py --reviewer <name> --split test --relabel-others
+  python src/review.py --reviewer <name> --split test --relabel-others
   ```
 
   Human labels override AI labels automatically, and `src/eval.py` then reports Cohen's kappa
@@ -286,7 +286,7 @@ all translational_slide and earth_mud_flow) or human-checked labels (§2).
 ## 5. Field app
 
 ```
-.venv\Scripts\python src/app.py [--token SECRET] [--no-save]
+python src/app.py [--token SECRET] [--no-save]
 ```
 
 **To open it:** use the printed address on a phone on the same Wi-Fi or hotspot. If it doesn't

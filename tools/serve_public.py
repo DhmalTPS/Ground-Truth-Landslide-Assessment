@@ -1,12 +1,12 @@
-"""Put the app on a free public https link (Cloudflare quick tunnel) while this laptop runs it.
+"""Put the app on a free public https link (Cloudflare quick tunnel) while this computer runs it.
 
     python tools/serve_public.py                 # GPU app + sizes, photos not saved
     python tools/serve_public.py --save          # keep uploads in data/app_uploads (your own field tests)
     python tools/serve_public.py --no-dims       # type only (less GPU memory)
 
 The app itself listens on 127.0.0.1 only; cloudflared carries the https traffic to it. cloudflared is a general
-tool, so it lives outside the project: E:\cloudflared\cloudflared.exe (official release 2026.10.2, sha256
-12c7c887...b70f199), or set CLOUDFLARED=<path>, or have it on PATH. The link
+tool, so it lives outside the project: set CLOUDFLARED=<path>, or have it on PATH (on the development laptop
+E:\cloudflared\cloudflared.exe, official release 2026.10.2, is also tried). The link
 https://<random words>.trycloudflare.com changes on every start and works until you press Ctrl+C.
 """
 import argparse
@@ -21,8 +21,7 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CLOUDFLARED = Path(os.environ.get("CLOUDFLARED") or (r"E:\cloudflared\cloudflared.exe" if Path(r"E:\cloudflared\cloudflared.exe").exists()
-                   else shutil.which("cloudflared") or r"E:\cloudflared\cloudflared.exe"))
+CLOUDFLARED = Path(os.environ.get("CLOUDFLARED") or shutil.which("cloudflared") or r"E:\cloudflared\cloudflared.exe")
 LOGS = ROOT / "results" / "serve_public"
 
 
@@ -46,8 +45,8 @@ def main():
     ap.add_argument("--no-dims", action="store_true", help="no size estimate")
     a = ap.parse_args()
     if not CLOUDFLARED.exists():
-        sys.exit(f"missing {CLOUDFLARED} (download cloudflared-windows-amd64.exe from "
-                 "github.com/cloudflare/cloudflared/releases, save it there or set CLOUDFLARED)")
+        sys.exit("cloudflared not found: install it from github.com/cloudflare/cloudflared/releases "
+                 "(put it on PATH, or set CLOUDFLARED to its full path)")
     LOGS.mkdir(parents=True, exist_ok=True)
     cmd = [sys.executable, "-u", str(ROOT / "src" / "app.py"), "--host", "127.0.0.1", "--port", str(a.port)]
     cmd += [] if a.save else ["--no-save"]
