@@ -43,8 +43,11 @@ GitHub repository.
 
 ## Limits of this demo
 
-- It runs on 2 free CPU cores: a photo takes about 15–20 s, longer when several people use it at
-  once. The first visit after a quiet period wakes the app, which takes a minute or two.
+- It runs on a CPU, without a GPU. In a test on a laptop limited to 2 CPU threads, a photo took
+  6–19 s and the app took 27–46 s to start; this Space's hardware may be faster or slower, and a
+  photo takes longer when several people use it at once.
+- If the Space has been asleep, the first visit starts it again, which takes at least the startup
+  time above.
 - **Size estimates are switched off**: on a CPU one estimate takes several minutes. Run the app
   on a laptop with a GPU for sizes (see the repository).
 - Uploaded photos are not stored.

@@ -1,4 +1,4 @@
-# Hugging Face Space (Docker, free CPU: 2 vCPU, 16 GB RAM; sizes off: one estimate takes ~8 min on 2 CPU threads). Built by tools/build_hf_space.py.
+# Hugging Face Space (Docker, CPU: 2 vCPU, 16 GB RAM; sizes off: one estimate takes ~8 min on 2 CPU threads). Built by tools/build_hf_space.py.
 FROM python:3.11-slim
 RUN useradd -m -u 1000 user
 USER user
